@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算机视觉学习路线</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --accent: #00e5ff;
+    --accent-2: #7c4dff;
+    --accent-3: #ff6d00;
+    --text-primary: #eef0f6;
+    --text-muted: #6b6d7b;
+    --green: #00e676;
+    --grid-cell: #1e1e2e;
+    --grid-border: #2a2a3d;
+    --highlight: #ffab00;
+    --yellow: #ffe066;
+    --purple: #a855f7;
+    --pink: #ff3cac;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s 0.6s;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 标题页 */
+  .slide-title {
+    background: radial-gradient(ellipse at 30% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(124, 77, 255, 0.06) 0%, transparent 50%),
+                var(--bg);
+    text-align: center;
+  }
+
+  .slide-title .tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+  }
+
+  .slide-title h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #b0b8d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title .subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .slide-title .hint {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* 内容页 */
+  .slide-content {
+    align-items: flex-start;
+    background: var(--bg);
+  }
+
+  .section-tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+    opacity: 0.85;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .content-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .card {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .card:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .card:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .card:nth-child(4) { animation-delay: 0.3s; }
+  .slide.active .card:nth-child(5) { animation-delay: 0.4s; }
+  .slide.active .card:nth-child(6) { animation-delay: 0.5s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .card:nth-child(1)::before { background: var(--accent); }
+  .card:nth-child(2)::before { background: var(--accent-2); }
+  .card:nth-child(3)::before { background: var(--green); }
+  .card:nth-child(4)::before { background: var(--accent-3); }
+  .card:nth-child(5)::before { background: var(--purple); }
+  .card:nth-child(6)::before { background: var(--pink); }
+
+  .card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+
+  .card p {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card ul li {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .card ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .highlight {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .highlight-pink {
+    color: var(--pink);
+    font-weight: 600;
+  }
+
+  .highlight-green {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  .highlight-yellow {
+    color: var(--yellow);
+    font-weight: 600;
+  }
+
+  /* 路线图页 */
+  .roadmap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .roadmap-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  .slide.active .roadmap-item {
+    animation: fadeRight 0.5s ease forwards;
+  }
+
+  .slide.active .roadmap-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .roadmap-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .roadmap-item:nth-child(4) { animation-delay: 0.3s; }
+  .slide.active .roadmap-item:nth-child(5) { animation-delay: 0.4s; }
+
+  @keyframes fadeRight {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .roadmap-num {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 20px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .roadmap-item:nth-child(1) .roadmap-num { background: rgba(0, 229, 255, 0.15); color: var(--accent); }
+  .roadmap-item:nth-child(2) .roadmap-num { background: rgba(124, 77, 255, 0.15); color: var(--accent-2); }
+  .roadmap-item:nth-child(3) .roadmap-num { background: rgba(0, 230, 118, 0.15); color: var(--green); }
+  .roadmap-item:nth-child(4) .roadmap-num { background: rgba(255, 109, 0, 0.15); color: var(--accent-3); }
+  .roadmap-item:nth-child(5) .roadmap-num { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
+
+  .roadmap-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .roadmap-content p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* 模块页 */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .module-item {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 8px;
+    padding: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .module-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .module-item:nth-child(2) { animation-delay: 0.08s; }
+  .slide.active .module-item:nth-child(3) { animation-delay: 0.16s; }
+  .slide.active .module-item:nth-child(4) { animation-delay: 0.24s; }
+  .slide.active .module-item:nth-child(5) { animation-delay: 0.32s; }
+  .slide.active .module-item:nth-child(6) { animation-delay: 0.4s; }
+  .slide.active .module-item:nth-child(7) { animation-delay: 0.48s; }
+  .slide.active .module-item:nth-child(8) { animation-delay: 0.56s; }
+  .slide.active .module-item:nth-child(9) { animation-delay: 0.64s; }
+
+  .module-item h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+
+  .module-item p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* 总结页 */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .summary-item {
+    display: flex;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 8px;
+    padding: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .summary-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .summary-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .summary-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .summary-item:nth-child(4) { animation-delay: 0.3s; }
+
+  .summary-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: rgba(0, 229, 255, 0.1);
+    color: var(--accent);
+  }
+
+  .summary-item h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .summary-item p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* 导航栏 */
+  .nav-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    z-index: 100;
+  }
+
+  .nav-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--grid-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .nav-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .nav-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .nav-page {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 12px;
+  }
+
+  @media (max-width: 900px) {
+    .slide { padding: 30px 24px; }
+    .content-grid { grid-template-columns: 1fr; }
+    .content-grid.cols-3 { grid-template-columns: 1fr; }
+    .module-grid { grid-template-columns: 1fr 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- SLIDE 0: 标题页 -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag">AI · Computer Vision</div>
+    <h1>计算机视觉<span>学习路线</span></h1>
+    <p class="subtitle">从数学基础到工业部署的完整进阶之路</p>
+    <div class="hint">按 → 或点击底部导航切换页面</div>
+  </div>
+
+  <!-- SLIDE 1: 总览 -->
+  <div class="slide slide-content" data-index="1">
+    <div class="section-tag" style="color:var(--accent)">总览</div>
+    <h2>五大战役，完整进阶</h2>
+    <div class="roadmap">
+      <div class="roadmap-item">
+        <div class="roadmap-num">1</div>
+        <div class="roadmap-content">
+          <h3 style="color:var(--accent)">底层内功与算子重构</h3>
+          <p>数学基础、开发工具、深度学习通用基础</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">2</div>
+        <div class="roadmap-content">
+          <h3 style="color:var(--accent-2)">经典视觉主干与下游任务</h3>
+          <p>CNN骨干网络演进、目标检测、分割与跟踪</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">3</div>
+        <div class="roadmap-content">
+          <h3 style="color:var(--green)">Transformer与端到端新范式</h3>
+          <p>ViT、Swin Transformer、DETR家族</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">4</div>
+        <div class="roadmap-content">
+          <h3 style="color:var(--accent-3)">多模态智能与前沿风口</h3>
+          <p>CLIP、BLIP2、Grounding DINO、SAM</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-num">5</div>
+        <div class="roadmap-content">
+          <h3 style="color:var(--purple)">高性能架构与工业部署</h3>
+          <p>ONNX、TensorRT、模型量化、推理优化</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: 第一战役概述 -->
+  <div class="slide slide-content" data-index="2">
+    <div class="section-tag" style="color:var(--accent)">⚔️ 第一战役</div>
+    <h2>底层内功与算子重构</h2>
+    <div class="content-grid cols-3">
+      <div class="card">
+        <h3>模块1：数学具象化</h3>
+        <ul>
+          <li>线性代数核心：向量/矩阵/张量</li>
+          <li>微积分与反向传播</li>
+          <li>概率统计与损失能量</li>
+          <li>手写矩阵乘法与PCA</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>模块2：开发工具</h3>
+        <ul>
+          <li>NumPy、OpenCV、Matplotlib</li>
+          <li>PyTorch核心机制</li>
+          <li>手写算子：Linear、Conv2d</li>
+          <li>手写MaxPool、BatchNorm</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>模块3：深度学习基础</h3>
+        <ul>
+          <li>网络结构：MLP、激活函数</li>
+          <li>工业优化：SGD、Adam、AdamW</li>
+          <li>损失函数：CrossEntropy</li>
+          <li>Focal Loss、Dice Loss、IoU Loss</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 数学基础 -->
+  <div class="slide slide-content" data-index="3">
+    <div class="section-tag" style="color:var(--accent)">模块 1</div>
+    <h2>数学具象化与底层推导</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>线性代数核心</h3>
+        <p>向量/矩阵/张量的内存连续性、矩阵乘法（<span class="highlight">Q, K, V 矩阵变换的几何意义</span>）、SVD 分解、PCA 降维</p>
+        <p style="margin-top:8px; color:var(--accent)">手写攻关：NumPy 纯手写矩阵乘法与 PCA</p>
+      </div>
+      <div class="card">
+        <h3>微积分与反向传播</h3>
+        <p>偏导数、梯度、链式法则、梯度下降</p>
+        <p style="margin-top:8px; color:var(--accent)">公式推导：线性层 y = Wx + b 的梯度</p>
+      </div>
+      <div class="card">
+        <h3>概率统计与损失能量</h3>
+        <p>常见概率分布、<span class="highlight-pink">Softmax</span>、最大似然估计、贝叶斯理论、KL 散度</p>
+        <p style="margin-top:8px; color:var(--accent)">公式推导：交叉熵损失的导数</p>
+      </div>
+      <div class="card">
+        <h3>📚 推荐资料</h3>
+        <ul>
+          <li>《深度学习的数学》涌井良幸</li>
+          <li>《深度学习》花书前5章</li>
+          <li>李沐《动手学深度学习》前两单元</li>
+          <li>斯坦福 CS231n 前6讲</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 开发工具 -->
+  <div class="slide slide-content" data-index="4">
+    <div class="section-tag" style="color:var(--accent)">模块 2</div>
+    <h2>开发工具与标准框架</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>基础工具链</h3>
+        <ul>
+          <li><span class="highlight">numpy</span> - 矩阵化思维</li>
+          <li><span class="highlight">opencv-python</span> - 图像处理</li>
+          <li><span class="highlight">matplotlib</span> - 可视化分析</li>
+          <li><span class="highlight">pandas</span> - 数据分析</li>
+        </ul>
+        <p style="margin-top:12px; color:var(--accent)">通关练习：50 个 NumPy 核心矩阵练习</p>
+      </div>
+      <div class="card">
+        <h3>PyTorch 核心机制</h3>
+        <ul>
+          <li>Tensor 存储机制</li>
+          <li>Autograd 自动求导</li>
+          <li>Module 生命周期</li>
+          <li>Dataset/DataLoader 多线程加载</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>手写算子（重点）</h3>
+        <p style="color:var(--pink); font-weight:600; margin-bottom:8px">禁止直接调用 nn 库</p>
+        <ul>
+          <li>Linear（全连接层）</li>
+          <li>Conv2d（二维卷积）</li>
+          <li>MaxPool（最大池化）</li>
+          <li>BatchNorm（批归一化）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: 第二战役概述 -->
+  <div class="slide slide-content" data-index="5">
+    <div class="section-tag" style="color:var(--accent-2)">⚔️ 第二战役</div>
+    <h2>经典视觉主干与下游任务</h2>
+    <div class="content-grid cols-3">
+      <div class="card">
+        <h3>模块4：CNN骨干演进</h3>
+        <p>LeNet → AlexNet → VGG → GoogLeNet → <span class="highlight">ResNet</span> → DenseNet → MobileNet → EfficientNet</p>
+      </div>
+      <div class="card">
+        <h3>模块5：目标检测</h3>
+        <p><span class="highlight-pink">Two-Stage</span>：R-CNN → Fast R-CNN → Faster R-CNN → Mask R-CNN</p>
+        <p style="margin-top:8px"><span class="highlight-green">One-Stage</span>：SSD → YOLOv1 → YOLOv8 → YOLO11</p>
+      </div>
+      <div class="card">
+        <h3>模块6：分割与跟踪</h3>
+        <ul>
+          <li>FCN → U-Net → DeepLab → SAM</li>
+          <li>OCR：CRNN + CTC Loss</li>
+          <li>MOT：SORT → DeepSORT → ByteTrack</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: CNN骨干网络 -->
+  <div class="slide slide-content" data-index="6">
+    <div class="section-tag" style="color:var(--accent-2)">模块 4</div>
+    <h2>CNN 特征提取主干演进</h2>
+    <div class="module-grid">
+      <div class="module-item">
+        <h4>LeNet</h4>
+        <p>CNN开山之作，理解卷积替代全连接</p>
+      </div>
+      <div class="module-item">
+        <h4>AlexNet</h4>
+        <p>引入ReLU、Dropout、GPU并行训练</p>
+      </div>
+      <div class="module-item">
+        <h4>VGG</h4>
+        <p>3×3小卷积核替代大卷积核</p>
+      </div>
+      <div class="module-item">
+        <h4>GoogLeNet</h4>
+        <p>Inception模块，多尺度并行特征</p>
+      </div>
+      <div class="module-item">
+        <h4 style="color:var(--highlight)">ResNet ⭐</h4>
+        <p>残差连接解决梯度消失</p>
+      </div>
+      <div class="module-item">
+        <h4>MobileNet</h4>
+        <p>Depthwise + Pointwise轻量化</p>
+      </div>
+      <div class="module-item">
+        <h4>EfficientNet</h4>
+        <p>复合缩放：深度×宽度×分辨率</p>
+      </div>
+      <div class="module-item">
+        <h4>DenseNet</h4>
+        <p>极致特征复用（Dense Connection）</p>
+      </div>
+      <div class="module-item">
+        <h4>实战项目</h4>
+        <p>使用timm库训练CIFAR-100分类模型</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 目标检测 -->
+  <div class="slide slide-content" data-index="7">
+    <div class="section-tag" style="color:var(--accent-2)">模块 5</div>
+    <h2>目标检测两大范式</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">Two-Stage（两阶段）</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">R-CNN → SPPNet → Fast R-CNN → Faster R-CNN → Mask R-CNN</p>
+        <ul>
+          <li>ROI Pooling 与 ROI Align</li>
+          <li>RPN（区域生成网络）</li>
+          <li>Proposal 筛选</li>
+          <li>Anchor 的概念</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--pink)">One-Stage（一阶段）</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">SSD → RetinaNet → YOLOv1 → YOLOv8 → YOLO11</p>
+        <ul>
+          <li>Anchor-Based → <span class="highlight-green">Anchor-Free</span></li>
+          <li>动态标签分配（SimOTA）</li>
+          <li>特征融合：FPN → PAN → BiFPN</li>
+          <li>CSP（跨阶段局部网络）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px; max-width:1200px; width:100%">
+      <h3>🏁 实战项目</h3>
+      <p>克隆 <span class="highlight">ultralytics/ultralytics</span> 仓库，在 VOC/COCO 数据集上跑通 YOLO11 训练，分析检测头源码</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: 第三战役概述 -->
+  <div class="slide slide-content" data-index="8">
+    <div class="section-tag" style="color:var(--green)">⚔️ 第三战役</div>
+    <h2>Transformer 架构与端到端新范式</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>模块7：视觉 Transformer</h3>
+        <ul>
+          <li>标准 Transformer 源码级拆解</li>
+          <li>Self-Attention → Multi-Head</li>
+          <li>Vision Transformer (ViT)</li>
+          <li>Swin Transformer（窗口注意力）</li>
+          <li>ConvNeXt（现代CNN反向优化）</li>
+        </ul>
+        <p style="margin-top:12px; color:var(--accent)">硬核手写：纯手写多头注意力与ViT</p>
+      </div>
+      <div class="card">
+        <h3>模块8：DETR 家族</h3>
+        <ul>
+          <li>DETR：Object Query + 匈牙利匹配</li>
+          <li>Deformable DETR：可变形注意力</li>
+          <li>DAB-DETR & DN-DETR</li>
+          <li><span class="highlight-green">DINO</span>：现代DETR巅峰</li>
+          <li><span class="highlight">RT-DETR</span>：实时化王牌</li>
+        </ul>
+        <p style="margin-top:12px; color:var(--accent)">源码必读：facebookresearch/detr</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: 第四战役 -->
+  <div class="slide slide-content" data-index="9">
+    <div class="section-tag" style="color:var(--accent-3)">⚔️ 第四战役</div>
+    <h2>多模态智能与前沿风口</h2>
+    <div class="content-grid cols-3">
+      <div class="card">
+        <h3>CLIP</h3>
+        <p>OpenAI巨作，<span class="highlight">对比学习</span>将视觉与文本特征空间对齐</p>
+        <p style="margin-top:8px; color:var(--text-muted)">千万级图文对训练</p>
+      </div>
+      <div class="card">
+        <h3>BLIP2 / Qwen-VL</h3>
+        <p>Q-Former解决Vision Token过长</p>
+        <p style="margin-top:8px; color:var(--text-muted)">Vision Encoder → Projection → LLM</p>
+      </div>
+      <div class="card">
+        <h3>Grounding DINO</h3>
+        <p><span class="highlight-pink">开放词汇</span>目标检测</p>
+        <p style="margin-top:8px; color:var(--text-muted)">文本提示词 + 图像特征跨注意力融合</p>
+      </div>
+      <div class="card">
+        <h3>SAM / SAM2</h3>
+        <p>Segment Anything</p>
+        <p style="margin-top:8px; color:var(--text-muted)">支持点、框、文本作为Prompt</p>
+      </div>
+      <div class="card">
+        <h3>🏁 交付成果</h3>
+        <p><span class="highlight-green">零样本自动标注系统</span></p>
+        <p style="margin-top:8px; color:var(--text-muted)">Grounding DINO + SAM，输入文本自动输出检测框和分割Mask</p>
+      </div>
+      <div class="card">
+        <h3>📚 核心论文</h3>
+        <ul>
+          <li>CLIP</li>
+          <li>SAM/SAM2</li>
+          <li>Grounding DINO</li>
+          <li>Qwen-VL Technical Report</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: 第五战役 -->
+  <div class="slide slide-content" data-index="10">
+    <div class="section-tag" style="color:var(--purple)">⚔️ 第五战役</div>
+    <h2>高性能架构与工业部署</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>计算图与模型转换</h3>
+        <ul>
+          <li>算子融合（Operator Fusion）</li>
+          <li>PyTorch → ONNX → TensorRT</li>
+          <li>OpenVINO / RKNN 导出</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>模型量化</h3>
+        <ul>
+          <li><span class="highlight">PTQ</span>（训练后量化）</li>
+          <li><span class="highlight">QAT</span>（量化感知训练）</li>
+          <li>FP32 → INT8 映射机制</li>
+          <li>KL散度寻找最佳截断阈值</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>高性能计算底层</h3>
+        <ul>
+          <li>GPU硬件架构（SM、Tensor Core）</li>
+          <li>显存层级、带宽瓶颈分析</li>
+          <li>TensorRT Custom Plugin</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🏁 交付成果</h3>
+        <p><span class="highlight-green">企业级视觉AI推理平台</span></p>
+        <p style="margin-top:8px">RT-DETR INT8量化 → TensorRT Engine → Triton推理服务</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: 总结 -->
+  <div class="slide slide-content" data-index="11">
+    <div class="section-tag" style="color:var(--accent)">总结</div>
+    <h2>执行铁律</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-icon" style="background:rgba(0,229,255,0.15)">🔄</div>
+        <div>
+          <h3>"演进"思维</h3>
+          <p>看任何模型，先问三件事：<span class="highlight">它的前任是谁？前任有什么痛点？它用了什么黑科技干掉痛点？</span></p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon" style="background:rgba(124,77,255,0.15)">📐</div>
+        <div>
+          <h3>"Shape" 思维</h3>
+          <p>看源码不要迷失在条件分支里，拿一个单步样本带入，死死盯住每一层 forward 之后的 <span class="highlight">Tensor Shape</span> 变换</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon" style="background:rgba(0,230,118,0.15)">💻</div>
+        <div>
+          <h3>"手写" 精神</h3>
+          <p>所有核心算子至少手写实现一次，<span class="highlight-green">禁止直接调用高级API</span>，理解底层原理</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon" style="background:rgba(255,109,0,0.15)">🚀</div>
+        <div>
+          <h3>"实战" 导向</h3>
+          <p>每个阶段都有明确的<span class="highlight-yellow">交付成果</span>，从手写算子到工业级部署，打通全链路</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 导航栏 -->
+<div class="nav-bar">
+  <div class="nav-progress" id="navProgress"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <span class="nav-page" id="pageIndicator">1 / 12</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  const navProgress = document.getElementById('navProgress');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    navProgress.appendChild(dot);
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+  }
+
+  function navigate(dir) {
+    goTo(currentSlide + dir);
+  }
+
+  function updateNav() {
+    document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+      dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    });
+    document.getElementById('pageIndicator').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    document.getElementById('btnPrev').disabled = currentSlide === 0;
+    document.getElementById('btnNext').disabled = currentSlide === totalSlides - 1;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      navigate(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      navigate(-1);
+    }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) navigate(1);
+      else navigate(-1);
+    }
+  });
+
+  updateNav();
+</script>
+
+</body>
+</html>

@@ -1,29 +1,36 @@
 [
   {
     "id": "deep-learning",
-    "name": "Deep Learning",
-    "description": "",
+    "name": "深度学习",
+    "description": "深度学习基础知识",
     "presentations": [
       {
         "id": "activation",
-        "title": "Activation",
-        "description": "",
+        "title": "激活函数",
+        "description": "激活函数详解",
         "file": "presentation.html",
-        "totalSlides": 8
+        "totalSlides": 10
       },
       {
         "id": "pooling",
-        "title": "Pooling",
-        "description": "",
+        "title": "池化",
+        "description": "池化技术详解",
         "file": "presentation.html",
         "totalSlides": 8
       },
       {
         "id": "resnet",
-        "title": "Resnet",
-        "description": "",
+        "title": "ResNet",
+        "description": "残差网络详解",
         "file": "presentation.html",
-        "totalSlides": 8
+        "totalSlides": 10
+      },
+      {
+        "id": "cv-learning-path",
+        "title": "计算机视觉学习路线",
+        "description": "从数学基础到工业部署的完整进阶之路",
+        "file": "presentation.html",
+        "totalSlides": 12
       }
     ]
   }
