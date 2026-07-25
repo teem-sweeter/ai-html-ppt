@@ -134,10 +134,40 @@
     50% { opacity: 0.7; }
   }
 
+  /* 页眉 */
+  .slide-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(10, 10, 15, 0.9);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    z-index: 10;
+  }
+
+  .slide-header .header-title {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .slide-header .header-page {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
   /* 内容页 */
   .slide-content {
     align-items: flex-start;
     background: var(--bg);
+    padding-top: 60px;
   }
 
   .section-tag {
@@ -520,6 +550,10 @@
 
   <!-- SLIDE 1: 总览 -->
   <div class="slide slide-content" data-index="1">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">1 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent)">总览</div>
     <h2>五大阶段，完整进阶</h2>
     <div class="roadmap">
@@ -563,6 +597,10 @@
 
   <!-- SLIDE 2: 第一阶段概述 -->
   <div class="slide slide-content" data-index="2">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">2 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent)">第一阶段</div>
     <h2>基础入门</h2>
     <div class="content-grid cols-3">
@@ -598,6 +636,10 @@
 
   <!-- SLIDE 3: Python基础 -->
   <div class="slide slide-content" data-index="3">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">3 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent)">模块 1</div>
     <h2>Python 编程基础</h2>
     <div class="content-grid">
@@ -630,6 +672,10 @@
 
   <!-- SLIDE 4: 数学基础 -->
   <div class="slide slide-content" data-index="4">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">4 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent)">模块 2</div>
     <h2>数学基础</h2>
     <div class="content-grid">
@@ -665,6 +711,10 @@
 
   <!-- SLIDE 5: 深度学习入门 -->
   <div class="slide slide-content" data-index="5">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">5 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent)">模块 3</div>
     <h2>深度学习入门</h2>
     <div class="content-grid">
@@ -724,6 +774,10 @@
 
   <!-- SLIDE 6: 第二阶段概述 -->
   <div class="slide slide-content" data-index="6">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">6 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent-2)">第二阶段</div>
     <h2>经典视觉主干与下游任务</h2>
     <div class="content-grid cols-3">
@@ -749,6 +803,10 @@
 
   <!-- SLIDE 7: CNN骨干网络 -->
   <div class="slide slide-content" data-index="7">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">7 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent-2)">模块 4</div>
     <h2>CNN 特征提取主干演进</h2>
     <div class="module-grid">
@@ -793,6 +851,10 @@
 
   <!-- SLIDE 8: 目标检测 -->
   <div class="slide slide-content" data-index="8">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">8 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent-2)">模块 5</div>
     <h2>目标检测两大范式</h2>
     <div class="content-grid">
@@ -825,6 +887,10 @@
 
   <!-- SLIDE 9: 分割与跟踪 -->
   <div class="slide slide-content" data-index="9">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">9 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent-2)">模块 3</div>
     <h2>图像分割与目标跟踪</h2>
     <div class="content-grid">
@@ -863,6 +929,10 @@
 
   <!-- SLIDE 10: 第三阶段概述 -->
   <div class="slide slide-content" data-index="10">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">10 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--green)">第三阶段</div>
     <h2>Transformer 架构与端到端新范式</h2>
     <div class="content-grid">
@@ -893,6 +963,10 @@
 
   <!-- SLIDE 11: ViT/Swin Transformer -->
   <div class="slide slide-content" data-index="11">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">11 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--green)">模块 1</div>
     <h2>视觉 Transformer</h2>
     <div class="content-grid">
@@ -943,6 +1017,10 @@
 
   <!-- SLIDE 12: DETR家族 -->
   <div class="slide slide-content" data-index="12">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">12 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--green)">模块 2</div>
     <h2>DETR 家族（端到端检测）</h2>
     <div class="content-grid">
@@ -988,6 +1066,10 @@
 
   <!-- SLIDE 13: 第四阶段 -->
   <div class="slide slide-content" data-index="13">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">13 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent-3)">第四阶段</div>
     <h2>多模态智能与前沿风口</h2>
     <div class="content-grid cols-3">
@@ -1030,6 +1112,10 @@
 
   <!-- SLIDE 14: 多模态模型 -->
   <div class="slide slide-content" data-index="14">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">14 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent-3)">模块 1-4</div>
     <h2>视觉-语言大模型</h2>
     <div class="content-grid">
@@ -1078,6 +1164,10 @@
 
   <!-- SLIDE 15: 第五阶段 -->
   <div class="slide slide-content" data-index="15">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">15 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--purple)">第五阶段</div>
     <h2>高性能架构与工业部署</h2>
     <div class="content-grid">
@@ -1116,6 +1206,10 @@
 
   <!-- SLIDE 16: 模型部署详情 -->
   <div class="slide slide-content" data-index="16">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">16 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--purple)">模块 1-3</div>
     <h2>工业级模型部署</h2>
     <div class="content-grid">
@@ -1164,6 +1258,10 @@
 
   <!-- SLIDE 17: 总结 -->
   <div class="slide slide-content" data-index="17">
+    <div class="slide-header">
+      <span class="header-title">计算机视觉学习路线</span>
+      <span class="header-page">17 / 17</span>
+    </div>
     <div class="section-tag" style="color:var(--accent)">总结</div>
     <h2>执行铁律</h2>
     <div class="summary-grid">
