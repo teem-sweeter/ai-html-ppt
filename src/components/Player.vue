@@ -9,6 +9,10 @@
         :style="{ visibility: iframeReady ? 'visible' : 'hidden' }"
         @load="onIframeLoad"
       ></iframe>
+      <div v-if="!iframeReady" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+      </div>
       <button class="fullscreen-btn" @click.stop="toggleFullscreen" :title="isFullscreen ? '退出全屏' : '全屏'">
         {{ isFullscreen ? '⊡' : '⛶' }}
       </button>
@@ -227,6 +231,37 @@ onUnmounted(() => {
   opacity: 0;
   transition: opacity 0.2s ease;
   background: linear-gradient(-90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  z-index: 5;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--surface-2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 .fullscreen-btn {
