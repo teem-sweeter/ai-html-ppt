@@ -58,7 +58,7 @@ watch(currentPptId, () => {
       />
       <ProgressBar 
         v-if="currentPresentation"
-        :total="currentPresentation.slides.length"
+        :total="currentPresentation.totalSlides"
         :current="currentPage"
         @update:current-page="currentPage = $event"
       />

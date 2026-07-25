@@ -1,7 +1,14 @@
 <template>
   <div class="player">
     <div class="slide-container" ref="slideContainer" @click="handleClick">
-      <component :is="currentSlideComponent" class="slide active" />
+      <iframe
+        ref="iframeRef"
+        class="slide-iframe"
+        frameborder="0"
+        :src="iframeUrl"
+        :style="{ visibility: iframeReady ? 'visible' : 'hidden' }"
+        @load="onIframeLoad"
+      ></iframe>
       <button class="fullscreen-btn" @click.stop="toggleFullscreen" :title="isFullscreen ? '退出全屏' : '全屏'">
         {{ isFullscreen ? '⊡' : '⛶' }}
       </button>
@@ -10,13 +17,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, defineAsyncComponent } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 interface Presentation {
   id: string
   title: string
   description: string
-  slides: Array<() => Promise<any>>
+  workspace: string
+  file: string
+  totalSlides: number
 }
 
 const props = defineProps<{
@@ -28,27 +37,76 @@ const emit = defineEmits<{
   'update:currentPage': [page: number]
 }>()
 
-const loading = ref(false)
 const isFullscreen = ref(false)
 const slideContainer = ref<HTMLDivElement | null>(null)
+const iframeRef = ref<HTMLIFrameElement | null>(null)
+const iframeReady = ref(false)
 const touchStartX = ref(0)
+let needsNavigate = false
 
-const currentSlideComponent = computed(() => {
-  if (!props.presentation.slides[props.currentPage]) {
-    return null
+const iframeUrl = ref('')
+
+function getIframeUrl() {
+  return `/workspaces/${props.presentation.workspace}/${props.presentation.id}/${props.presentation.file}`
+}
+
+function goToSlide(index: number) {
+  if (!iframeRef.value?.contentWindow) return
+  try {
+    iframeRef.value.contentWindow.postMessage({ type: 'goToSlide', index }, '*')
+  } catch (e) {
+    console.error('postMessage error:', e)
   }
-  return defineAsyncComponent(() => {
-    loading.value = true
-    return props.presentation.slides[props.currentPage]().finally(() => {
-      loading.value = false
-    })
-  })
+}
+
+function onIframeLoad() {
+  injectControlScript()
+  if (needsNavigate) {
+    setTimeout(() => {
+      goToSlide(props.currentPage)
+      iframeReady.value = true
+    }, 100)
+    needsNavigate = false
+  } else {
+    iframeReady.value = true
+  }
+}
+
+function injectControlScript() {
+  if (!iframeRef.value?.contentDocument) return
+  try {
+    const script = iframeRef.value.contentDocument.createElement('script')
+    script.textContent = `
+      var navBar = document.querySelector('.nav-bar');
+      if (navBar) navBar.style.display = 'none';
+      var pres = document.querySelector('.presentation');
+      if (pres) { pres.style.width = '100vw'; pres.style.height = '100vh'; }
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'goToSlide') {
+          if (typeof goTo === 'function') { goTo(e.data.index); }
+        }
+      });
+    `
+    iframeRef.value.contentDocument.head.appendChild(script)
+  } catch (e) {
+    console.error('inject script error:', e)
+  }
+}
+
+watch(() => props.currentPage, (newPage) => {
+  goToSlide(newPage)
 })
+
+watch(() => [props.presentation.workspace, props.presentation.id], () => {
+  needsNavigate = true
+  iframeReady.value = false
+  iframeUrl.value = getIframeUrl()
+}, { immediate: false })
 
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') {
     event.preventDefault()
-    if (props.currentPage < props.presentation.slides.length - 1) {
+    if (props.currentPage < props.presentation.totalSlides - 1) {
       emit('update:currentPage', props.currentPage + 1)
     }
   } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
@@ -61,44 +119,24 @@ function handleKeydown(event: KeyboardEvent) {
 
 function toggleFullscreen() {
   if (!slideContainer.value) return
-  
   if (!document.fullscreenElement) {
-    slideContainer.value.requestFullscreen().then(() => {
-      isFullscreen.value = true
-    }).catch(err => {
-      console.log('全屏请求失败:', err)
-    })
+    slideContainer.value.requestFullscreen().then(() => { isFullscreen.value = true })
   } else {
-    document.exitFullscreen().then(() => {
-      isFullscreen.value = false
-    }).catch(err => {
-      console.log('退出全屏失败:', err)
-    })
+    document.exitFullscreen().then(() => { isFullscreen.value = false })
   }
 }
 
 function handleFullscreenChange() {
-  // 检查当前全屏元素是否是slideContainer
-  isFullscreen.value = document.fullscreenElement === slideContainer.value
+  isFullscreen.value = !!document.fullscreenElement
 }
 
 function handleClick(event: MouseEvent) {
-  const container = event.currentTarget as HTMLElement
-  const rect = container.getBoundingClientRect()
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
   const clickX = event.clientX - rect.left
-  const containerWidth = rect.width
-  
-  // 点击左侧1/3区域上一页，右侧2/3区域下一页
-  if (clickX < containerWidth / 3) {
-    // 上一页
-    if (props.currentPage > 0) {
-      emit('update:currentPage', props.currentPage - 1)
-    }
+  if (clickX < rect.width / 3) {
+    if (props.currentPage > 0) emit('update:currentPage', props.currentPage - 1)
   } else {
-    // 下一页
-    if (props.currentPage < props.presentation.slides.length - 1) {
-      emit('update:currentPage', props.currentPage + 1)
-    }
+    if (props.currentPage < props.presentation.totalSlides - 1) emit('update:currentPage', props.currentPage + 1)
   }
 }
 
@@ -107,21 +145,12 @@ function handleTouchStart(event: TouchEvent) {
 }
 
 function handleTouchEnd(event: TouchEvent) {
-  const touchEndX = event.changedTouches[0].screenX
-  const diff = touchStartX.value - touchEndX
-  
-  // 滑动距离超过60px时触发翻页
+  const diff = touchStartX.value - event.changedTouches[0].screenX
   if (Math.abs(diff) > 60) {
-    if (diff > 0) {
-      // 向左滑动，下一页
-      if (props.currentPage < props.presentation.slides.length - 1) {
-        emit('update:currentPage', props.currentPage + 1)
-      }
-    } else {
-      // 向右滑动，上一页
-      if (props.currentPage > 0) {
-        emit('update:currentPage', props.currentPage - 1)
-      }
+    if (diff > 0 && props.currentPage < props.presentation.totalSlides - 1) {
+      emit('update:currentPage', props.currentPage + 1)
+    } else if (diff < 0 && props.currentPage > 0) {
+      emit('update:currentPage', props.currentPage - 1)
     }
   }
 }
@@ -129,23 +158,18 @@ function handleTouchEnd(event: TouchEvent) {
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   document.addEventListener('fullscreenchange', handleFullscreenChange)
-  
-  // 添加触摸事件监听器
-  if (slideContainer.value) {
-    slideContainer.value.addEventListener('touchstart', handleTouchStart)
-    slideContainer.value.addEventListener('touchend', handleTouchEnd)
-  }
+  slideContainer.value?.addEventListener('touchstart', handleTouchStart)
+  slideContainer.value?.addEventListener('touchend', handleTouchEnd)
+  needsNavigate = true
+  iframeReady.value = false
+  iframeUrl.value = getIframeUrl()
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
-  
-  // 移除触摸事件监听器
-  if (slideContainer.value) {
-    slideContainer.value.removeEventListener('touchstart', handleTouchStart)
-    slideContainer.value.removeEventListener('touchend', handleTouchEnd)
-  }
+  slideContainer.value?.removeEventListener('touchstart', handleTouchStart)
+  slideContainer.value?.removeEventListener('touchend', handleTouchEnd)
 })
 </script>
 
@@ -171,16 +195,11 @@ onUnmounted(() => {
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
-/* 点击区域提示 */
-.slide-container::before,
-.slide-container::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+.slide-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
 }
 
 .slide-container:hover::before,
@@ -189,28 +208,35 @@ onUnmounted(() => {
 }
 
 .slide-container::before {
-  left: 0;
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
   width: 33%;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
   background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
 }
 
 .slide-container::after {
-  right: 0;
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
   width: 67%;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
   background: linear-gradient(-90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
 }
 
-/* 全屏按钮 */
 .fullscreen-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 10px; right: 10px;
   z-index: 20;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -218,52 +244,26 @@ onUnmounted(() => {
   justify-content: center;
   font-size: 18px;
   opacity: 0;
-  transition: opacity 0.2s ease, background 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
-.slide-container:hover .fullscreen-btn {
-  opacity: 1;
-}
+.slide-container:hover .fullscreen-btn { opacity: 1; }
+.fullscreen-btn:hover { background: rgba(0, 0, 0, 0.8); border-color: var(--accent); }
 
-.fullscreen-btn:hover {
-  background: rgba(0, 0, 0, 0.8);
-  border-color: var(--accent);
-}
-
-/* 全屏状态样式 */
 .slide-container:fullscreen {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  aspect-ratio: auto;
-  border-radius: 0;
-  box-shadow: none;
+  width: 100vw; height: 100vh;
+  max-width: none; aspect-ratio: auto;
+  border-radius: 0; box-shadow: none;
 }
 
 .slide-container:fullscreen .fullscreen-btn {
-  opacity: 1;
-  top: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
-  font-size: 22px;
+  opacity: 1; top: 20px; right: 20px;
+  width: 44px; height: 44px; font-size: 22px;
 }
 
-/* 响应式调整 */
 @media (max-width: 768px) {
-  .player {
-    padding: 0.5rem;
-  }
-  
-  .slide-container {
-    border-radius: 2px;
-  }
-  
-  .fullscreen-btn {
-    opacity: 1;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
+  .player { padding: 0.5rem; }
+  .slide-container { border-radius: 2px; }
+  .fullscreen-btn { opacity: 1; width: 32px; height: 32px; font-size: 16px; }
 }
 </style>

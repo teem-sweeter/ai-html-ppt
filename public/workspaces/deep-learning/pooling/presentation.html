@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深度学习 - 池化 (Pooling)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --accent: #00e5ff;
+    --accent-2: #7c4dff;
+    --accent-3: #ff6d00;
+    --text-primary: #eef0f6;
+    --text-muted: #6b6d7b;
+    --green: #00e676;
+    --grid-cell: #1e1e2e;
+    --grid-border: #2a2a3d;
+    --highlight: #ffab00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans SC', 'Inter', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s 0.6s;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ===== SLIDE 0: TITLE ===== */
+  .slide-title {
+    background: radial-gradient(ellipse at 30% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(124, 77, 255, 0.06) 0%, transparent 50%),
+                var(--bg);
+  }
+
+  .slide-title .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+  }
+
+  .slide-title h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #b0b8d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title .subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  .slide-title .hint {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* ===== SLIDE 1: CONCEPT ===== */
+  .slide-concept {
+    background: radial-gradient(ellipse at 20% 80%, rgba(124, 77, 255, 0.06) 0%, transparent 50%),
+                var(--bg);
+    align-items: flex-start;
+  }
+
+  .slide-concept .section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--accent-2);
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  .slide-concept h2 {
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 900;
+    margin-bottom: 48px;
+    line-height: 1.2;
+  }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .concept-card {
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .slide.active .concept-card:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .concept-card:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .concept-card:nth-child(4) { animation-delay: 0.3s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .concept-card:nth-child(1)::before { background: var(--accent); }
+  .concept-card:nth-child(2)::before { background: var(--accent-2); }
+  .concept-card:nth-child(3)::before { background: var(--green); }
+  .concept-card:nth-child(4)::before { background: var(--accent-3); }
+
+  .concept-card .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 42px;
+    font-weight: 700;
+    opacity: 0.08;
+    position: absolute;
+    top: 12px;
+    right: 20px;
+  }
+
+  .concept-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+  }
+
+  .concept-card p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  /* ===== SLIDE 2-5: CALCULATION STEPS ===== */
+  .slide-calc {
+    background: var(--bg);
+    align-items: flex-start;
+  }
+
+  .calc-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .step-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 5px 14px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .calc-header h2 {
+    font-size: clamp(24px, 3.5vw, 40px);
+    font-weight: 900;
+  }
+
+  .calc-body {
+    display: flex;
+    gap: 48px;
+    width: 100%;
+    max-width: 1100px;
+    align-items: center;
+  }
+
+  /* Grid styles */
+  .grid-wrapper {
+    flex-shrink: 0;
+  }
+
+  .grid-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .matrix-4x4 {
+    display: grid;
+    grid-template-columns: repeat(4, 64px);
+    grid-template-rows: repeat(4, 64px);
+    gap: 3px;
+  }
+
+  .matrix-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    background: var(--grid-cell);
+    border: 1px solid var(--grid-border);
+    border-radius: 3px;
+    transition: all 0.4s ease;
+    position: relative;
+  }
+
+  .matrix-cell.active-cell {
+    background: rgba(0, 229, 255, 0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+  }
+
+  .matrix-cell.max-cell {
+    background: rgba(255, 171, 0, 0.2);
+    border-color: var(--highlight);
+    color: var(--highlight);
+    box-shadow: 0 0 24px rgba(255, 171, 0, 0.2);
+    z-index: 2;
+  }
+
+  .matrix-cell.dim-cell {
+    opacity: 0.2;
+  }
+
+  /* Arrow */
+  .arrow-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .arrow-line {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    position: relative;
+  }
+
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    top: -6px;
+    border: 7px solid transparent;
+    border-left: 10px solid var(--accent-2);
+  }
+
+  /* Result grid */
+  .matrix-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 80px);
+    grid-template-rows: repeat(2, 80px);
+    gap: 4px;
+  }
+
+  .matrix-2x2 .matrix-cell {
+    font-size: 28px;
+    background: var(--surface-2);
+    border-color: var(--grid-border);
+    transition: all 0.4s ease;
+  }
+
+  .matrix-2x2 .matrix-cell.result-new {
+    background: rgba(255, 171, 0, 0.15);
+    border-color: var(--highlight);
+    color: var(--highlight);
+    box-shadow: 0 0 20px rgba(255, 171, 0, 0.15);
+  }
+
+  /* Formula */
+  .formula-section {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px 32px;
+    max-width: 420px;
+    flex: 1;
+  }
+
+  .formula-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .formula-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .formula-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    background: var(--grid-cell);
+    border: 1px solid var(--grid-border);
+    padding: 8px 16px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  .formula-result {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  .formula-result strong {
+    color: var(--highlight);
+    font-size: 22px;
+  }
+
+  /* ===== SLIDE 6: FINAL RESULT ===== */
+  .slide-final {
+    background: radial-gradient(ellipse at 50% 50%, rgba(255, 171, 0, 0.05) 0%, transparent 60%),
+                var(--bg);
+    text-align: center;
+  }
+
+  .slide-final h2 {
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 900;
+    margin-bottom: 48px;
+  }
+
+  .final-layout {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+
+  .final-4x4 .matrix-4x4 {
+    grid-template-columns: repeat(4, 72px);
+    grid-template-rows: repeat(4, 72px);
+  }
+
+  .final-2x2 .matrix-2x2 {
+    grid-template-columns: repeat(2, 100px);
+    grid-template-rows: repeat(2, 100px);
+  }
+
+  .final-2x2 .matrix-cell {
+    font-size: 36px;
+    background: rgba(255, 171, 0, 0.12);
+    border-color: var(--highlight);
+    color: var(--highlight);
+    box-shadow: 0 0 30px rgba(255, 171, 0, 0.12);
+  }
+
+  .final-note {
+    margin-top: 40px;
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .final-note strong {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ===== SLIDE 7: SUMMARY ===== */
+  .slide-summary {
+    background: radial-gradient(ellipse at 70% 30%, rgba(0, 230, 118, 0.06) 0%, transparent 50%),
+                var(--bg);
+    align-items: flex-start;
+  }
+
+  .slide-summary h2 {
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 900;
+    margin-bottom: 40px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .summary-item {
+    display: flex;
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 28px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .summary-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .slide.active .summary-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .summary-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .summary-item:nth-child(4) { animation-delay: 0.3s; }
+
+  .summary-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .summary-item:nth-child(1) .summary-icon { background: rgba(0, 229, 255, 0.12); color: var(--accent); }
+  .summary-item:nth-child(2) .summary-icon { background: rgba(124, 77, 255, 0.12); color: var(--accent-2); }
+  .summary-item:nth-child(3) .summary-icon { background: rgba(0, 230, 118, 0.12); color: var(--green); }
+  .summary-item:nth-child(4) .summary-icon { background: rgba(255, 109, 0, 0.12); color: var(--accent-3); }
+
+  .summary-item h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .summary-item p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* ===== NAVIGATION ===== */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    z-index: 100;
+  }
+
+  .nav-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--grid-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .nav-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .nav-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .nav-btn:disabled:hover {
+    border-color: var(--grid-border);
+    color: var(--text-muted);
+  }
+
+  .nav-page {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 12px;
+  }
+
+  /* ===== POOLING TYPE TABS (slide 1) ===== */
+  .pool-type-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .pool-type-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    border: 1px solid var(--grid-border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: default;
+    transition: all 0.3s ease;
+  }
+
+  .pool-type-badge:nth-child(1) { border-color: rgba(0, 229, 255, 0.4); color: var(--accent); }
+
+  /* Regions overlay on 4x4 */
+  .region-label {
+    position: absolute;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 2px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 10;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .slide { padding: 40px 32px; }
+    .calc-body { flex-direction: column; gap: 32px; }
+    .concept-grid { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .final-layout { flex-direction: column; gap: 32px; }
+    .matrix-4x4 { grid-template-columns: repeat(4, 52px); grid-template-rows: repeat(4, 52px); }
+    .matrix-cell { font-size: 16px; }
+    .matrix-2x2 { grid-template-columns: repeat(2, 64px); grid-template-rows: repeat(2, 64px); }
+    .matrix-2x2 .matrix-cell { font-size: 22px; }
+    .final-4x4 .matrix-4x4 { grid-template-columns: repeat(4, 52px); grid-template-rows: repeat(4, 52px); }
+    .final-2x2 .matrix-2x2 { grid-template-columns: repeat(2, 72px); grid-template-rows: repeat(2, 72px); }
+    .final-2x2 .matrix-cell { font-size: 28px; }
+    .formula-section { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- SLIDE 0: Title -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag">Deep Learning · CNN</div>
+    <h1>深度学习中的<span>池化</span></h1>
+    <p class="subtitle">Pooling — 用更少的信息量保留最重要的内容</p>
+    <div class="hint">按 → 或 点击下方导航 切换页面</div>
+  </div>
+
+  <!-- SLIDE 1: Concept -->
+  <div class="slide slide-concept" data-index="1">
+    <div class="section-tag">01 / 核心概念</div>
+    <h2>什么是池化？</h2>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="num">01</div>
+        <h3>下采样操作</h3>
+        <p>池化在空间维度上对特征图进行压缩，用一个值来概括局部区域的信息，将一小块区域"浓缩"成一个值。</p>
+      </div>
+      <div class="concept-card">
+        <div class="num">02</div>
+        <h3>降低计算量</h3>
+        <p>特征图尺寸缩小后，后续层的参数和计算量大幅减少，提升网络运行效率。</p>
+      </div>
+      <div class="concept-card">
+        <div class="num">03</div>
+        <h3>提取主要特征</h3>
+        <p>保留最突出的信息，过滤掉不重要的细节，提取局部最显著的特征响应。</p>
+      </div>
+      <div class="concept-card">
+        <div class="num">04</div>
+        <h3>平移不变性</h3>
+        <p>特征位置稍有偏移时，池化后的结果变化不大，增强模型对位置变化的鲁棒性。</p>
+      </div>
+    </div>
+    <div class="pool-type-row">
+      <div class="pool-type-badge">Max Pooling — 最大池化</div>
+      <div class="pool-type-badge">Average Pooling — 平均池化</div>
+      <div class="pool-type-badge">Global Avg Pooling — 全局平均池化</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Step 1 -->
+  <div class="slide slide-calc" data-index="2">
+    <div class="calc-header">
+      <span class="step-badge">STEP 1 / 4</span>
+      <h2>左上区域（行0-1，列0-1）</h2>
+    </div>
+    <div class="calc-body">
+      <div class="grid-wrapper">
+        <div class="grid-label">输入特征图 4×4</div>
+        <div class="matrix-4x4" id="grid-step1">
+          <div class="matrix-cell active-cell">1</div>
+          <div class="matrix-cell active-cell">3</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell active-cell">5</div>
+          <div class="matrix-cell max-cell">6</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">0</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">7</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell dim-cell">8</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell dim-cell">9</div>
+          <div class="matrix-cell dim-cell">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line"></div>
+      </div>
+      <div class="grid-wrapper">
+        <div class="grid-label">输出特征图 2×2</div>
+        <div class="matrix-2x2">
+          <div class="matrix-cell result-new">6</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+        </div>
+      </div>
+      <div class="formula-section">
+        <div class="formula-title">COMPUTATION</div>
+        <div class="formula-values">
+          <span class="formula-val">1</span>
+          <span class="formula-val">3</span>
+          <span class="formula-val">5</span>
+          <span class="formula-val" style="color:var(--highlight); border-color:var(--highlight)">6</span>
+        </div>
+        <div class="formula-result">
+          max(1, 3, 5, 6) = <strong>6</strong><br><br>
+          result[0][0] = <strong>6</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Step 2 -->
+  <div class="slide slide-calc" data-index="3">
+    <div class="calc-header">
+      <span class="step-badge">STEP 2 / 4</span>
+      <h2>右上区域（行0-1，列2-3）</h2>
+    </div>
+    <div class="calc-body">
+      <div class="grid-wrapper">
+        <div class="grid-label">输入特征图 4×4</div>
+        <div class="matrix-4x4">
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell active-cell">2</div>
+          <div class="matrix-cell max-cell">4</div>
+          <div class="matrix-cell dim-cell">5</div>
+          <div class="matrix-cell dim-cell">6</div>
+          <div class="matrix-cell active-cell">1</div>
+          <div class="matrix-cell active-cell">0</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">7</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell dim-cell">8</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell dim-cell">9</div>
+          <div class="matrix-cell dim-cell">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line"></div>
+      </div>
+      <div class="grid-wrapper">
+        <div class="grid-label">输出特征图 2×2</div>
+        <div class="matrix-2x2">
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">6</div>
+          <div class="matrix-cell result-new">4</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+        </div>
+      </div>
+      <div class="formula-section">
+        <div class="formula-title">COMPUTATION</div>
+        <div class="formula-values">
+          <span class="formula-val">2</span>
+          <span class="formula-val" style="color:var(--highlight); border-color:var(--highlight)">4</span>
+          <span class="formula-val">1</span>
+          <span class="formula-val">0</span>
+        </div>
+        <div class="formula-result">
+          max(2, 4, 1, 0) = <strong>4</strong><br><br>
+          result[0][1] = <strong>4</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Step 3 -->
+  <div class="slide slide-calc" data-index="4">
+    <div class="calc-header">
+      <span class="step-badge">STEP 3 / 4</span>
+      <h2>左下区域（行2-3，列0-1）</h2>
+    </div>
+    <div class="calc-body">
+      <div class="grid-wrapper">
+        <div class="grid-label">输入特征图 4×4</div>
+        <div class="matrix-4x4">
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell dim-cell">5</div>
+          <div class="matrix-cell dim-cell">6</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">0</div>
+          <div class="matrix-cell active-cell">2</div>
+          <div class="matrix-cell active-cell">1</div>
+          <div class="matrix-cell dim-cell">7</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell max-cell">8</div>
+          <div class="matrix-cell active-cell">4</div>
+          <div class="matrix-cell dim-cell">9</div>
+          <div class="matrix-cell dim-cell">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line"></div>
+      </div>
+      <div class="grid-wrapper">
+        <div class="grid-label">输出特征图 2×2</div>
+        <div class="matrix-2x2">
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">6</div>
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">4</div>
+          <div class="matrix-cell result-new">8</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+        </div>
+      </div>
+      <div class="formula-section">
+        <div class="formula-title">COMPUTATION</div>
+        <div class="formula-values">
+          <span class="formula-val">2</span>
+          <span class="formula-val">1</span>
+          <span class="formula-val" style="color:var(--highlight); border-color:var(--highlight)">8</span>
+          <span class="formula-val">4</span>
+        </div>
+        <div class="formula-result">
+          max(2, 1, 8, 4) = <strong>8</strong><br><br>
+          result[1][0] = <strong>8</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Step 4 -->
+  <div class="slide slide-calc" data-index="5">
+    <div class="calc-header">
+      <span class="step-badge">STEP 4 / 4</span>
+      <h2>右下区域（行2-3，列2-3）</h2>
+    </div>
+    <div class="calc-body">
+      <div class="grid-wrapper">
+        <div class="grid-label">输入特征图 4×4</div>
+        <div class="matrix-4x4">
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell dim-cell">5</div>
+          <div class="matrix-cell dim-cell">6</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">0</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell active-cell">7</div>
+          <div class="matrix-cell active-cell">3</div>
+          <div class="matrix-cell dim-cell">8</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell max-cell">9</div>
+          <div class="matrix-cell active-cell">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line"></div>
+      </div>
+      <div class="grid-wrapper">
+        <div class="grid-label">输出特征图 2×2</div>
+        <div class="matrix-2x2">
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">6</div>
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">4</div>
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">8</div>
+          <div class="matrix-cell result-new">9</div>
+        </div>
+      </div>
+      <div class="formula-section">
+        <div class="formula-title">COMPUTATION</div>
+        <div class="formula-values">
+          <span class="formula-val" style="color:var(--highlight); border-color:var(--highlight)">7</span>
+          <span class="formula-val">3</span>
+          <span class="formula-val" style="color:var(--highlight); border-color:var(--highlight)">9</span>
+          <span class="formula-val">5</span>
+        </div>
+        <div class="formula-result">
+          max(7, 3, 9, 5) = <strong>9</strong><br><br>
+          result[1][1] = <strong>9</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Final Result -->
+  <div class="slide slide-final" data-index="6">
+    <h2>计算完成 — 最终结果</h2>
+    <div class="final-layout">
+      <div class="final-4x4">
+        <div class="grid-label">输入 4×4</div>
+        <div class="matrix-4x4" style="margin-top:12px">
+          <div class="matrix-cell" style="background:rgba(0,229,255,0.06); border-color:rgba(0,229,255,0.2)">1</div>
+          <div class="matrix-cell" style="background:rgba(0,229,255,0.06); border-color:rgba(0,229,255,0.2)">3</div>
+          <div class="matrix-cell" style="background:rgba(124,77,255,0.06); border-color:rgba(124,77,255,0.2)">2</div>
+          <div class="matrix-cell" style="background:rgba(124,77,255,0.06); border-color:rgba(124,77,255,0.2)">4</div>
+          <div class="matrix-cell" style="background:rgba(0,229,255,0.06); border-color:rgba(0,229,255,0.2)">5</div>
+          <div class="matrix-cell max-cell">6</div>
+          <div class="matrix-cell" style="background:rgba(124,77,255,0.06); border-color:rgba(124,77,255,0.2)">1</div>
+          <div class="matrix-cell max-cell" style="background:rgba(124,77,255,0.2); border-color:var(--accent-2); color:var(--accent-2)">4</div>
+          <div class="matrix-cell" style="background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2)">2</div>
+          <div class="matrix-cell" style="background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2)">1</div>
+          <div class="matrix-cell" style="background:rgba(255,109,0,0.06); border-color:rgba(255,109,0,0.2)">7</div>
+          <div class="matrix-cell" style="background:rgba(255,109,0,0.06); border-color:rgba(255,109,0,0.2)">3</div>
+          <div class="matrix-cell max-cell" style="background:rgba(0,230,118,0.2); border-color:var(--green); color:var(--green)">8</div>
+          <div class="matrix-cell" style="background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2)">4</div>
+          <div class="matrix-cell max-cell" style="background:rgba(255,109,0,0.2); border-color:var(--accent-3); color:var(--accent-3)">9</div>
+          <div class="matrix-cell" style="background:rgba(255,109,0,0.06); border-color:rgba(255,109,0,0.2)">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line" style="width:80px"></div>
+      </div>
+      <div class="final-2x2">
+        <div class="grid-label">输出 2×2</div>
+        <div class="matrix-2x2" style="margin-top:12px">
+          <div class="matrix-cell result-new">6</div>
+          <div class="matrix-cell result-new">4</div>
+          <div class="matrix-cell result-new">8</div>
+          <div class="matrix-cell result-new">9</div>
+        </div>
+      </div>
+    </div>
+    <p class="final-note">
+      空间尺寸从 <strong>4×4</strong> 压缩为 <strong>2×2</strong>，通道数不变 — 每个窗口取最大值，保留最强激活信号
+    </p>
+  </div>
+
+  <!-- SLIDE 7: Summary -->
+  <div class="slide slide-summary" data-index="7">
+    <div class="section-tag">02 / 总结</div>
+    <h2>池化的核心作用</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-icon">↓</div>
+        <div>
+          <h3>降低计算量</h3>
+          <p>特征图尺寸缩小，后续层的参数和计算量大幅减少，提升网络训练和推理效率。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">◎</div>
+        <div>
+          <h3>提取主要特征</h3>
+          <p>保留最显著的激活响应，过滤掉次要信息，聚焦于局部区域中最突出的特征。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">↔</div>
+        <div>
+          <h3>增强平移不变性</h3>
+          <p>特征位置稍有偏移时，池化后的输出变化不大，让模型对位置变化更加鲁棒。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">◇</div>
+        <div>
+          <h3>防止过拟合</h3>
+          <p>减少参数量，降低模型复杂度，减少过拟合风险，提升模型泛化能力。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation Bar -->
+<div class="nav-bar">
+  <div class="nav-progress" id="navProgress"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <span class="nav-page" id="pageIndicator">1 / 8</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  // Build nav dots
+  const navProgress = document.getElementById('navProgress');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    navProgress.appendChild(dot);
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+  }
+
+  function navigate(dir) {
+    goTo(currentSlide + dir);
+  }
+
+  function updateNav() {
+    document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+      dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    });
+    document.getElementById('pageIndicator').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    document.getElementById('btnPrev').disabled = currentSlide === 0;
+    document.getElementById('btnNext').disabled = currentSlide === totalSlides - 1;
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      navigate(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      navigate(-1);
+    }
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) navigate(1);
+      else navigate(-1);
+    }
+  });
+
+  updateNav();
+</script>
+
+</body>
+</html>

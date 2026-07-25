@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>激活函数 Activation Functions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700;900&family=JetBrains+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08080c;
+    --surface: #111118;
+    --surface-2: #191922;
+    --accent: #00d4ff;
+    --accent-2: #ff3cac;
+    --accent-3: #36f9a0;
+    --yellow: #ffe066;
+    --orange: #ff8c42;
+    --purple: #a855f7;
+    --text-primary: #eaedf5;
+    --text-muted: #5e6178;
+    --grid-border: #252536;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans SC', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .presentation { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 52px 68px;
+    opacity: 0; visibility: hidden; transform: translateY(26px);
+    transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+                transform 0.55s cubic-bezier(0.22,1,0.36,1),
+                visibility 0s 0.55s;
+  }
+
+  .slide.active {
+    opacity: 1; visibility: visible; transform: translateY(0);
+    transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+                transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 5px 16px; border-radius: 2px;
+    margin-bottom: 24px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em;
+    margin-bottom: 12px; opacity: 0.85;
+  }
+
+  h2 { font-weight: 900; line-height: 1.2; }
+
+  .fi {
+    opacity: 0; transform: translateY(16px);
+  }
+  .slide.active .fi { animation: fadeUp 0.5s ease forwards; }
+  .slide.active .fi:nth-child(2) { animation-delay: 0.07s; }
+  .slide.active .fi:nth-child(3) { animation-delay: 0.14s; }
+  .slide.active .fi:nth-child(4) { animation-delay: 0.21s; }
+  .slide.active .fi:nth-child(5) { animation-delay: 0.28s; }
+  .slide.active .fi:nth-child(6) { animation-delay: 0.35s; }
+  .slide.active .fi:nth-child(7) { animation-delay: 0.42s; }
+  .slide.active .fi:nth-child(8) { animation-delay: 0.49s; }
+
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+
+  /* ===== SLIDE 0: TITLE ===== */
+  .slide-title {
+    background:
+      radial-gradient(ellipse at 30% 55%, rgba(0,212,255,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse at 70% 40%, rgba(255,60,172,0.05) 0%, transparent 50%),
+      var(--bg);
+    text-align: center;
+  }
+
+  .slide-title .tag { color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+
+  .slide-title h1 {
+    font-size: clamp(50px, 8vw, 108px); font-weight: 900;
+    letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 30%, #a0a8c8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title .subtitle {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: clamp(18px, 2.5vw, 30px);
+    color: var(--text-muted); font-weight: 300;
+  }
+
+  .slide-title .hint {
+    position: absolute; bottom: 38px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-muted);
+    opacity: 0.4; animation: pulse 2.2s ease infinite;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:0.2} 50%{opacity:0.6} }
+
+  /* ===== COMMON LAYOUTS ===== */
+  .sc {
+    align-items: flex-start;
+    background: var(--bg);
+  }
+
+  .row { display: flex; gap: 40px; width: 100%; max-width: 1120px; align-items: flex-start; }
+  .col { flex: 1; min-width: 0; }
+  .col-wide { flex: 1.3; min-width: 0; }
+  .col-narrow { flex: 0.7; min-width: 0; }
+
+  .big {
+    font-size: clamp(26px, 3.5vw, 42px);
+    font-weight: 900; line-height: 1.3; margin-bottom: 20px;
+  }
+
+  .desc {
+    font-size: 16px; line-height: 1.85;
+    color: var(--text-muted); max-width: 700px; margin-bottom: 20px;
+  }
+
+  .hl { color: var(--accent); font-weight: 700; }
+  .hl-pink { color: var(--accent-2); font-weight: 700; }
+  .hl-green { color: var(--accent-3); font-weight: 700; }
+  .hl-yellow { color: var(--yellow); font-weight: 700; }
+  .hl-orange { color: var(--orange); font-weight: 700; }
+  .hl-purple { color: var(--purple); font-weight: 700; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 26px;
+    position: relative; overflow: hidden;
+  }
+
+  .card + .card { margin-top: 16px; }
+
+  .card-top {
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+
+  .card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .card p, .card li {
+    font-size: 14px; line-height: 1.75; color: var(--text-muted);
+  }
+  .card ul { list-style: none; padding: 0; }
+  .card ul li { padding: 3px 0; }
+  .card ul li::before { content: '—'; margin-right: 8px; font-weight: 700; }
+
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 28px 36px;
+    text-align: center;
+    max-width: 560px; width: 100%;
+  }
+
+  .formula-main {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(24px, 3.5vw, 40px);
+    font-weight: 700; margin-bottom: 12px;
+  }
+
+  .formula-note {
+    font-size: 14px; color: var(--text-muted); line-height: 1.7;
+  }
+
+  /* ===== CHART / SVG AREA ===== */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    display: flex; justify-content: center;
+  }
+
+  .chart-wrap svg { width: 100%; max-width: 100%; }
+
+  /* ===== COMPARISON CARDS ===== */
+  .cmp-row {
+    display: flex; gap: 24px; width: 100%; max-width: 1100px;
+  }
+
+  .cmp-card {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 28px;
+    position: relative; overflow: hidden;
+    opacity: 0; transform: translateY(16px);
+  }
+
+  .slide.active .cmp-card { animation: fadeUp 0.5s ease forwards; }
+  .slide.active .cmp-card:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .cmp-card:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .cmp-card:nth-child(4) { animation-delay: 0.3s; }
+
+  .cmp-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+  }
+
+  .cmp-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+  .cmp-card .sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; margin-bottom: 12px; line-height: 1.8;
+  }
+  .cmp-card .props { font-size: 13px; color: var(--text-muted); line-height: 1.8; }
+
+  /* ===== FUNCTION DETAIL LAYOUT ===== */
+  .func-detail {
+    display: flex; gap: 36px; width: 100%; max-width: 1100px;
+    align-items: stretch;
+  }
+
+  .func-chart {
+    flex: 1; min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .func-info {
+    flex: 0.85; min-width: 0;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .func-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    margin-bottom: 8px;
+  }
+
+  /* ===== PROS/CONS ===== */
+  .pc-row {
+    display: flex; gap: 16px;
+  }
+
+  .pc-box {
+    flex: 1;
+    background: var(--surface-2);
+    border-radius: 5px;
+    padding: 16px 18px;
+    border: 1px solid var(--grid-border);
+  }
+
+  .pc-box h4 {
+    font-size: 12px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .pc-box ul { list-style: none; padding: 0; }
+  .pc-box ul li {
+    font-size: 13px; line-height: 1.7;
+    color: var(--text-muted); padding: 2px 0;
+  }
+
+  .pc-box.good h4 { color: var(--accent-3); }
+  .pc-box.good ul li::before { content: '+ '; color: var(--accent-3); font-weight: 700; font-family: 'JetBrains Mono'; }
+  .pc-box.bad h4 { color: var(--accent-2); }
+  .pc-box.bad ul li::before { content: '− '; color: var(--accent-2); font-weight: 700; font-family: 'JetBrains Mono'; }
+
+  /* ===== VARIANT CARDS ===== */
+  .var-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; width: 100%; max-width: 1100px;
+  }
+
+  .var-card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    opacity: 0; transform: translateY(16px);
+  }
+
+  .slide.active .var-card { animation: fadeUp 0.5s ease forwards; }
+  .slide.active .var-card:nth-child(2) { animation-delay: 0.08s; }
+  .slide.active .var-card:nth-child(3) { animation-delay: 0.16s; }
+
+  .var-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .var-card .var-sig {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; margin-bottom: 10px; line-height: 1.6;
+  }
+  .var-card p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+  /* ===== SUMMARY ===== */
+  .sum-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 18px; width: 100%; max-width: 1000px;
+  }
+
+  .sum-card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 26px;
+    display: flex; gap: 16px;
+    opacity: 0; transform: translateY(16px);
+  }
+
+  .slide.active .sum-card { animation: fadeUp 0.5s ease forwards; }
+  .slide.active .sum-card:nth-child(2) { animation-delay: 0.08s; }
+  .slide.active .sum-card:nth-child(3) { animation-delay: 0.16s; }
+  .slide.active .sum-card:nth-child(4) { animation-delay: 0.24s; }
+
+  .sum-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  }
+
+  .sum-card:nth-child(1) .sum-icon { background: rgba(0,212,255,0.1); color: var(--accent); }
+  .sum-card:nth-child(2) .sum-icon { background: rgba(255,60,172,0.1); color: var(--accent-2); }
+  .sum-card:nth-child(3) .sum-icon { background: rgba(54,249,160,0.1); color: var(--accent-3); }
+  .sum-card:nth-child(4) .sum-icon { background: rgba(168,85,247,0.1); color: var(--purple); }
+
+  .sum-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 5px; }
+  .sum-card p { font-size: 13px; line-height: 1.65; color: var(--text-muted); }
+
+  /* ===== TABLE ===== */
+  .cmp-table {
+    width: 100%; max-width: 1050px;
+    border-collapse: collapse; font-size: 13px;
+  }
+
+  .cmp-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--text-muted); text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--grid-border);
+  }
+
+  .cmp-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(37,37,54,0.5);
+    color: var(--text-muted); font-size: 13px;
+  }
+
+  .cmp-table tr td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+
+  .cmp-table .good-cell { color: var(--accent-3); }
+  .cmp-table .bad-cell { color: var(--accent-2); }
+  .cmp-table .mid-cell { color: var(--yellow); }
+
+  /* ===== NAV ===== */
+  .nav-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 36px;
+    background: rgba(8,8,12,0.9);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    z-index: 100;
+  }
+
+  .nav-progress { display: flex; gap: 5px; align-items: center; }
+
+  .nav-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--grid-border);
+    transition: all 0.3s ease; cursor: pointer;
+  }
+
+  .nav-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(0,212,255,0.5);
+    width: 22px; border-radius: 4px;
+  }
+
+  .nav-controls { display: flex; gap: 8px; align-items: center; }
+
+  .nav-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--surface); border: 1px solid var(--grid-border);
+    color: var(--text-muted); padding: 6px 16px;
+    border-radius: 3px; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.2; cursor: default; }
+  .nav-btn:disabled:hover { border-color: var(--grid-border); color: var(--text-muted); }
+
+  .nav-page {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text-muted); margin: 0 12px;
+  }
+
+  @media (max-width: 900px) {
+    .slide { padding: 32px 24px; }
+    .row, .func-detail { flex-direction: column; gap: 20px; }
+    .cmp-row, .var-grid { flex-direction: column; }
+    .var-grid { grid-template-columns: 1fr; }
+    .sum-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- ======== SLIDE 0: TITLE ======== -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag">Deep Learning · Fundamentals</div>
+    <h1>激活函数</h1>
+    <p class="subtitle">Activation Functions — 赋予神经网络非线性力量的核心机制</p>
+    <div class="hint">按 → 或点击底部导航切换页面</div>
+  </div>
+
+  <!-- ======== SLIDE 1: WHAT & WHY ======== -->
+  <div class="slide sc" data-index="1">
+    <div class="section-label" style="color:var(--accent)">01 / 核心概念</div>
+    <div class="big">什么是激活函数？为什么需要它？</div>
+    <p class="desc fi">
+      激活函数是神经网络中每个神经元的"开关"——它接收输入的加权求和，经过一个<span class="hl">非线性函数</span>变换后输出。
+      没有它，无论网络多少层，最终都只是一个线性变换。
+    </p>
+    <div class="row fi">
+      <div class="col-narrow">
+        <div class="card">
+          <div class="card-top" style="background:var(--accent)"></div>
+          <h3>神经元的运作</h3>
+          <p style="margin-bottom:12px">输入 → 加权求和 → <span class="hl">激活函数</span> → 输出</p>
+          <div style="font-family:'JetBrains Mono'; font-size:14px; line-height:2; color:var(--accent)">
+            z = w₁x₁ + w₂x₂ + b<br>
+            <span style="color:var(--accent-2); font-weight:700">a = σ(z)</span>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="card-top" style="background:var(--accent-2)"></div>
+          <h3>直觉理解</h3>
+          <p>就像大脑神经元：只有当输入信号足够强（超过某个阈值）时，神经元才会"激活"并向下传递信号。</p>
+        </div>
+      </div>
+      <div class="col-wide">
+        <div class="card" style="height:100%">
+          <div class="card-top" style="background:var(--accent-3)"></div>
+          <h3>为什么不能没有激活函数？</h3>
+          <svg viewBox="0 0 460 240" fill="none" style="width:100%; margin-top:12px">
+            <!-- Without activation -->
+            <text x="115" y="20" fill="#ff3cac" font-size="12" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">无激活函数</text>
+            <rect x="20" y="32" width="80" height="40" rx="4" fill="#191922" stroke="#5e6178" stroke-width="1.5"/>
+            <text x="60" y="56" fill="#eaedf7" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Layer 1</text>
+            <line x1="100" y1="52" x2="130" y2="52" stroke="#5e6178" stroke-width="1.5"/>
+            <polygon points="128,48 138,52 128,56" fill="#5e6178"/>
+            <text x="115" y="68" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">W₁x</text>
+            <rect x="140" y="32" width="80" height="40" rx="4" fill="#191922" stroke="#5e6178" stroke-width="1.5"/>
+            <text x="180" y="56" fill="#eaedf7" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Layer 2</text>
+            <line x1="220" y1="52" x2="245" y2="52" stroke="#5e6178" stroke-width="1.5"/>
+            <text x="232" y="44" fill="#ff3cac" font-size="18" text-anchor="middle" font-weight="700">=</text>
+            <rect x="260" y="32" width="80" height="40" rx="4" fill="rgba(255,60,172,0.08)" stroke="#ff3cac" stroke-width="1.5"/>
+            <text x="300" y="56" fill="#ff3cac" font-size="11" text-anchor="middle" font-family="JetBrains Mono">W₂W₁x</text>
+            <text x="350" y="56" fill="#5e6178" font-size="10" font-family="Noto Sans SC">→ 仍然是线性变换</text>
+
+            <!-- With activation -->
+            <text x="115" y="120" fill="#36f9a0" font-size="12" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">有激活函数</text>
+            <rect x="20" y="132" width="80" height="40" rx="4" fill="#191922" stroke="#5e6178" stroke-width="1.5"/>
+            <text x="60" y="156" fill="#eaedf7" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Layer 1</text>
+            <line x1="100" y1="152" x2="118" y2="152" stroke="#5e6178" stroke-width="1.5"/>
+            <polygon points="116,148 126,152 116,156" fill="#5e6178"/>
+            <rect x="128" y="136" width="46" height="32" rx="4" fill="rgba(0,212,255,0.1)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="151" y="156" fill="#00d4ff" font-size="11" text-anchor="middle" font-family="JetBrains Mono">σ(·)</text>
+            <line x1="174" y1="152" x2="192" y2="152" stroke="#5e6178" stroke-width="1.5"/>
+            <polygon points="190,148 200,152 190,156" fill="#5e6178"/>
+            <rect x="202" y="132" width="80" height="40" rx="4" fill="#191922" stroke="#5e6178" stroke-width="1.5"/>
+            <text x="242" y="156" fill="#eaedf7" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Layer 2</text>
+            <line x1="282" y1="152" x2="305" y2="152" stroke="#5e6178" stroke-width="1.5"/>
+            <text x="293" y="144" fill="#36f9a0" font-size="18" text-anchor="middle" font-weight="700">≠</text>
+            <rect x="315" y="132" width="120" height="40" rx="4" fill="rgba(54,249,160,0.08)" stroke="#36f9a0" stroke-width="1.5"/>
+            <text x="375" y="156" fill="#36f9a0" font-size="10" text-anchor="middle" font-family="JetBrains Mono">W₂·σ(W₁x+b₁)+b₂</text>
+            <text x="375" y="188" fill="#36f9a0" font-size="10" text-anchor="middle" font-family="Noto Sans SC">非线性 → 能拟合任意函数</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 2: SIGMOID ======== -->
+  <div class="slide sc" data-index="2">
+    <div class="section-label" style="color:var(--yellow)">02 / 经典激活函数</div>
+    <div class="big">Sigmoid — <span class="hl-yellow">最早的激活函数</span></div>
+
+    <div class="func-detail fi">
+      <div class="func-chart">
+        <div class="func-name" style="color:var(--yellow)">σ(x) = 1 / (1 + e<sup>−x</sup>)</div>
+        <svg viewBox="0 0 400 280" fill="none" style="width:100%">
+          <!-- Grid -->
+          <line x1="40" y1="140" x2="380" y2="140" stroke="#252536" stroke-width="1"/>
+          <line x1="200" y1="20" x2="200" y2="260" stroke="#252536" stroke-width="1"/>
+          <!-- Grid marks -->
+          <text x="385" y="144" fill="#5e6178" font-size="10" font-family="JetBrains Mono">0</text>
+          <text x="200" y="18" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">1</text>
+          <text x="200" y="272" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">0</text>
+          <text x="120" y="152" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">-2</text>
+          <text x="280" y="152" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">+2</text>
+          <!-- Asymptote lines -->
+          <line x1="40" y1="24" x2="380" y2="24" stroke="#5e6178" stroke-width="0.5" stroke-dasharray="4"/>
+          <line x1="40" y1="256" x2="380" y2="256" stroke="#5e6178" stroke-width="0.5" stroke-dasharray="4"/>
+          <!-- Sigmoid curve -->
+          <path d="M40 256 Q80 256 120 252 Q160 240 180 210 Q195 170 200 140 Q205 110 220 70 Q240 40 280 28 Q320 24 380 24"
+                stroke="#ffe066" stroke-width="3" fill="none"/>
+          <!-- Center point -->
+          <circle cx="200" cy="140" r="5" fill="#ffe066"/>
+          <text x="218" y="136" fill="#ffe066" font-size="10" font-family="JetBrains Mono">(0, 0.5)</text>
+          <!-- Labels -->
+          <text x="60" y="40" fill="#5e6178" font-size="10" font-family="JetBrains Mono">→ 1</text>
+          <text x="60" y="250" fill="#5e6178" font-size="10" font-family="JetBrains Mono">→ 0</text>
+          <!-- Output range -->
+          <rect x="290" y="100" width="80" height="24" rx="3" fill="rgba(255,224,102,0.08)"/>
+          <text x="330" y="116" fill="#ffe066" font-size="10" text-anchor="middle" font-family="JetBrains Mono">值域: (0, 1)</text>
+        </svg>
+      </div>
+
+      <div class="func-info">
+        <div class="formula-box" style="max-width:100%">
+          <div class="formula-main" style="color:var(--yellow)">σ(x) = 1 / (1 + e<sup>−x</sup>)</div>
+          <div class="formula-note">导数: σ'(x) = σ(x) · (1 − σ(x))</div>
+        </div>
+
+        <div class="pc-row">
+          <div class="pc-box good">
+            <h4>优点</h4>
+            <ul>
+              <li>输出 (0,1)，可表示概率</li>
+              <li>处处可导，平滑连续</li>
+              <li>历史经典，易于理解</li>
+            </ul>
+          </div>
+          <div class="pc-box bad">
+            <h4>缺点</h4>
+            <ul>
+              <li><span class="hl-pink">梯度消失</span>：两端梯度接近0</li>
+              <li>输出非零中心，影响收敛</li>
+              <li>含 exp 运算，计算较慢</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--accent-2)">
+          <h3 style="font-size:14px">梯度消失示意</h3>
+          <p style="font-size:13px">
+            当 x 很大或很小时，σ'(x) ≈ 0。反向传播时梯度经过连乘会趋近于零，
+            <span class="hl-pink">深层网络的前几层几乎无法更新</span>。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 3: TANH ======== -->
+  <div class="slide sc" data-index="3">
+    <div class="section-label" style="color:var(--orange)">03 / 经典激活函数</div>
+    <div class="big">Tanh — <span class="hl-orange">零中心的改进</span></div>
+
+    <div class="func-detail fi">
+      <div class="func-chart">
+        <div class="func-name" style="color:var(--orange)">tanh(x) = (e<sup>x</sup> − e<sup>−x</sup>) / (e<sup>x</sup> + e<sup>−x</sup>)</div>
+        <svg viewBox="0 0 400 280" fill="none" style="width:100%">
+          <line x1="40" y1="140" x2="380" y2="140" stroke="#252536" stroke-width="1"/>
+          <line x1="200" y1="20" x2="200" y2="260" stroke="#252536" stroke-width="1"/>
+          <text x="385" y="144" fill="#5e6178" font-size="10" font-family="JetBrains Mono">0</text>
+          <text x="200" y="18" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">+1</text>
+          <text x="200" y="272" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">−1</text>
+          <text x="120" y="152" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">-2</text>
+          <text x="280" y="152" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">+2</text>
+          <line x1="40" y1="24" x2="380" y2="24" stroke="#5e6178" stroke-width="0.5" stroke-dasharray="4"/>
+          <line x1="40" y1="256" x2="380" y2="256" stroke="#5e6178" stroke-width="0.5" stroke-dasharray="4"/>
+          <!-- Tanh curve -->
+          <path d="M40 256 Q80 254 120 246 Q160 220 180 190 Q195 160 200 140 Q205 120 220 90 Q240 54 280 34 Q320 26 380 24"
+                stroke="#ff8c42" stroke-width="3" fill="none"/>
+          <circle cx="200" cy="140" r="5" fill="#ff8c42"/>
+          <text x="218" y="136" fill="#ff8c42" font-size="10" font-family="JetBrains Mono">(0, 0)</text>
+          <rect x="290" y="60" width="86" height="24" rx="3" fill="rgba(255,140,66,0.08)"/>
+          <text x="333" y="76" fill="#ff8c42" font-size="10" text-anchor="middle" font-family="JetBrains Mono">值域: (−1, +1)</text>
+        </svg>
+      </div>
+
+      <div class="func-info">
+        <div class="formula-box" style="max-width:100%">
+          <div class="formula-main" style="color:var(--orange)">tanh(x)</div>
+          <div class="formula-note">导数: tanh'(x) = 1 − tanh²(x)<br>本质上是 Sigmoid 的缩放平移版本</div>
+        </div>
+
+        <div class="pc-row">
+          <div class="pc-box good">
+            <h4>优点 vs Sigmoid</h4>
+            <ul>
+              <li><span class="hl-green">零中心</span>输出 (−1, +1)</li>
+              <li>梯度更强（最大值 1 vs 0.25）</li>
+              <li>收敛速度更快</li>
+            </ul>
+          </div>
+          <div class="pc-box bad">
+            <h4>仍然存在的问题</h4>
+            <ul>
+              <li>两端仍有<span class="hl-pink">梯度消失</span></li>
+              <li>仍含 exp 运算，计算开销</li>
+              <li>深层网络效果仍不理想</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--orange)">
+          <h3 style="font-size:14px">与 Sigmoid 的关系</h3>
+          <p style="font-size:13px; font-family:'JetBrains Mono'; line-height:1.8">
+            tanh(x) = 2σ(2x) − 1<br>
+            <span style="color:var(--text-muted)">tanh 是 sigmoid 的线性变换版本，值域从 (0,1) 变为 (−1,+1)</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 4: ReLU ======== -->
+  <div class="slide sc" data-index="4">
+    <div class="section-label" style="color:var(--accent)">04 / 现代标准</div>
+    <div class="big">ReLU — <span class="hl">深度学习的默认选择</span></div>
+
+    <div class="func-detail fi">
+      <div class="func-chart">
+        <div class="func-name" style="color:var(--accent)">ReLU(x) = max(0, x)</div>
+        <svg viewBox="0 0 400 280" fill="none" style="width:100%">
+          <line x1="40" y1="220" x2="380" y2="220" stroke="#252536" stroke-width="1"/>
+          <line x1="200" y1="20" x2="200" y2="260" stroke="#252536" stroke-width="1"/>
+          <text x="385" y="224" fill="#5e6178" font-size="10" font-family="JetBrains Mono">0</text>
+          <text x="120" y="232" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">-2</text>
+          <text x="280" y="232" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">+2</text>
+          <text x="320" y="130" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">+4</text>
+          <!-- ReLU curve -->
+          <path d="M40 220 L200 220 L380 40" stroke="#00d4ff" stroke-width="3" fill="none"/>
+          <!-- Corner highlight -->
+          <circle cx="200" cy="220" r="6" fill="#00d4ff"/>
+          <text x="218" y="216" fill="#00d4ff" font-size="10" font-family="JetBrains Mono">拐点 (0,0)</text>
+          <!-- Annotations -->
+          <text x="120" y="208" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">y = 0</text>
+          <text x="310" y="100" fill="#00d4ff" font-size="10" text-anchor="middle" font-family="JetBrains Mono">y = x</text>
+          <rect x="280" y="20" width="100" height="24" rx="3" fill="rgba(0,212,255,0.08)"/>
+          <text x="330" y="36" fill="#00d4ff" font-size="10" text-anchor="middle" font-family="JetBrains Mono">值域: [0, +∞)</text>
+        </svg>
+      </div>
+
+      <div class="func-info">
+        <div class="formula-box" style="max-width:100%">
+          <div class="formula-main" style="color:var(--accent)">f(x) = max(0, x)</div>
+          <div class="formula-note">
+            导数: x > 0 时为 1，x < 0 时为 0<br>
+            计算极其简单，无需指数运算
+          </div>
+        </div>
+
+        <div class="pc-row">
+          <div class="pc-box good">
+            <h4>优点</h4>
+            <ul>
+              <li><span class="hl-green">计算极快</span>：只需比较大小</li>
+              <li>正区间梯度恒为 1，不消失</li>
+              <li>稀疏激活，提升效率</li>
+              <li>收敛速度远超 Sigmoid/Tanh</li>
+            </ul>
+          </div>
+          <div class="pc-box bad">
+            <h4>缺点</h4>
+            <ul>
+              <li><span class="hl-pink">Dead ReLU</span>：负区间梯度为 0</li>
+              <li>神经元可能永久"死亡"</li>
+              <li>输出非零中心</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--accent-2)">
+          <h3 style="font-size:14px">Dead ReLU 问题</h3>
+          <p style="font-size:13px">
+            当输入持续为负时，梯度永远为 0，权重不再更新。
+            这个神经元就"死"了。<span class="hl-pink">学习率过大</span>时更容易发生。
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 5: ReLU VARIANTS ======== -->
+  <div class="slide sc" data-index="5">
+    <div class="section-label" style="color:var(--purple)">05 / ReLU 变体</div>
+    <div class="big">解决 Dead ReLU 的<span class="hl-purple">三种方案</span></div>
+
+    <div class="row fi" style="margin-top:8px">
+      <div class="col" style="flex:1.1">
+        <div class="chart-wrap" style="height:100%">
+          <svg viewBox="0 0 440 320" fill="none" style="width:100%">
+            <!-- Grid -->
+            <line x1="40" y1="200" x2="420" y2="200" stroke="#252536" stroke-width="1"/>
+            <line x1="220" y1="20" x2="220" y2="300" stroke="#252536" stroke-width="1"/>
+            <text x="425" y="204" fill="#5e6178" font-size="9" font-family="JetBrains Mono">0</text>
+            <!-- ReLU (reference, dimmer) -->
+            <path d="M40 200 L220 200 L400 40" stroke="#00d4ff" stroke-width="1.5" fill="none" opacity="0.25" stroke-dasharray="4"/>
+            <!-- Leaky ReLU -->
+            <path d="M40 248 Q100 230 160 216 L220 200 L400 40" stroke="#a855f7" stroke-width="2.5" fill="none"/>
+            <!-- Labels -->
+            <text x="100" y="240" fill="#a855f7" font-size="11" font-weight="700" font-family="JetBrains Mono">Leaky ReLU</text>
+            <text x="120" y="190" fill="#00d4ff" font-size="9" font-family="JetBrains Mono" opacity="0.5">ReLU (参考)</text>
+            <text x="320" y="60" fill="#5e6178" font-size="9" font-family="JetBrains Mono">y = x (x > 0)</text>
+            <text x="100" y="264" fill="#a855f7" font-size="9" font-family="JetBrains Mono">y = 0.01x (x < 0)</text>
+            <!-- Parameter annotation -->
+            <rect x="270" y="260" width="140" height="40" rx="4" fill="rgba(168,85,247,0.06)" stroke="#a855f7" stroke-width="1" stroke-dasharray="4"/>
+            <text x="340" y="278" fill="#a855f7" font-size="10" text-anchor="middle" font-family="JetBrains Mono">负区间保留</text>
+            <text x="340" y="292" fill="#a855f7" font-size="10" text-anchor="middle" font-family="JetBrains Mono">小梯度 → 不会死亡</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="col" style="flex:0.9">
+        <div class="var-grid" style="grid-template-columns:1fr; gap:12px">
+          <div class="var-card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+              <div style="width:10px; height:10px; border-radius:50%; background:var(--purple)"></div>
+              <h3 style="margin:0">Leaky ReLU</h3>
+            </div>
+            <div class="var-sig" style="color:var(--purple)">
+              f(x) = max(<span style="color:var(--accent-2)">α</span>x, x)，α = 0.01
+            </div>
+            <p>负区间给一个很小的斜率（通常 0.01），保证梯度不为零，神经元不会"死亡"。</p>
+          </div>
+          <div class="var-card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+              <div style="width:10px; height:10px; border-radius:50%; background:var(--accent-3)"></div>
+              <h3 style="margin:0">PReLU</h3>
+            </div>
+            <div class="var-sig" style="color:var(--accent-3)">
+              f(x) = max(<span style="color:var(--accent-2)">α</span>x, x)，α 可学习
+            </div>
+            <p>与 Leaky ReLU 类似，但 α 是<span class="hl-green">通过训练自动学习</span>的参数，而非固定值。</p>
+          </div>
+          <div class="var-card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+              <div style="width:10px; height:10px; border-radius:50%; background:var(--orange)"></div>
+              <h3 style="margin:0">ELU</h3>
+            </div>
+            <div class="var-sig" style="color:var(--orange)">
+              f(x) = x (x > 0)，α(e<sup>x</sup> − 1) (x ≤ 0)
+            </div>
+            <p>负区间用指数函数平滑过渡，输出均值更接近零，有助于收敛。但计算稍慢。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 6: MODERN ACTIVATIONS ======== -->
+  <div class="slide sc" data-index="6">
+    <div class="section-label" style="color:var(--accent-3)">06 / 现代激活函数</div>
+    <div class="big">GELU & Swish — <span class="hl-green">Transformer 时代的宠儿</span></div>
+
+    <div class="row fi" style="margin-top:10px">
+      <div class="col">
+        <div class="card" style="border-top:3px solid var(--accent)">
+          <h3 style="color:var(--accent); margin-bottom:12px">GELU</h3>
+          <div style="font-family:'JetBrains Mono'; font-size:14px; color:var(--accent); margin-bottom:12px; line-height:1.8">
+            GELU(x) = x · Φ(x)
+          </div>
+          <p style="margin-bottom:12px">
+            其中 Φ(x) 是标准正态分布的累积分布函数。
+            <span class="hl">直觉</span>：输入越大，被保留的概率越高。
+          </p>
+          <div style="font-size:13px; color:var(--text-muted); line-height:1.8">
+            <span style="color:var(--accent)">使用场景</span>：BERT、GPT、ViT 等 Transformer 架构的标配
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px; border-top:3px solid var(--accent-2)">
+          <h3 style="color:var(--accent-2); margin-bottom:12px">Swish / SiLU</h3>
+          <div style="font-family:'JetBrains Mono'; font-size:14px; color:var(--accent-2); margin-bottom:12px; line-height:1.8">
+            Swish(x) = x · σ(x)
+          </div>
+          <p style="margin-bottom:12px">
+            其中 σ 是 Sigmoid 函数。<span class="hl-pink">自门控机制</span>：输入本身决定激活程度。
+          </div>
+          <div style="font-size:13px; color:var(--text-muted); line-height:1.8">
+            <span style="color:var(--accent-2)">使用场景</span>：EfficientNet、LLaMA、Mistral 等现代模型
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="chart-wrap" style="height:100%; min-height:300px">
+          <svg viewBox="0 0 400 300" fill="none" style="width:100%">
+            <line x1="40" y1="180" x2="380" y2="180" stroke="#252536" stroke-width="1"/>
+            <line x1="200" y1="20" x2="200" y2="280" stroke="#252536" stroke-width="1"/>
+            <text x="385" y="184" fill="#5e6178" font-size="9" font-family="JetBrains Mono">0</text>
+            <!-- ReLU reference -->
+            <path d="M40 180 L200 180 L380 20" stroke="#00d4ff" stroke-width="1.2" fill="none" opacity="0.2" stroke-dasharray="4"/>
+            <text x="298" y="40" fill="#00d4ff" font-size="8" opacity="0.4" font-family="JetBrains Mono">ReLU</text>
+            <!-- GELU curve -->
+            <path d="M40 186 Q80 186 120 185 Q160 182 180 176 Q195 166 200 180 Q205 168 210 150 Q230 100 260 60 Q300 30 380 14"
+                  stroke="#00d4ff" stroke-width="2.5" fill="none"/>
+            <text x="310" y="52" fill="#00d4ff" font-size="11" font-weight="700" font-family="JetBrains Mono">GELU</text>
+            <!-- Swish curve (slightly different) -->
+            <path d="M40 190 Q80 189 120 188 Q155 186 175 180 Q192 170 200 180 Q208 164 215 145 Q235 95 265 55 Q305 28 380 16"
+                  stroke="#ff3cac" stroke-width="2.5" fill="none"/>
+            <text x="340" y="70" fill="#ff3cac" font-size="11" font-weight="700" font-family="JetBrains Mono">Swish</text>
+            <!-- Negative dip annotation -->
+            <text x="130" y="205" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">负区间有微小负值</text>
+            <text x="130" y="217" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">→ 更好的正则化效果</text>
+            <!-- Smooth annotation -->
+            <rect x="220" y="230" width="160" height="50" rx="4" fill="rgba(54,249,160,0.05)" stroke="rgba(54,249,160,0.2)" stroke-width="1"/>
+            <text x="300" y="250" fill="#36f9a0" font-size="10" text-anchor="middle" font-family="JetBrains Mono">全程平滑可导</text>
+            <text x="300" y="266" fill="#36f9a0" font-size="10" text-anchor="middle" font-family="JetBrains Mono">无拐点 → 优化更稳定</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fi" style="max-width:1100px; width:100%; margin-top:14px; border-left:3px solid var(--accent-3); padding:20px 28px">
+      <p style="font-size:15px; color:var(--text-muted); line-height:1.8">
+        <span class="hl-green">关键洞察</span>：GELU 和 Swish 都是<strong style="color:var(--text-primary)">平滑、非单调</strong>的——它们在负区间有一个微小的"下凹"，
+        这让模型能对负输入也保留微弱的梯度信号，同时起到隐式正则化的效果。这正是它们在大模型中表现优异的原因之一。
+      </p>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 7: COMPARISON TABLE ======== -->
+  <div class="slide sc" data-index="7">
+    <div class="section-label" style="color:var(--accent)">07 / 全面对比</div>
+    <div class="big" style="font-size:clamp(24px,3vw,38px)">激活函数<span class="hl">横向对比</span></div>
+
+    <div class="fi" style="width:100%; max-width:1100px; overflow-x:auto; margin-top:10px">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>函数</th>
+            <th>值域</th>
+            <th>零中心</th>
+            <th>梯度消失</th>
+            <th>计算速度</th>
+            <th>可导性</th>
+            <th>典型应用</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--yellow)">Sigmoid</td>
+            <td>(0, 1)</td>
+            <td class="bad-cell">否</td>
+            <td class="bad-cell">严重</td>
+            <td class="bad-cell">慢</td>
+            <td class="good-cell">平滑</td>
+            <td>二分类输出层</td>
+          </tr>
+          <tr>
+            <td style="color:var(--orange)">Tanh</td>
+            <td>(−1, +1)</td>
+            <td class="good-cell">是</td>
+            <td class="mid-cell">中等</td>
+            <td class="bad-cell">慢</td>
+            <td class="good-cell">平滑</td>
+            <td>RNN / LSTM</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">ReLU</td>
+            <td>[0, +∞)</td>
+            <td class="bad-cell">否</td>
+            <td class="good-cell">正区间无</td>
+            <td class="good-cell">极快</td>
+            <td class="mid-cell">x=0 不可导</td>
+            <td>CNN 默认选择</td>
+          </tr>
+          <tr>
+            <td style="color:var(--purple)">Leaky ReLU</td>
+            <td>(−∞, +∞)</td>
+            <td class="bad-cell">否</td>
+            <td class="good-cell">基本无</td>
+            <td class="good-cell">极快</td>
+            <td class="mid-cell">x=0 不可导</td>
+            <td>替代 ReLU</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent-3)">ELU</td>
+            <td>(−α, +∞)</td>
+            <td class="mid-cell">近似</td>
+            <td class="good-cell">无</td>
+            <td class="mid-cell">中等</td>
+            <td class="good-cell">平滑</td>
+            <td>深层 CNN</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">GELU</td>
+            <td>≈(−0.17, +∞)</td>
+            <td class="mid-cell">近似</td>
+            <td class="good-cell">无</td>
+            <td class="mid-cell">中等</td>
+            <td class="good-cell">平滑</td>
+            <td>Transformer / ViT</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent-2)">Swish</td>
+            <td>≈(−0.28, +∞)</td>
+            <td class="mid-cell">近似</td>
+            <td class="good-cell">无</td>
+            <td class="mid-cell">中等</td>
+            <td class="good-cell">平滑</td>
+            <td>EfficientNet / LLM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card fi" style="max-width:1100px; width:100%; margin-top:18px; text-align:center; padding:20px">
+      <p style="font-size:15px; color:var(--text-muted); line-height:1.8">
+        没有"万能"的激活函数 —— 选择取决于<span class="hl">任务类型</span>、<span class="hl-pink">网络架构</span>和<span class="hl-green">性能需求</span>。
+        但趋势很清晰：从简单分段（ReLU）走向平滑非单调（GELU/Swish）。
+      </p>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 8: HOW TO CHOOSE ======== -->
+  <div class="slide sc" data-index="8">
+    <div class="section-label" style="color:var(--accent-3)">08 / 实践指南</div>
+    <div class="big">如何选择激活函数？</div>
+
+    <div class="row fi" style="margin-top:12px">
+      <div class="col-narrow">
+        <div class="card" style="border-left:3px solid var(--accent)">
+          <h3 style="font-size:15px">CNN 图像任务</h3>
+          <p><span class="hl">ReLU</span> 仍然是安全的默认选择。<br>追求更好效果时试 <span class="hl-pink">Swish</span>。</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--accent-2)">
+          <h3 style="font-size:15px">Transformer / NLP</h3>
+          <p><span class="hl-pink">GELU</span> 是标准选择（BERT、GPT 系列均使用）。</p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--accent-3)">
+          <h3 style="font-size:15px">输出层</h3>
+          <p>
+            二分类 → <span class="hl-yellow">Sigmoid</span><br>
+            多分类 → <span class="hl-green">Softmax</span><br>
+            回归 → 无激活 / 线性
+          </p>
+        </div>
+        <div class="card" style="border-left:3px solid var(--orange)">
+          <h3 style="font-size:15px">遇到 Dead ReLU</h3>
+          <p>换用 <span class="hl-orange">Leaky ReLU</span> 或 <span class="hl-purple">ELU</span>，或降低学习率。</p>
+        </div>
+      </div>
+
+      <div class="col-wide">
+        <div class="card" style="height:100%">
+          <div class="card-top" style="background:var(--accent-3)"></div>
+          <h3>选择流程图</h3>
+          <svg viewBox="0 0 480 420" fill="none" style="width:100%; margin-top:12px">
+            <!-- Start -->
+            <rect x="160" y="0" width="160" height="36" rx="18" fill="rgba(0,212,255,0.1)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="240" y="23" fill="#00d4ff" font-size="12" text-anchor="middle" font-weight="700" font-family="JetBrains Mono">选择激活函数</text>
+            <line x1="240" y1="36" x2="240" y2="60" stroke="#5e6178" stroke-width="1.5"/>
+            <polygon points="236,58 240,66 244,58" fill="#5e6178"/>
+
+            <!-- Q1 -->
+            <rect x="130" y="68" width="220" height="36" rx="4" fill="#191922" stroke="#ffe066" stroke-width="1.5"/>
+            <text x="240" y="90" fill="#ffe066" font-size="11" text-anchor="middle" font-family="JetBrains Mono">是输出层吗？</text>
+            <!-- Yes branch -->
+            <line x1="130" y1="86" x2="60" y2="86" stroke="#5e6178" stroke-width="1"/>
+            <line x1="60" y1="86" x2="60" y2="120" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="56,118 60,126 64,118" fill="#5e6178"/>
+            <text x="95" y="80" fill="#36f9a0" font-size="9" font-family="JetBrains Mono">是</text>
+            <rect x="10" y="128" width="100" height="56" rx="4" fill="rgba(54,249,160,0.06)" stroke="#36f9a0" stroke-width="1"/>
+            <text x="60" y="148" fill="#36f9a0" font-size="10" text-anchor="middle" font-family="JetBrains Mono">分类: Softmax</text>
+            <text x="60" y="164" fill="#36f9a0" font-size="10" text-anchor="middle" font-family="JetBrains Mono">二分类: Sigmoid</text>
+            <text x="60" y="178" fill="#36f9a0" font-size="9" text-anchor="middle" font-family="JetBrains Mono">回归: 线性</text>
+            <!-- No branch -->
+            <line x1="240" y1="104" x2="240" y2="134" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="236,132 240,140 244,132" fill="#5e6178"/>
+            <text x="254" y="124" fill="#ff3cac" font-size="9" font-family="JetBrains Mono">否</text>
+
+            <!-- Q2 -->
+            <rect x="130" y="142" width="220" height="36" rx="4" fill="#191922" stroke="#ffe066" stroke-width="1.5"/>
+            <text x="240" y="164" fill="#ffe066" font-size="11" text-anchor="middle" font-family="JetBrains Mono">Transformer 架构？</text>
+            <!-- Yes -->
+            <line x1="130" y1="160" x2="60" y2="160" stroke="#5e6178" stroke-width="1"/>
+            <line x1="60" y1="160" x2="60" y2="210" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="56,208 60,216 64,208" fill="#5e6178"/>
+            <text x="95" y="154" fill="#36f9a0" font-size="9" font-family="JetBrains Mono">是</text>
+            <rect x="10" y="218" width="100" height="32" rx="4" fill="rgba(0,212,255,0.06)" stroke="#00d4ff" stroke-width="1"/>
+            <text x="60" y="238" fill="#00d4ff" font-size="11" text-anchor="middle" font-weight="700" font-family="JetBrains Mono">GELU</text>
+            <!-- No -->
+            <line x1="240" y1="178" x2="240" y2="208" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="236,206 240,214 244,206" fill="#5e6178"/>
+            <text x="254" y="198" fill="#ff3cac" font-size="9" font-family="JetBrains Mono">否</text>
+
+            <!-- Q3 -->
+            <rect x="130" y="216" width="220" height="36" rx="4" fill="#191922" stroke="#ffe066" stroke-width="1.5"/>
+            <text x="240" y="238" fill="#ffe066" font-size="11" text-anchor="middle" font-family="JetBrains Mono">追求极致性能？</text>
+            <!-- Yes -->
+            <line x1="130" y1="234" x2="60" y2="234" stroke="#5e6178" stroke-width="1"/>
+            <line x1="60" y1="234" x2="60" y2="290" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="56,288 60,296 64,288" fill="#5e6178"/>
+            <text x="95" y="228" fill="#36f9a0" font-size="9" font-family="JetBrains Mono">是</text>
+            <rect x="10" y="298" width="100" height="32" rx="4" fill="rgba(255,60,172,0.06)" stroke="#ff3cac" stroke-width="1"/>
+            <text x="60" y="318" fill="#ff3cac" font-size="11" text-anchor="middle" font-weight="700" font-family="JetBrains Mono">Swish</text>
+            <!-- No -->
+            <line x1="240" y1="252" x2="240" y2="282" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="236,280 240,288 244,280" fill="#5e6178"/>
+            <text x="254" y="272" fill="#ff3cac" font-size="9" font-family="JetBrains Mono">否</text>
+
+            <!-- Q4 -->
+            <rect x="130" y="290" width="220" height="36" rx="4" fill="#191922" stroke="#ffe066" stroke-width="1.5"/>
+            <text x="240" y="312" fill="#ffe066" font-size="11" text-anchor="middle" font-family="JetBrains Mono">有 Dead ReLU 问题？</text>
+            <!-- Yes -->
+            <line x1="130" y1="308" x2="60" y2="308" stroke="#5e6178" stroke-width="1"/>
+            <line x1="60" y1="308" x2="60" y2="352" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="56,350 60,358 64,350" fill="#5e6178"/>
+            <text x="95" y="302" fill="#36f9a0" font-size="9" font-family="JetBrains Mono">是</text>
+            <rect x="5" y="360" width="110" height="32" rx="4" fill="rgba(168,85,247,0.06)" stroke="#a855f7" stroke-width="1"/>
+            <text x="60" y="380" fill="#a855f7" font-size="11" text-anchor="middle" font-weight="700" font-family="JetBrains Mono">Leaky ReLU</text>
+            <!-- No -->
+            <line x1="240" y1="326" x2="240" y2="356" stroke="#5e6178" stroke-width="1"/>
+            <polygon points="236,354 240,362 244,354" fill="#5e6178"/>
+            <text x="254" y="346" fill="#ff3cac" font-size="9" font-family="JetBrains Mono">否</text>
+
+            <!-- Default -->
+            <rect x="160" y="364" width="160" height="36" rx="4" fill="rgba(0,212,255,0.08)" stroke="#00d4ff" stroke-width="2"/>
+            <text x="240" y="386" fill="#00d4ff" font-size="13" text-anchor="middle" font-weight="700" font-family="JetBrains Mono">ReLU ✓</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SLIDE 9: SUMMARY ======== -->
+  <div class="slide sc" data-index="9">
+    <div class="section-label" style="color:var(--accent)">09 / 总结</div>
+    <div class="big" style="font-size:clamp(26px,3.5vw,42px)">激活函数的演进之路</div>
+
+    <div class="sum-grid fi" style="margin-top:20px">
+      <div class="sum-card">
+        <div class="sum-icon">σ</div>
+        <div>
+          <h3>非线性是核心</h3>
+          <p>没有激活函数，神经网络就是线性变换的堆叠，表达能力极其有限。激活函数赋予了网络拟合任意复杂函数的能力。</p>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">∇</div>
+        <div>
+          <h3>梯度是关键约束</h3>
+          <p>激活函数的选择直接影响梯度流。Sigmoid/Tanh 的梯度消失催生了 ReLU，ReLU 的 Dead 问题催生了变体。</p>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">~</div>
+        <div>
+          <h3>从分段到平滑</h3>
+          <p>演进方向是：分段线性（ReLU）→ 平滑非单调（GELU/Swish）。平滑性让优化更稳定，非单调性带来隐式正则化。</p>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">⚡</div>
+        <div>
+          <h3>实用建议</h3>
+          <p>CNN 默认 ReLU，Transformer 用 GELU，大模型用 Swish，输出层按任务选择。没有万能解，根据场景决定。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fi" style="max-width:1000px; width:100%; margin-top:20px; text-align:center; padding:24px; border-top:3px solid var(--accent)">
+      <p style="font-size:18px; font-weight:700; line-height:1.8">
+        <span style="color:var(--yellow)">Sigmoid</span> →
+        <span style="color:var(--orange)">Tanh</span> →
+        <span style="color:var(--accent)">ReLU</span> →
+        <span style="color:var(--purple)">Leaky ReLU</span> →
+        <span style="color:var(--accent)">GELU</span> →
+        <span style="color:var(--accent-2)">Swish</span>
+      </p>
+      <p style="font-size:14px; color:var(--text-muted); margin-top:8px">
+        每一代都在解决上一代的核心缺陷，推动深度学习不断突破边界
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <div class="nav-progress" id="navProgress"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <span class="nav-page" id="pageIndicator">1 / 10</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let cur = 0;
+
+  const nav = document.getElementById('navProgress');
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    nav.appendChild(d);
+  }
+
+  function goTo(i) {
+    if (i < 0 || i >= total || i === cur) return;
+    slides[cur].classList.remove('active');
+    cur = i;
+    slides[cur].classList.add('active');
+    upd();
+  }
+
+  function navigate(d) { goTo(cur + d); }
+
+  function upd() {
+    document.querySelectorAll('.nav-dot').forEach((d, i) => {
+      d.className = 'nav-dot' + (i === cur ? ' active' : '');
+    });
+    document.getElementById('pageIndicator').textContent = (cur + 1) + ' / ' + total;
+    document.getElementById('btnPrev').disabled = cur === 0;
+    document.getElementById('btnNext').disabled = cur === total - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); navigate(1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); navigate(-1); }
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.changedTouches[0].screenX; });
+  document.addEventListener('touchend', e => {
+    const d = tx - e.changedTouches[0].screenX;
+    if (Math.abs(d) > 60) d > 0 ? navigate(1) : navigate(-1);
+  });
+
+  upd();
+</script>
+
+</body>
+</html>
