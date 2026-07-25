@@ -94,7 +94,10 @@ PRESENTATIONS.sort((a, b) => {
 async function loadHtmlSlide(path: string): Promise<any> {
   try {
     const response = await fetch(path)
-    const html = await response.text()
+    let html = await response.text()
+    
+    // 移除 Vite 注入的 script 标签
+    html = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
     
     // 创建一个 Vue 组件来渲染 HTML
     // 直接返回组件选项对象，而不是包含 default 的模块
