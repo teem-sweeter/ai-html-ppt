@@ -3,17 +3,22 @@ import { ref, computed, onMounted, watch } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import Player from './components/Player.vue'
 import ProgressBar from './components/ProgressBar.vue'
-import { PRESENTATIONS } from './presentations/registry'
+import { PRESENTATIONS, workspacesReady } from './presentations/registry'
 
 const currentPptId = ref('pooling')
 const currentPage = ref(0)
+const ready = ref(false)
 
 const currentPresentation = computed(() => {
   return PRESENTATIONS.find(p => p.id === currentPptId.value) || PRESENTATIONS[0]
 })
 
 // 从URL查询参数初始化状态
-onMounted(() => {
+onMounted(async () => {
+  // 等待工作空间加载完成
+  await workspacesReady
+  ready.value = true
+
   const params = new URLSearchParams(window.location.search)
   const pptId = params.get('ppt')
   const page = params.get('page')
@@ -44,7 +49,7 @@ watch(currentPptId, () => {
 </script>
 
 <template>
-  <div class="app">
+  <div class="app" v-if="ready">
     <Sidebar 
       :current-ppt-id="currentPptId"
       @update:current-ppt-id="currentPptId = $event"
@@ -64,6 +69,9 @@ watch(currentPptId, () => {
       />
     </div>
   </div>
+  <div v-else class="loading">
+    <p>加载中...</p>
+  </div>
 </template>
 
 <style scoped>
@@ -78,5 +86,13 @@ watch(currentPptId, () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: var(--text-muted);
 }
 </style>

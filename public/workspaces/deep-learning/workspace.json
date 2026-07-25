@@ -1,0 +1,28 @@
+{
+  "id": "deep-learning",
+  "name": "Deep Learning",
+  "description": "",
+  "presentations": [
+    {
+      "id": "activation",
+      "title": "Activation",
+      "description": "",
+      "file": "presentation.html",
+      "totalSlides": 8
+    },
+    {
+      "id": "pooling",
+      "title": "Pooling",
+      "description": "",
+      "file": "presentation.html",
+      "totalSlides": 8
+    },
+    {
+      "id": "resnet",
+      "title": "Resnet",
+      "description": "",
+      "file": "presentation.html",
+      "totalSlides": 8
+    }
+  ]
+}
