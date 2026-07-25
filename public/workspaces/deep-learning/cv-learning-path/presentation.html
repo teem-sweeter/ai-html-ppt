@@ -659,8 +659,67 @@
     </div>
   </div>
 
-  <!-- SLIDE 5: 第二阶段概述 -->
+  <!-- SLIDE 5: 深度学习入门 -->
   <div class="slide slide-content" data-index="5">
+    <div class="section-tag" style="color:var(--accent)">模块 3</div>
+    <h2>深度学习入门</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>神经网络基本结构</h3>
+        <ul>
+          <li><span class="highlight">神经元</span>：接收输入，加权求和，激活输出</li>
+          <li><span class="highlight">层</span>：多个神经元组成一层</li>
+          <li><span class="highlight">网络</span>：多层堆叠形成网络</li>
+          <li>输入层 → 隐藏层 → 输出层</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>前向传播</h3>
+        <p>数据从输入层流向输出层的过程</p>
+        <div class="code-block" style="margin-top:8px; font-size:12px">
+          z = W·x + b<br>
+          a = σ(z)
+        </div>
+        <p style="margin-top:8px; color:var(--text-muted)">每一层的输出是下一层的输入</p>
+      </div>
+      <div class="card">
+        <h3>反向传播</h3>
+        <p>误差从输出层反向传播，计算梯度</p>
+        <div class="code-block" style="margin-top:8px; font-size:12px">
+          损失 → 梯度 → 更新权重
+        </div>
+        <p style="margin-top:8px; color:var(--text-muted)">链式法则：∂L/∂W = ∂L/∂a · ∂a/∂z · ∂z/∂W</p>
+      </div>
+      <div class="card">
+        <h3>常用激活函数</h3>
+        <ul>
+          <li><span class="highlight">ReLU</span>：max(0, x)，简单高效</li>
+          <li><span class="highlight">Sigmoid</span>：输出(0,1)，用于二分类</li>
+          <li><span class="highlight">Softmax</span>：多分类输出</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">激活函数引入非线性，让网络能拟合复杂函数</p>
+      </div>
+      <div class="card">
+        <h3>损失函数</h3>
+        <ul>
+          <li><span class="highlight">MSE</span>：均方误差，用于回归</li>
+          <li><span class="highlight">CrossEntropy</span>：交叉熵，用于分类</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">衡量预测值与真实值的差距</p>
+      </div>
+      <div class="card">
+        <h3>优化器</h3>
+        <ul>
+          <li><span class="highlight">SGD</span>：随机梯度下降</li>
+          <li><span class="highlight">Adam</span>：自适应学习率</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">根据梯度更新权重，最小化损失</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: 第二阶段概述 -->
+  <div class="slide slide-content" data-index="6">
     <div class="section-tag" style="color:var(--accent-2)">⚔️ 第二阶段</div>
     <h2>经典视觉主干与下游任务</h2>
     <div class="content-grid cols-3">
@@ -684,8 +743,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 6: CNN骨干网络 -->
-  <div class="slide slide-content" data-index="6">
+  <!-- SLIDE 7: CNN骨干网络 -->
+  <div class="slide slide-content" data-index="7">
     <div class="section-tag" style="color:var(--accent-2)">模块 4</div>
     <h2>CNN 特征提取主干演进</h2>
     <div class="module-grid">
@@ -728,8 +787,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 7: 目标检测 -->
-  <div class="slide slide-content" data-index="7">
+  <!-- SLIDE 8: 目标检测 -->
+  <div class="slide slide-content" data-index="8">
     <div class="section-tag" style="color:var(--accent-2)">模块 5</div>
     <h2>目标检测两大范式</h2>
     <div class="content-grid">
@@ -760,8 +819,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 8: 第三阶段概述 -->
-  <div class="slide slide-content" data-index="8">
+  <!-- SLIDE 9: 第三阶段概述 -->
+  <div class="slide slide-content" data-index="9">
     <div class="section-tag" style="color:var(--green)">⚔️ 第三阶段</div>
     <h2>Transformer 架构与端到端新范式</h2>
     <div class="content-grid">
@@ -790,8 +849,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 9: 第四阶段 -->
-  <div class="slide slide-content" data-index="9">
+  <!-- SLIDE 10: 第四阶段 -->
+  <div class="slide slide-content" data-index="10">
     <div class="section-tag" style="color:var(--accent-3)">⚔️ 第四阶段</div>
     <h2>多模态智能与前沿风口</h2>
     <div class="content-grid cols-3">
@@ -832,8 +891,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 10: 第五阶段 -->
-  <div class="slide slide-content" data-index="10">
+  <!-- SLIDE 11: 第五阶段 -->
+  <div class="slide slide-content" data-index="11">
     <div class="section-tag" style="color:var(--purple)">⚔️ 第五阶段</div>
     <h2>高性能架构与工业部署</h2>
     <div class="content-grid">
@@ -870,8 +929,8 @@
     </div>
   </div>
 
-  <!-- SLIDE 11: 总结 -->
-  <div class="slide slide-content" data-index="11">
+  <!-- SLIDE 12: 总结 -->
+  <div class="slide slide-content" data-index="12">
     <div class="section-tag" style="color:var(--accent)">总结</div>
     <h2>执行铁律</h2>
     <div class="summary-grid">
