@@ -25,7 +25,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import html2canvas from 'html2canvas'
 import Toolbar from './Toolbar.vue'
 
 interface Presentation {
@@ -116,37 +115,75 @@ function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-// 下载PNG - 使用html2canvas截图
+// 下载PNG - 通过SVG foreignObject转Canvas
 async function downloadPng() {
-  if (!iframeRef.value?.contentDocument?.body) {
+  if (!iframeRef.value?.contentDocument || !iframeRef.value?.contentWindow) {
     alert('无法访问页面内容')
     return
   }
   try {
     const iframeDoc = iframeRef.value.contentDocument
-    const iframeWin = iframeRef.value.contentWindow
-    const width = iframeWin?.innerWidth || 1920
-    const height = iframeWin?.innerHeight || 1080
+    const width = iframeRef.value.contentWindow.innerWidth || 1920
+    const height = iframeRef.value.contentWindow.innerHeight || 1080
 
-    // 使用html2canvas截图iframe内容
-    const canvas = await html2canvas(iframeDoc.body, {
-      width: width,
-      height: height,
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: null,
-      logging: false
-    })
+    // 获取iframe的样式和内容
+    const css = Array.from(iframeDoc.querySelectorAll('style'))
+      .map(s => s.textContent)
+      .join('\n')
 
-    // 导出为PNG
-    const url = canvas.toDataURL('image/png')
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${props.presentation.id}-slide${props.currentPage + 1}.png`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    // 构建带样式的HTML
+    const styledHtml = `
+      <html xmlns="http://www.w3.org/1999/xhtml">
+        <head><style>${css}</style></head>
+        <body style="margin:0;padding:0;">${iframeDoc.body.innerHTML}</body>
+      </html>
+    `
+
+    // 转为SVG foreignObject
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        <foreignObject width="100%" height="100%">
+          ${styledHtml}
+        </foreignObject>
+      </svg>
+    `
+
+    // SVG转Blob URL
+    const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+
+    // 创建Image加载SVG
+    const img = new Image()
+    img.onload = () => {
+      // 绘制到Canvas
+      const canvas = document.createElement('canvas')
+      canvas.width = width * 2  // 2倍清晰度
+      canvas.height = height * 2
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+
+      ctx.scale(2, 2)
+      ctx.drawImage(img, 0, 0, width, height)
+      URL.revokeObjectURL(svgUrl)
+
+      // 导出PNG
+      canvas.toBlob((blob) => {
+        if (!blob) return
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${props.presentation.id}-slide${props.currentPage + 1}.png`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 'image/png')
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(svgUrl)
+      alert('截图失败，部分内容可能无法渲染')
+    }
+    img.src = svgUrl
   } catch (e) {
     console.error('Download PNG error:', e)
     alert('下载PNG失败: ' + (e as Error).message)

@@ -28,7 +28,6 @@
   },
   "homepage": "https://github.com/teem-sweeter/ai-html-ppt#readme",
   "dependencies": {
-    "html2canvas": "^1.4.1",
     "vue": "^3.5.39"
   },
   "devDependencies": {
