@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 // 从工作空间模块导入类型
 export interface SlideConfig {
   file: string
@@ -92,9 +94,10 @@ async function loadHtmlSlide(path: string): Promise<any> {
     // 创建一个 Vue 组件来渲染 HTML
     return {
       default: {
-        template: `<div class="html-slide" v-html="content"></div>`,
+        template: `<div class="html-slide-wrapper" v-html="content"></div>`,
         setup() {
-          return { content: html }
+          const content = ref(html)
+          return { content }
         }
       }
     }
@@ -105,7 +108,8 @@ async function loadHtmlSlide(path: string): Promise<any> {
       default: {
         template: `<div class="slide-error">加载失败: {{ path }}</div>`,
         setup() {
-          return { path }
+          const pathRef = ref(path)
+          return { path: pathRef }
         }
       }
     }
