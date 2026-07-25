@@ -1,0 +1,107 @@
+<div class="slide-container">
+<div class="slide sc" data-index="3">
+    <div class="section-label" style="color:var(--orange)">03 / 经典激活函数</div>
+    <div class="big">Tanh — <span class="hl-orange">零中心的改进</span></div>
+
+    <div class="func-detail fi">
+      <div class="func-chart">
+        <div class="func-name" style="color:var(--orange)">tanh(x) = (e<sup>x</sup> − e<sup>−x</sup>) / (e<sup>x</sup> + e<sup>−x</sup>)</div>
+        <svg viewBox="0 0 400 280" fill="none" style="width:100%">
+          <line x1="40" y1="140" x2="380" y2="140" stroke="#252536" stroke-width="1"/>
+          <line x1="200" y1="20" x2="200" y2="260" stroke="#252536" stroke-width="1"/>
+          <text x="385" y="144" fill="#5e6178" font-size="10" font-family="JetBrains Mono">0</text>
+          <text x="200" y="18" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">+1</text>
+          <text x="200" y="272" fill="#5e6178" font-size="10" text-anchor="middle" font-family="JetBrains Mono">−1</text>
+          <text x="120" y="152" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">-2</text>
+          <text x="280" y="152" fill="#5e6178" font-size="9" text-anchor="middle" font-family="JetBrains Mono">+2</text>
+          <line x1="40" y1="24" x2="380" y2="24" stroke="#5e6178" stroke-width="0.5" stroke-dasharray="4"/>
+          <line x1="40" y1="256" x2="380" y2="256" stroke="#5e6178" stroke-width="0.5" stroke-dasharray="4"/>
+          <!-- Tanh curve -->
+          <path d="M40 256 Q80 254 120 246 Q160 220 180 190 Q195 160 200 140 Q205 120 220 90 Q240 54 280 34 Q320 26 380 24"
+                stroke="#ff8c42" stroke-width="3" fill="none"/>
+          <circle cx="200" cy="140" r="5" fill="#ff8c42"/>
+          <text x="218" y="136" fill="#ff8c42" font-size="10" font-family="JetBrains Mono">(0, 0)</text>
+          <rect x="290" y="60" width="86" height="24" rx="3" fill="rgba(255,140,66,0.08)"/>
+          <text x="333" y="76" fill="#ff8c42" font-size="10" text-anchor="middle" font-family="JetBrains Mono">值域: (−1, +1)</text>
+        </svg>
+      </div>
+
+      <div class="func-info">
+        <div class="formula-box" style="max-width:100%">
+          <div class="formula-main" style="color:var(--orange)">tanh(x)</div>
+          <div class="formula-note">导数: tanh'(x) = 1 − tanh²(x)<br>本质上是 Sigmoid 的缩放平移版本</div>
+        </div>
+
+        <div class="pc-row">
+          <div class="pc-box good">
+            <h4>优点 vs Sigmoid</h4>
+            <ul>
+              <li><span class="hl-green">零中心</span>输出 (−1, +1)</li>
+              <li>梯度更强（最大值 1 vs 0.25）</li>
+              <li>收敛速度更快</li>
+            </ul>
+          </div>
+          <div class="pc-box bad">
+            <h4>仍然存在的问题</h4>
+            <ul>
+              <li>两端仍有<span class="hl-pink">梯度消失</span></li>
+              <li>仍含 exp 运算，计算开销</li>
+              <li>深层网络效果仍不理想</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" style="border-left:3px solid var(--orange)">
+          <h3 style="font-size:14px">与 Sigmoid 的关系</h3>
+          <p style="font-size:13px; font-family:'JetBrains Mono'; line-height:1.8">
+            tanh(x) = 2σ(2x) − 1<br>
+            <span style="color:var(--text-muted)">tanh 是 sigmoid 的线性变换版本，值域从 (0,1) 变为 (−1,+1)</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

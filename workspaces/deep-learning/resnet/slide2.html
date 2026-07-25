@@ -1,0 +1,81 @@
+<div class="slide-container">
+<div class="slide slide-content" data-index="2">
+    <div class="section-label">02 / 核心思想</div>
+    <div class="big-text">如果学习恒等映射很难，<br>那就让它<span class="highlight">变得容易</span></div>
+    <p class="desc-text fade-item" style="margin-bottom: 36px;">
+      ResNet 的核心洞察：与其让网络直接学习目标映射 H(x)，不如让它学习<span class="highlight">残差</span>
+      F(x) = H(x) − x。这样，如果最优解就是恒等映射，网络只需把 F(x) 学成 0 即可——
+      比学习 H(x) = x 容易得多。
+    </p>
+
+    <div class="comparison-row fade-item">
+      <div class="comparison-col plain">
+        <h3 style="color:var(--danger)">传统网络</h3>
+        <p style="color:var(--text-muted); font-size:15px; line-height:1.8; margin-bottom:16px">
+          直接学习目标映射 H(x)
+        </p>
+        <div style="background:var(--surface-2); border-radius:4px; padding:20px; text-align:center; font-family:'JetBrains Mono'; font-size:20px; font-weight:700; color:var(--danger)">
+          x → [层] → H(x)
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:14px; line-height:1.6">
+          如果最优解是恒等映射，需要把权重学成恰好使得 H(x) = x，这很难精确优化。
+        </p>
+      </div>
+      <div class="comparison-col resnet">
+        <h3 style="color:var(--accent-3)">残差网络 (ResNet)</h3>
+        <p style="color:var(--text-muted); font-size:15px; line-height:1.8; margin-bottom:16px">
+          学习残差 F(x) = H(x) − x
+        </p>
+        <div style="background:var(--surface-2); border-radius:4px; padding:20px; text-align:center; font-family:'JetBrains Mono'; font-size:20px; font-weight:700; color:var(--accent-3)">
+          x → [层] → F(x) + x
+        </div>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:14px; line-height:1.6">
+          如果最优解是恒等映射，只需 F(x) → 0，把权重推向 0 即可——这是优化器擅长的。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

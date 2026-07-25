@@ -1,0 +1,86 @@
+<div class="slide-container">
+<div class="slide slide-final" data-index="6">
+    <h2>计算完成 — 最终结果</h2>
+    <div class="final-layout">
+      <div class="final-4x4">
+        <div class="grid-label">输入 4×4</div>
+        <div class="matrix-4x4" style="margin-top:12px">
+          <div class="matrix-cell" style="background:rgba(0,229,255,0.06); border-color:rgba(0,229,255,0.2)">1</div>
+          <div class="matrix-cell" style="background:rgba(0,229,255,0.06); border-color:rgba(0,229,255,0.2)">3</div>
+          <div class="matrix-cell" style="background:rgba(124,77,255,0.06); border-color:rgba(124,77,255,0.2)">2</div>
+          <div class="matrix-cell" style="background:rgba(124,77,255,0.06); border-color:rgba(124,77,255,0.2)">4</div>
+          <div class="matrix-cell" style="background:rgba(0,229,255,0.06); border-color:rgba(0,229,255,0.2)">5</div>
+          <div class="matrix-cell max-cell">6</div>
+          <div class="matrix-cell" style="background:rgba(124,77,255,0.06); border-color:rgba(124,77,255,0.2)">1</div>
+          <div class="matrix-cell max-cell" style="background:rgba(124,77,255,0.2); border-color:var(--accent-2); color:var(--accent-2)">4</div>
+          <div class="matrix-cell" style="background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2)">2</div>
+          <div class="matrix-cell" style="background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2)">1</div>
+          <div class="matrix-cell" style="background:rgba(255,109,0,0.06); border-color:rgba(255,109,0,0.2)">7</div>
+          <div class="matrix-cell" style="background:rgba(255,109,0,0.06); border-color:rgba(255,109,0,0.2)">3</div>
+          <div class="matrix-cell max-cell" style="background:rgba(0,230,118,0.2); border-color:var(--green); color:var(--green)">8</div>
+          <div class="matrix-cell" style="background:rgba(0,230,118,0.06); border-color:rgba(0,230,118,0.2)">4</div>
+          <div class="matrix-cell max-cell" style="background:rgba(255,109,0,0.2); border-color:var(--accent-3); color:var(--accent-3)">9</div>
+          <div class="matrix-cell" style="background:rgba(255,109,0,0.06); border-color:rgba(255,109,0,0.2)">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line" style="width:80px"></div>
+      </div>
+      <div class="final-2x2">
+        <div class="grid-label">输出 2×2</div>
+        <div class="matrix-2x2" style="margin-top:12px">
+          <div class="matrix-cell result-new">6</div>
+          <div class="matrix-cell result-new">4</div>
+          <div class="matrix-cell result-new">8</div>
+          <div class="matrix-cell result-new">9</div>
+        </div>
+      </div>
+    </div>
+    <p class="final-note">
+      空间尺寸从 <strong>4×4</strong> 压缩为 <strong>2×2</strong>，通道数不变 — 每个窗口取最大值，保留最强激活信号
+    </p>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

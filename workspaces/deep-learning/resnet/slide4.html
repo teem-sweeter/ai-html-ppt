@@ -1,0 +1,90 @@
+<div class="slide-container">
+<div class="slide slide-content" data-index="4">
+    <div class="section-label">04 / 数学表达</div>
+    <div class="big-text" style="font-size:clamp(24px,3vw,38px)">残差学习的数学本质</div>
+
+    <div class="formula-box fade-item">
+      <div class="formula-main">
+        <span style="color:#edf0f7">y</span> = <span style="color:#ff6b35">F(x, {W<sub>i</sub>})</span> + <span style="color:#06d6a0">x</span>
+      </div>
+      <div class="formula-note">
+        <span style="color:#06d6a0">x</span>：输入（恒等映射）&nbsp;&nbsp;
+        <span style="color:#ff6b35">F(x)</span>：残差函数（要学习的部分）&nbsp;&nbsp;
+        <span style="color:#edf0f7">y</span>：输出
+      </div>
+    </div>
+
+    <div class="body-row fade-item" style="margin-top:24px">
+      <div class="card">
+        <div class="card-accent-top" style="background:var(--accent-2)"></div>
+        <h3>如果最优映射接近恒等</h3>
+        <p style="margin-bottom:10px">理想情况：H(x) ≈ x</p>
+        <div style="font-family:'JetBrains Mono'; font-size:15px; color:var(--accent-2); margin-bottom:10px">
+          F(x) = H(x) − x ≈ 0
+        </div>
+        <p>网络只需将权重推向零即可——优化器非常擅长这个任务。</p>
+      </div>
+      <div class="card">
+        <div class="card-accent-top" style="background:var(--accent-3)"></div>
+        <h3>如果最优映射需要学习</h3>
+        <p style="margin-bottom:10px">网络仍然有能力学习复杂的 F(x)</p>
+        <div style="font-family:'JetBrains Mono'; font-size:15px; color:var(--accent-3); margin-bottom:10px">
+          F(x) = H(x) − x ≠ 0
+        </div>
+        <p>残差块有两层卷积，足够表达复杂的非线性变换。不会损失任何表达能力。</p>
+      </div>
+      <div class="card">
+        <div class="card-accent-top" style="background:var(--blue)"></div>
+        <h3>维度不匹配时</h3>
+        <p style="margin-bottom:10px">当通道数或尺寸变化时：</p>
+        <div style="font-family:'JetBrains Mono'; font-size:15px; color:var(--blue); margin-bottom:10px">
+          y = F(x, {W<sub>i</sub>}) + <span style="font-weight:700">W<sub>s</sub> · x</span>
+        </div>
+        <p>通过 ×1 卷积（W<sub>s</sub>）投影 x 到匹配维度，再做加法。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

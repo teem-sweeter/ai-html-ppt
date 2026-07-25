@@ -1,0 +1,89 @@
+<div class="slide-container">
+<div class="slide slide-content" data-index="9">
+    <div class="section-label">09 / 总结</div>
+    <div class="big-text" style="font-size:clamp(24px,3.5vw,44px)">ResNet 带来了什么？</div>
+
+    <div class="summary-grid fade-item" style="margin-top:28px">
+      <div class="summary-card">
+        <div class="summary-icon">F</div>
+        <div>
+          <h3>残差学习</h3>
+          <p>学习 F(x) = H(x) − x，而非直接学 H(x)。让恒等映射变得容易学习，解决退化问题。</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon">+</div>
+        <div>
+          <h3>跳跃连接</h3>
+          <p>shortcut connection 直接传递输入，梯度有了"高速公路"，训练数百层成为可能。</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon">D</div>
+        <div>
+          <h3>突破深度极限</h3>
+          <p>从此前约 20 层的上限，一举推进到 152 层甚至更深，同时训练误差持续下降。</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon">★</div>
+        <div>
+          <h3>深远影响</h3>
+          <p>残差连接已成为现代网络的标配组件，影响了 Transformer、DenseNet 等后续架构的设计哲学。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula-box fade-item" style="margin-top:28px; border-color:rgba(255,107,53,0.3)">
+      <div class="formula-main" style="font-size:clamp(22px,3vw,36px)">
+        <span style="color:#edf0f7">y</span> = <span style="color:#ff6b35">F(x)</span> + <span style="color:#06d6a0">x</span>
+      </div>
+      <div class="formula-note">
+        一个简单优雅的加法，彻底改变了深度学习的历史进程。
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

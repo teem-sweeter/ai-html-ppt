@@ -1,0 +1,76 @@
+<div class="slide-container">
+<div class="slide slide-concept" data-index="1">
+    <div class="section-tag">01 / 核心概念</div>
+    <h2>什么是池化？</h2>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="num">01</div>
+        <h3>下采样操作</h3>
+        <p>池化在空间维度上对特征图进行压缩，用一个值来概括局部区域的信息，将一小块区域"浓缩"成一个值。</p>
+      </div>
+      <div class="concept-card">
+        <div class="num">02</div>
+        <h3>降低计算量</h3>
+        <p>特征图尺寸缩小后，后续层的参数和计算量大幅减少，提升网络运行效率。</p>
+      </div>
+      <div class="concept-card">
+        <div class="num">03</div>
+        <h3>提取主要特征</h3>
+        <p>保留最突出的信息，过滤掉不重要的细节，提取局部最显著的特征响应。</p>
+      </div>
+      <div class="concept-card">
+        <div class="num">04</div>
+        <h3>平移不变性</h3>
+        <p>特征位置稍有偏移时，池化后的结果变化不大，增强模型对位置变化的鲁棒性。</p>
+      </div>
+    </div>
+    <div class="pool-type-row">
+      <div class="pool-type-badge">Max Pooling — 最大池化</div>
+      <div class="pool-type-badge">Average Pooling — 平均池化</div>
+      <div class="pool-type-badge">Global Avg Pooling — 全局平均池化</div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

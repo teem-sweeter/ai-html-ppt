@@ -1,0 +1,99 @@
+<div class="slide-container">
+<div class="slide slide-calc" data-index="4">
+    <div class="calc-header">
+      <span class="step-badge">STEP 3 / 4</span>
+      <h2>左下区域（行2-3，列0-1）</h2>
+    </div>
+    <div class="calc-body">
+      <div class="grid-wrapper">
+        <div class="grid-label">输入特征图 4×4</div>
+        <div class="matrix-4x4">
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell dim-cell">5</div>
+          <div class="matrix-cell dim-cell">6</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">0</div>
+          <div class="matrix-cell active-cell">2</div>
+          <div class="matrix-cell active-cell">1</div>
+          <div class="matrix-cell dim-cell">7</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell max-cell">8</div>
+          <div class="matrix-cell active-cell">4</div>
+          <div class="matrix-cell dim-cell">9</div>
+          <div class="matrix-cell dim-cell">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line"></div>
+      </div>
+      <div class="grid-wrapper">
+        <div class="grid-label">输出特征图 2×2</div>
+        <div class="matrix-2x2">
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">6</div>
+          <div class="matrix-cell" style="opacity:0.4; color:var(--accent)">4</div>
+          <div class="matrix-cell result-new">8</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+        </div>
+      </div>
+      <div class="formula-section">
+        <div class="formula-title">COMPUTATION</div>
+        <div class="formula-values">
+          <span class="formula-val">2</span>
+          <span class="formula-val">1</span>
+          <span class="formula-val" style="color:var(--highlight); border-color:var(--highlight)">8</span>
+          <span class="formula-val">4</span>
+        </div>
+        <div class="formula-result">
+          max(2, 1, 8, 4) = <strong>8</strong><br><br>
+          result[1][0] = <strong>8</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

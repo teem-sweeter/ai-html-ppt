@@ -1,16 +1,18 @@
 # AI HTML PPT
 
-基于 Vue 3 + Vite + TypeScript 的 AI HTML PPT 演示系统，支持自动发现、动态加载、全屏展示等功能。
+基于 Vue 3 + Vite + TypeScript 的 AI HTML PPT 演示系统，支持工作空间管理、自动发现、动态加载、全屏展示等功能。
 
 ## ✨ 功能特点
 
-- 🎯 **自动发现** - 无需手动注册，自动扫描并加载 PPT 演示文稿
+- 📁 **工作空间管理** - 支持多个工作空间，每个工作空间包含多个 PPT
+- 🎯 **自动发现** - 无需手动注册，自动扫描并加载工作空间和 PPT
+- 📄 **多格式支持** - 支持 HTML、Markdown、Vue 组件等多种格式
 - 📱 **响应式设计** - 支持桌面端和移动端，自适应屏幕尺寸
 - 🖥️ **全屏展示** - 支持全屏播放，提供沉浸式演示体验
 - ⌨️ **多种翻页方式** - 键盘方向键、鼠标点击、触摸滑动、导航按钮
 - 🎨 **精美动画** - 流畅的过渡动画和交互效果
 - 📦 **按需加载** - 每页独立加载，优化首屏加载速度
-- 🔧 **易于扩展** - 简单的目录结构，轻松添加新的 PPT
+- 🔧 **易于扩展** - 简单的目录结构，轻松添加新的工作空间和 PPT
 
 ## 🚀 快速开始
 
@@ -45,75 +47,88 @@ npm run preview
 ## 📁 项目结构
 
 ```
-ppt-viewer/
-├── public/                    # 静态资源
+ai-html-ppt/
+├── workspaces/                 # 🌟 工作空间目录
+│   ├── registry.ts             # 工作空间注册中心（自动发现）
+│   └── deep-learning/          # 示例工作空间：深度学习
+│       ├── index.ts            # 工作空间配置
+│       ├── pooling/            # PPT：池化
+│       │   ├── slide0.html     # 幻灯片页面
+│       │   ├── slide1.html
+│       │   └── ...
+│       ├── activation/         # PPT：激活函数
+│       └── resnet/             # PPT：ResNet
 ├── src/
-│   ├── assets/               # 全局样式、字体等
-│   │   └── base.css          # 基础样式和 CSS 变量
-│   ├── components/           # 核心组件
-│   │   ├── Sidebar.vue       # 左侧 PPT 列表组件
-│   │   ├── Player.vue        # 右侧 PPT 播放器核心组件
-│   │   └── ProgressBar.vue   # 底部进度条和导航组件
-│   ├── presentations/        # 🌟 PPT 内容存放区
-│   │   ├── registry.ts       # 全局 PPT 注册中心（自动发现）
-│   │   ├── pooling/          # 池化 PPT 示例
-│   │   ├── activation/       # 激活函数 PPT 示例
-│   │   └── resnet/           # ResNet PPT 示例
-│   ├── App.vue               # 主布局
-│   └── main.ts               # 入口文件
-├── index.html                # HTML 入口
-├── vite.config.ts            # Vite 配置
-├── tsconfig.json             # TypeScript 配置
-└── package.json              # 项目配置
+│   ├── assets/                 # 全局样式、字体等
+│   │   └── base.css            # 基础样式和 CSS 变量
+│   ├── components/             # 核心组件
+│   │   ├── Sidebar.vue         # 左侧工作空间和 PPT 列表
+│   │   ├── Player.vue          # 右侧 PPT 播放器核心组件
+│   │   └── ProgressBar.vue     # 底部进度条和导航组件
+│   ├── presentations/          # 兼容层（自动发现 workspaces）
+│   │   └── registry.ts         # 注册中心
+│   ├── App.vue                 # 主布局
+│   └── main.ts                 # 入口文件
+├── index.html                  # HTML 入口
+├── vite.config.ts              # Vite 配置
+├── tsconfig.json               # TypeScript 配置
+└── package.json                # 项目配置
 ```
 
-## 📝 如何添加新的 PPT
+## 📝 如何添加新的工作空间和 PPT
 
-### 1. 创建 PPT 目录
+### 1. 创建工作空间目录
 
-在 `src/presentations/` 下创建新目录：
+在 `workspaces/` 下创建新目录：
 
 ```bash
-mkdir src/presentations/my-ppt
+mkdir workspaces/my-workspace
 ```
 
-### 2. 创建配置文件
+### 2. 创建工作空间配置文件
 
 在新目录下创建 `index.ts` 文件：
 
 ```typescript
-import type { Presentation } from '../registry'
+import type { Workspace } from '../registry'
 
-export const myPptPresentation: Presentation = {
-  id: 'my-ppt',                    // 唯一标识符
-  title: '我的 PPT',               // 显示标题
-  description: 'PPT 描述信息',     // 描述信息
-  slides: [
-    () => import('./Slide0.vue'),  // 第 0 页
-    () => import('./Slide1.vue'),  // 第 1 页
-    () => import('./Slide2.vue'),  // 第 2 页
-    // ... 添加更多页
+export const myWorkspace: Workspace = {
+  id: 'my-workspace',
+  name: '我的工作空间',
+  description: '工作空间描述',
+  presentations: [
+    {
+      id: 'my-ppt',
+      title: '我的 PPT',
+      description: 'PPT 描述信息',
+      slides: [
+        { file: 'slide0.html', title: '标题页' },
+        { file: 'slide1.html', title: '第二页' },
+        { file: 'slide2.md', title: 'Markdown 页' },
+        // ... 添加更多页
+      ]
+    }
   ]
 }
 ```
 
-### 3. 创建 Slide 组件
+### 3. 创建 PPT 目录和幻灯片文件
 
-创建对应的 Vue 组件文件：
+```bash
+mkdir workspaces/my-workspace/my-ppt
+```
 
-```vue
-<!-- Slide0.vue -->
-<template>
-  <div class="slide">
-    <h1>我的 PPT 标题</h1>
-    <p>副标题或描述</p>
-  </div>
-</template>
+创建幻灯片文件（支持 HTML、Markdown、Vue 组件）：
 
-<script setup lang="ts">
-</script>
+#### HTML 格式 (`slide0.html`)
 
-<style scoped>
+```html
+<div class="slide">
+  <h1>我的 PPT 标题</h1>
+  <p>副标题或描述</p>
+</div>
+
+<style>
 .slide {
   display: flex;
   flex-direction: column;
@@ -131,13 +146,25 @@ h1 {
 </style>
 ```
 
+#### Markdown 格式 (`slide1.md`)
+
+```markdown
+# 第二页
+
+这是一个 **Markdown** 格式的幻灯片。
+
+- 支持列表
+- 支持 **粗体** 和 *斜体*
+- 支持 [链接](https://example.com)
+```
+
 ### 4. 重启开发服务器
 
 ```bash
 npm run dev
 ```
 
-新的 PPT 将自动出现在左侧边栏中。
+新的工作空间和 PPT 将自动出现在左侧边栏中。
 
 ## 🎮 使用说明
 
@@ -156,6 +183,12 @@ npm run dev
 - 全屏模式下只显示播放区域，隐藏其他 UI 元素
 - 按 `Esc` 键或点击全屏按钮退出全屏
 
+### 工作空间管理
+
+- 左侧边栏按工作空间分组显示所有 PPT
+- 点击工作空间名称可展开/折叠该工作空间下的 PPT 列表
+- 选中的 PPT 会高亮显示
+
 ## 🛠️ 技术栈
 
 - **Vue 3** - 渐进式 JavaScript 框架
@@ -163,6 +196,7 @@ npm run dev
 - **TypeScript** - JavaScript 的超集
 - **CSS Variables** - 主题色彩管理
 - **Dynamic Import** - 按需加载优化
+- **import.meta.glob** - 自动发现机制
 
 ## 📄 开源许可证
 
@@ -174,9 +208,11 @@ npm run dev
 
 1. Fork 本仓库
 2. 创建你的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交你的更改 (`git commit -m 'Add some AmazingFeature'`)
+3. 提交你的更改 (`git commit -m 'feat: add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 打开一个 Pull Request
+
+详细贡献指南请参考 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 🔗 相关链接
 

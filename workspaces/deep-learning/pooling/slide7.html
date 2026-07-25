@@ -1,0 +1,79 @@
+<div class="slide-container">
+<div class="slide slide-summary" data-index="7">
+    <div class="section-tag">02 / 总结</div>
+    <h2>池化的核心作用</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-icon">↓</div>
+        <div>
+          <h3>降低计算量</h3>
+          <p>特征图尺寸缩小，后续层的参数和计算量大幅减少，提升网络训练和推理效率。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">◎</div>
+        <div>
+          <h3>提取主要特征</h3>
+          <p>保留最显著的激活响应，过滤掉次要信息，聚焦于局部区域中最突出的特征。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">↔</div>
+        <div>
+          <h3>增强平移不变性</h3>
+          <p>特征位置稍有偏移时，池化后的输出变化不大，让模型对位置变化更加鲁棒。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">◇</div>
+        <div>
+          <h3>防止过拟合</h3>
+          <p>减少参数量，降低模型复杂度，减少过拟合风险，提升模型泛化能力。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

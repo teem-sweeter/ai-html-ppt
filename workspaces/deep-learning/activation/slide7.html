@@ -1,0 +1,137 @@
+<div class="slide-container">
+<div class="slide sc" data-index="7">
+    <div class="section-label" style="color:var(--accent)">07 / 全面对比</div>
+    <div class="big" style="font-size:clamp(24px,3vw,38px)">激活函数<span class="hl">横向对比</span></div>
+
+    <div class="fi" style="width:100%; max-width:1100px; overflow-x:auto; margin-top:10px">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>函数</th>
+            <th>值域</th>
+            <th>零中心</th>
+            <th>梯度消失</th>
+            <th>计算速度</th>
+            <th>可导性</th>
+            <th>典型应用</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--yellow)">Sigmoid</td>
+            <td>(0, 1)</td>
+            <td class="bad-cell">否</td>
+            <td class="bad-cell">严重</td>
+            <td class="bad-cell">慢</td>
+            <td class="good-cell">平滑</td>
+            <td>二分类输出层</td>
+          </tr>
+          <tr>
+            <td style="color:var(--orange)">Tanh</td>
+            <td>(−1, +1)</td>
+            <td class="good-cell">是</td>
+            <td class="mid-cell">中等</td>
+            <td class="bad-cell">慢</td>
+            <td class="good-cell">平滑</td>
+            <td>RNN / LSTM</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">ReLU</td>
+            <td>[0, +∞)</td>
+            <td class="bad-cell">否</td>
+            <td class="good-cell">正区间无</td>
+            <td class="good-cell">极快</td>
+            <td class="mid-cell">x=0 不可导</td>
+            <td>CNN 默认选择</td>
+          </tr>
+          <tr>
+            <td style="color:var(--purple)">Leaky ReLU</td>
+            <td>(−∞, +∞)</td>
+            <td class="bad-cell">否</td>
+            <td class="good-cell">基本无</td>
+            <td class="good-cell">极快</td>
+            <td class="mid-cell">x=0 不可导</td>
+            <td>替代 ReLU</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent-3)">ELU</td>
+            <td>(−α, +∞)</td>
+            <td class="mid-cell">近似</td>
+            <td class="good-cell">无</td>
+            <td class="mid-cell">中等</td>
+            <td class="good-cell">平滑</td>
+            <td>深层 CNN</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent)">GELU</td>
+            <td>≈(−0.17, +∞)</td>
+            <td class="mid-cell">近似</td>
+            <td class="good-cell">无</td>
+            <td class="mid-cell">中等</td>
+            <td class="good-cell">平滑</td>
+            <td>Transformer / ViT</td>
+          </tr>
+          <tr>
+            <td style="color:var(--accent-2)">Swish</td>
+            <td>≈(−0.28, +∞)</td>
+            <td class="mid-cell">近似</td>
+            <td class="good-cell">无</td>
+            <td class="mid-cell">中等</td>
+            <td class="good-cell">平滑</td>
+            <td>EfficientNet / LLM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card fi" style="max-width:1100px; width:100%; margin-top:18px; text-align:center; padding:20px">
+      <p style="font-size:15px; color:var(--text-muted); line-height:1.8">
+        没有"万能"的激活函数 —— 选择取决于<span class="hl">任务类型</span>、<span class="hl-pink">网络架构</span>和<span class="hl-green">性能需求</span>。
+        但趋势很清晰：从简单分段（ReLU）走向平滑非单调（GELU/Swish）。
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

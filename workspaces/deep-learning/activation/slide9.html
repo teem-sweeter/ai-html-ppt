@@ -1,0 +1,94 @@
+<div class="slide-container">
+<div class="slide sc" data-index="9">
+    <div class="section-label" style="color:var(--accent)">09 / 总结</div>
+    <div class="big" style="font-size:clamp(26px,3.5vw,42px)">激活函数的演进之路</div>
+
+    <div class="sum-grid fi" style="margin-top:20px">
+      <div class="sum-card">
+        <div class="sum-icon">σ</div>
+        <div>
+          <h3>非线性是核心</h3>
+          <p>没有激活函数，神经网络就是线性变换的堆叠，表达能力极其有限。激活函数赋予了网络拟合任意复杂函数的能力。</p>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">∇</div>
+        <div>
+          <h3>梯度是关键约束</h3>
+          <p>激活函数的选择直接影响梯度流。Sigmoid/Tanh 的梯度消失催生了 ReLU，ReLU 的 Dead 问题催生了变体。</p>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">~</div>
+        <div>
+          <h3>从分段到平滑</h3>
+          <p>演进方向是：分段线性（ReLU）→ 平滑非单调（GELU/Swish）。平滑性让优化更稳定，非单调性带来隐式正则化。</p>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">⚡</div>
+        <div>
+          <h3>实用建议</h3>
+          <p>CNN 默认 ReLU，Transformer 用 GELU，大模型用 Swish，输出层按任务选择。没有万能解，根据场景决定。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fi" style="max-width:1000px; width:100%; margin-top:20px; text-align:center; padding:24px; border-top:3px solid var(--accent)">
+      <p style="font-size:18px; font-weight:700; line-height:1.8">
+        <span style="color:var(--yellow)">Sigmoid</span> →
+        <span style="color:var(--orange)">Tanh</span> →
+        <span style="color:var(--accent)">ReLU</span> →
+        <span style="color:var(--purple)">Leaky ReLU</span> →
+        <span style="color:var(--accent)">GELU</span> →
+        <span style="color:var(--accent-2)">Swish</span>
+      </p>
+      <p style="font-size:14px; color:var(--text-muted); margin-top:8px">
+        每一代都在解决上一代的核心缺陷，推动深度学习不断突破边界
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+/* 通用样式 */
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a26;
+  --accent: #00e5ff;
+  --accent-2: #7c4dff;
+  --accent-3: #ff6d00;
+  --text-primary: #eef0f6;
+  --text-muted: #6b6d7b;
+  --green: #00e676;
+  --grid-cell: #1e1e2e;
+  --grid-border: #2a2a3d;
+  --highlight: #ffab00;
+  --danger: #ff6b6b;
+  --yellow: #ffab00;
+  --orange: #ff8c42;
+  --purple: #a855f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', 'Inter', sans-serif;
+}
+</style>

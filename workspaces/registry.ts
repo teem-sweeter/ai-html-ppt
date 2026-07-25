@@ -1,9 +1,10 @@
-// 从工作空间模块导入类型
+// 幻灯片配置
 export interface SlideConfig {
-  file: string
-  title?: string
+  file: string        // 文件名（支持 html, md, pptx）
+  title?: string      // 幻灯片标题
 }
 
+// PPT 配置
 export interface PresentationConfig {
   id: string
   title: string
@@ -11,6 +12,7 @@ export interface PresentationConfig {
   slides: SlideConfig[]
 }
 
+// 工作空间配置
 export interface Workspace {
   id: string
   name: string
@@ -18,6 +20,7 @@ export interface Workspace {
   presentations: PresentationConfig[]
 }
 
+// 运行时 PPT 对象（包含加载函数）
 export interface Presentation {
   id: string
   title: string
@@ -27,7 +30,7 @@ export interface Presentation {
 }
 
 // 自动发现所有工作空间
-const workspaceModules = import.meta.glob<{ [key: string]: Workspace }>('../../workspaces/**/index.ts', { eager: true })
+const workspaceModules = import.meta.glob<{ [key: string]: Workspace }>('./**/index.ts', { eager: true })
 
 // 工作空间列表
 export const WORKSPACES: Workspace[] = []
@@ -53,14 +56,12 @@ for (const path in workspaceModules) {
           workspace: workspace.id,
           slides: presConfig.slides.map(slide => {
             // 根据文件扩展名创建不同的加载函数
-            const filePath = `../../workspaces/${workspace.id}/${presConfig.id}/${slide.file}`
+            const filePath = `./${workspace.id}/${presConfig.id}/${slide.file}`
             
             if (slide.file.endsWith('.html')) {
               return () => loadHtmlSlide(filePath)
             } else if (slide.file.endsWith('.md')) {
               return () => loadMarkdownSlide(filePath)
-            } else if (slide.file.endsWith('.vue')) {
-              return () => import(/* @vite-ignore */ filePath)
             } else {
               // 默认尝试加载为 Vue 组件
               return () => import(/* @vite-ignore */ filePath)
@@ -117,7 +118,7 @@ async function loadMarkdownSlide(path: string): Promise<any> {
     const response = await fetch(path)
     const md = await response.text()
     
-    // 简单的 Markdown 转 HTML
+    // 简单的 Markdown 转 HTML（实际项目中可以使用 marked 或 markdown-it）
     const html = simpleMarkdownToHtml(md)
     
     return {
