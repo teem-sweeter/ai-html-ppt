@@ -138,26 +138,40 @@
   .slide-content {
     align-items: flex-start;
     background: var(--bg);
-    padding-top: 80px;
+    padding: 60px 80px;
+    position: relative;
+  }
+
+  .slide-header {
+    position: absolute;
+    top: 60px;
+    left: 80px;
+    right: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .section-tag {
     font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
     font-size: 12px;
     letter-spacing: 0.15em;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     opacity: 0.85;
-    height: 20px;
   }
 
   h2 {
     font-size: clamp(28px, 4vw, 48px);
     font-weight: 900;
-    margin-bottom: 32px;
     line-height: 1.2;
-    height: 60px;
+  }
+
+  .slide-body {
+    margin-top: 100px;
+    width: 100%;
     display: flex;
-    align-items: center;
+    justify-content: center;
   }
 
   .content-grid {
@@ -525,8 +539,11 @@
 
   <!-- SLIDE 1: 总览 -->
   <div class="slide slide-content" data-index="1">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent)">总览</div>
     <h2>五大阶段，完整进阶</h2>
+    </div>
+    <div class="slide-body">
     <div class="roadmap">
       <div class="roadmap-item">
         <div class="roadmap-num">1</div>
@@ -564,47 +581,59 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 2: 第一阶段概述 -->
   <div class="slide slide-content" data-index="2">
-    <div class="section-tag" style="color:var(--accent)">第一阶段</div>
-    <h2>基础入门</h2>
-    <div class="content-grid cols-3">
-      <div class="card">
-        <h3>模块 1：Python 编程</h3>
-        <ul>
-          <li>Python 语法与数据结构</li>
-          <li>NumPy 数组操作</li>
-          <li>Matplotlib 数据可视化</li>
-          <li>Pandas 数据处理</li>
-        </ul>
+    <div class="slide-header">
+      <div class="slide-header">
+      <div class="section-tag" style="color:var(--accent)">第一阶段</div>
+      <h2>基础入门</h2>
       </div>
-      <div class="card">
-        <h3>模块 2：数学基础</h3>
-        <ul>
-          <li>向量与矩阵运算</li>
-          <li>导数与梯度</li>
-          <li>概率统计基础</li>
-          <li>线性代数直观理解</li>
-        </ul>
+      <div class="slide-body">
+    </div>
+    <div class="slide-body">
+      <div class="content-grid cols-3">
+        <div class="card">
+          <h3>模块 1：Python 编程</h3>
+          <ul>
+            <li>Python 语法与数据结构</li>
+            <li>NumPy 数组操作</li>
+            <li>Matplotlib 数据可视化</li>
+            <li>Pandas 数据处理</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>模块 2：数学基础</h3>
+          <ul>
+            <li>向量与矩阵运算</li>
+            <li>导数与梯度</li>
+            <li>概率统计基础</li>
+            <li>线性代数直观理解</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>模块 3：深度学习入门</h3>
+          <ul>
+            <li>神经网络基本结构</li>
+            <li>前向传播与反向传播</li>
+            <li>损失函数与优化器</li>
+            <li>PyTorch 基础使用</li>
+          </ul>
+        </div>
       </div>
-      <div class="card">
-        <h3>模块 3：深度学习入门</h3>
-        <ul>
-          <li>神经网络基本结构</li>
-          <li>前向传播与反向传播</li>
-          <li>损失函数与优化器</li>
-          <li>PyTorch 基础使用</li>
-        </ul>
-      </div>
+    </div>
     </div>
   </div>
 
   <!-- SLIDE 3: Python基础 -->
   <div class="slide slide-content" data-index="3">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent)">模块 1</div>
     <h2>Python 编程基础</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3>Python 语法</h3>
@@ -631,12 +660,16 @@
         </ul>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 4: 数学基础 -->
   <div class="slide slide-content" data-index="4">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent)">模块 2</div>
     <h2>数学基础</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3>线性代数</h3>
@@ -666,12 +699,16 @@
         <p style="margin-top:8px; color:var(--accent)">为理解损失函数打基础</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 5: 深度学习入门 -->
   <div class="slide slide-content" data-index="5">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent)">模块 3</div>
     <h2>深度学习入门</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3>神经网络基本结构</h3>
@@ -725,12 +762,16 @@
         <p style="margin-top:8px; color:var(--text-muted)">根据梯度更新权重，最小化损失</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 6: 第二阶段概述 -->
   <div class="slide slide-content" data-index="6">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent-2)">第二阶段</div>
     <h2>经典视觉主干与下游任务</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid cols-3">
       <div class="card">
         <h3>模块 1：CNN 骨干演进</h3>
@@ -750,12 +791,16 @@
         </ul>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 7: CNN骨干网络 -->
   <div class="slide slide-content" data-index="7">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent-2)">模块 4</div>
     <h2>CNN 特征提取主干演进</h2>
+    </div>
+    <div class="slide-body">
     <div class="module-grid">
       <div class="module-item">
         <h4>LeNet</h4>
@@ -794,12 +839,16 @@
         <p>使用timm库训练CIFAR-100分类模型</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 8: 目标检测 -->
   <div class="slide slide-content" data-index="8">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent-2)">模块 5</div>
     <h2>目标检测两大范式</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">Two-Stage（两阶段）</h3>
@@ -826,12 +875,16 @@
       <h3>🏁 实战项目</h3>
       <p>克隆 <span class="highlight">ultralytics/ultralytics</span> 仓库，在 VOC/COCO 数据集上跑通 YOLO11 训练，分析检测头源码</p>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 9: 分割与跟踪 -->
   <div class="slide slide-content" data-index="9">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent-2)">模块 3</div>
     <h2>图像分割与目标跟踪</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">图像分割演进</h3>
@@ -864,12 +917,16 @@
         </ul>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 10: 第三阶段概述 -->
   <div class="slide slide-content" data-index="10">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--green)">第三阶段</div>
     <h2>Transformer 架构与端到端新范式</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3>模块 1：视觉 Transformer</h3>
@@ -894,12 +951,16 @@
         <p style="margin-top:12px; color:var(--accent)">源码必读：facebookresearch/detr</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 11: ViT/Swin Transformer -->
   <div class="slide slide-content" data-index="11">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--green)">模块 1</div>
     <h2>视觉 Transformer</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">标准 Transformer</h3>
@@ -944,12 +1005,16 @@
         <p style="margin-top:8px; color:var(--text-muted)">证明CNN仍有生命力</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 12: DETR家族 -->
   <div class="slide slide-content" data-index="12">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--green)">模块 2</div>
     <h2>DETR 家族（端到端检测）</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">DETR 奠基</h3>
@@ -989,12 +1054,16 @@
         </ul>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 13: 第四阶段 -->
   <div class="slide slide-content" data-index="13">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent-3)">第四阶段</div>
     <h2>多模态智能与前沿风口</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid cols-3">
       <div class="card">
         <h3>模块 1：视觉-语言对齐</h3>
@@ -1031,12 +1100,16 @@
         </ul>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 14: 多模态模型 -->
   <div class="slide slide-content" data-index="14">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent-3)">模块 1-4</div>
     <h2>视觉-语言大模型</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">CLIP</h3>
@@ -1079,12 +1152,16 @@
         <p style="margin-top:8px; color:var(--text-muted)">通用分割基础模型</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 15: 第五阶段 -->
   <div class="slide slide-content" data-index="15">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--purple)">第五阶段</div>
     <h2>高性能架构与工业部署</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3>模块 1：模型转换</h3>
@@ -1117,12 +1194,16 @@
         <p style="margin-top:8px">RT-DETR INT8量化 → TensorRT Engine → Triton推理服务</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 16: 模型部署详情 -->
   <div class="slide slide-content" data-index="16">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--purple)">模块 1-3</div>
     <h2>工业级模型部署</h2>
+    </div>
+    <div class="slide-body">
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">模型转换链</h3>
@@ -1165,12 +1246,16 @@
         <p style="margin-top:8px; color:var(--text-muted)">C++ 或 Python 封装</p>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- SLIDE 17: 总结 -->
   <div class="slide slide-content" data-index="17">
+    <div class="slide-header">
     <div class="section-tag" style="color:var(--accent)">总结</div>
     <h2>执行铁律</h2>
+    </div>
+    <div class="slide-body">
     <div class="summary-grid">
       <div class="summary-item">
         <div class="summary-icon" style="background:rgba(0,229,255,0.15)">🔄</div>
@@ -1200,6 +1285,7 @@
           <p>每个阶段都有明确的<span class="highlight-yellow">交付成果</span>，从手写算子到工业级部署，打通全链路</p>
         </div>
       </div>
+    </div>
     </div>
   </div>
 
