@@ -51,11 +51,13 @@ watch(currentPptId, () => {
     />
     <div class="main-content">
       <Player 
+        v-if="currentPresentation"
         :presentation="currentPresentation"
         :current-page="currentPage"
         @update:current-page="currentPage = $event"
       />
       <ProgressBar 
+        v-if="currentPresentation"
         :total="currentPresentation.slides.length"
         :current="currentPage"
         @update:current-page="currentPage = $event"

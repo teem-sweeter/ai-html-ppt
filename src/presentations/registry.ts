@@ -1,5 +1,3 @@
-import { ref } from 'vue'
-
 // 从工作空间模块导入类型
 export interface SlideConfig {
   file: string
@@ -37,12 +35,18 @@ export const WORKSPACES: Workspace[] = []
 // 所有 PPT 列表
 export const PRESENTATIONS: Presentation[] = []
 
+console.log('Found workspace modules:', workspaceModules)
+
 // 加载工作空间配置
 for (const path in workspaceModules) {
   const module = workspaceModules[path]
+  console.log('Processing module:', path, module)
+  
   const keys = Object.keys(module)
   if (keys.length > 0) {
     const workspace = module[keys[0]]
+    console.log('Workspace:', workspace)
+    
     if (workspace && workspace.id && workspace.presentations) {
       WORKSPACES.push(workspace)
       
@@ -62,8 +66,6 @@ for (const path in workspaceModules) {
               return () => loadHtmlSlide(filePath)
             } else if (slide.file.endsWith('.md')) {
               return () => loadMarkdownSlide(filePath)
-            } else if (slide.file.endsWith('.vue')) {
-              return () => import(/* @vite-ignore */ filePath)
             } else {
               // 默认尝试加载为 Vue 组件
               return () => import(/* @vite-ignore */ filePath)
@@ -75,6 +77,8 @@ for (const path in workspaceModules) {
     }
   }
 }
+
+console.log('Loaded presentations:', PRESENTATIONS)
 
 // 按工作空间和 id 排序
 WORKSPACES.sort((a, b) => a.id.localeCompare(b.id))
@@ -96,8 +100,7 @@ async function loadHtmlSlide(path: string): Promise<any> {
       default: {
         template: `<div class="html-slide-wrapper" v-html="content"></div>`,
         setup() {
-          const content = ref(html)
-          return { content }
+          return { content: html }
         }
       }
     }
@@ -108,8 +111,7 @@ async function loadHtmlSlide(path: string): Promise<any> {
       default: {
         template: `<div class="slide-error">加载失败: {{ path }}</div>`,
         setup() {
-          const pathRef = ref(path)
-          return { path: pathRef }
+          return { path }
         }
       }
     }
