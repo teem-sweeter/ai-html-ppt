@@ -138,33 +138,21 @@
   .slide-content {
     align-items: flex-start;
     background: var(--bg);
-    padding: 40px 80px;
-    position: relative;
-  }
-
-  .slide-header {
-    width: 100%;
-    margin-bottom: 24px;
   }
 
   .section-tag {
     font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
     font-size: 12px;
     letter-spacing: 0.15em;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
     opacity: 0.85;
   }
 
   h2 {
     font-size: clamp(28px, 4vw, 48px);
     font-weight: 900;
+    margin-bottom: 32px;
     line-height: 1.2;
-  }
-
-  .slide-body {
-    width: 100%;
-    display: flex;
-    justify-content: center;
   }
 
   .content-grid {
@@ -532,15 +520,11 @@
 
   <!-- SLIDE 1: 总览 -->
   <div class="slide slide-content" data-index="1">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent)">总览</div>
-      <h2>五大阶段，完整进阶</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="roadmap">
+    <div class="section-tag" style="color:var(--accent)">总览</div>
+    <h2>五大阶段，完整进阶</h2>
+    <div class="roadmap">
       <div class="roadmap-item">
-    </div>
+        <div class="roadmap-num">1</div>
         <div class="roadmap-content">
           <h3 style="color:var(--accent)">基础入门</h3>
           <p>Python编程、数学基础、深度学习入门概念</p>
@@ -575,151 +559,124 @@
         </div>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 2: 第一阶段概述 -->
   <div class="slide slide-content" data-index="2">
-    <div class="slide-header">
-    </div>
-      <div class="slide-header">
-        <div class="section-tag" style="color:var(--accent)">第一阶段</div>
-        <h2>基础入门</h2>
-      </div>
-      </div>
-      <div class="slide-body">
-      </div>
-    <div class="slide-body">
-      <div class="content-grid cols-3">
+    <div class="section-tag" style="color:var(--accent)">第一阶段</div>
+    <h2>基础入门</h2>
+    <div class="content-grid cols-3">
       <div class="card">
-      <h3>模块 1：Python 编程</h3>
-      <ul>
-      <li>Python 语法与数据结构</li>
-      <li>NumPy 数组操作</li>
-      <li>Matplotlib 数据可视化</li>
-      <li>Pandas 数据处理</li>
-      </ul>
-    </div>
-        <div class="card">
-          <h3>模块 2：数学基础</h3>
-          <ul>
-            <li>向量与矩阵运算</li>
-            <li>导数与梯度</li>
-            <li>概率统计基础</li>
-            <li>线性代数直观理解</li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>模块 3：深度学习入门</h3>
-          <ul>
-            <li>神经网络基本结构</li>
-            <li>前向传播与反向传播</li>
-            <li>损失函数与优化器</li>
-            <li>PyTorch 基础使用</li>
-          </ul>
-        </div>
+        <h3>模块 1：Python 编程</h3>
+        <ul>
+          <li>Python 语法与数据结构</li>
+          <li>NumPy 数组操作</li>
+          <li>Matplotlib 数据可视化</li>
+          <li>Pandas 数据处理</li>
+        </ul>
       </div>
-    </div>
+      <div class="card">
+        <h3>模块 2：数学基础</h3>
+        <ul>
+          <li>向量与矩阵运算</li>
+          <li>导数与梯度</li>
+          <li>概率统计基础</li>
+          <li>线性代数直观理解</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>模块 3：深度学习入门</h3>
+        <ul>
+          <li>神经网络基本结构</li>
+          <li>前向传播与反向传播</li>
+          <li>损失函数与优化器</li>
+          <li>PyTorch 基础使用</li>
+        </ul>
+      </div>
     </div>
   </div>
 
   <!-- SLIDE 3: Python基础 -->
   <div class="slide slide-content" data-index="3">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent)">模块 1</div>
-      <h2>Python 编程基础</h2>
-    </div>
-<div class="slide-body">
-      <div class="content-grid">
-        <div class="card">
-          <h3>Python 语法</h3>
-          <p>变量、数据类型、控制流、函数、面向对象编程</p>
-          <p style="margin-top:8px; color:var(--accent)">重点掌握列表推导式、字典操作、文件读写</p>
-        </div>
-        <div class="card">
-          <h3>NumPy 数组</h3>
-          <p>数组创建、索引切片、广播机制、矩阵运算</p>
-          <p style="margin-top:8px; color:var(--accent)">练习：50个NumPy核心练习题</p>
-        </div>
-        <div class="card">
-          <h3>数据可视化</h3>
-          <p>Matplotlib 绑图基础：折线图、散点图、柱状图、热力图</p>
-          <p style="margin-top:8px; color:var(--accent)">学会分析实验结果和数据分布</p>
-        </div>
-        <div class="card">
-          <h3>📚 推荐资源</h3>
-          <ul>
-            <li>Python官方教程</li>
-            <li>NumPy官方文档</li>
-            <li>《利用Python进行数据分析》</li>
-            <li>Kaggle Learn 入门课程</li>
-          </ul>
-        </div>
+    <div class="section-tag" style="color:var(--accent)">模块 1</div>
+    <h2>Python 编程基础</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>Python 语法</h3>
+        <p>变量、数据类型、控制流、函数、面向对象编程</p>
+        <p style="margin-top:8px; color:var(--accent)">重点掌握列表推导式、字典操作、文件读写</p>
       </div>
-    </div>
-  </div>
+      <div class="card">
+        <h3>NumPy 数组</h3>
+        <p>数组创建、索引切片、广播机制、矩阵运算</p>
+        <p style="margin-top:8px; color:var(--accent)">练习：50个NumPy核心练习题</p>
+      </div>
+      <div class="card">
+        <h3>数据可视化</h3>
+        <p>Matplotlib 绑图基础：折线图、散点图、柱状图、热力图</p>
+        <p style="margin-top:8px; color:var(--accent)">学会分析实验结果和数据分布</p>
+      </div>
+      <div class="card">
+        <h3>📚 推荐资源</h3>
+        <ul>
+          <li>Python官方教程</li>
+          <li>NumPy官方文档</li>
+          <li>《利用Python进行数据分析》</li>
+          <li>Kaggle Learn 入门课程</li>
+        </ul>
+      </div>
     </div>
   </div>
 
   <!-- SLIDE 4: 数学基础 -->
   <div class="slide slide-content" data-index="4">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent)">模块 2</div>
-      <h2>数学基础</h2>
-    </div>
-<div class="slide-body">
-      <div class="content-grid">
-        <div class="card">
-          <h3>线性代数</h3>
-          <ul>
-            <li>向量：加法、数乘、点积</li>
-            <li>矩阵：乘法、转置、逆矩阵</li>
-            <li>直观理解：向量是方向，矩阵是变换</li>
-          </ul>
-          <p style="margin-top:8px; color:var(--accent)">推荐：3Blue1Brown《线性代数的本质》</p>
-        </div>
-        <div class="card">
-          <h3>微积分</h3>
-          <ul>
-            <li>导数：变化率的度量</li>
-            <li>梯度：多变量函数的导数</li>
-            <li>链式法则：复合函数求导</li>
-          </ul>
-          <p style="margin-top:8px; color:var(--accent)">理解：梯度指向函数增长最快的方向</p>
-        </div>
-        <div class="card">
-          <h3>概率统计</h3>
-          <ul>
-            <li>概率：事件发生的可能性</li>
-            <li>分布：数据的统计规律</li>
-            <li>期望与方差：数据的集中趋势和离散程度</li>
-          </ul>
-          <p style="margin-top:8px; color:var(--accent)">为理解损失函数打基础</p>
-        </div>
+    <div class="section-tag" style="color:var(--accent)">模块 2</div>
+    <h2>数学基础</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3>线性代数</h3>
+        <ul>
+          <li>向量：加法、数乘、点积</li>
+          <li>矩阵：乘法、转置、逆矩阵</li>
+          <li>直观理解：向量是方向，矩阵是变换</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--accent)">推荐：3Blue1Brown《线性代数的本质》</p>
       </div>
-    </div>
-  </div>
+      <div class="card">
+        <h3>微积分</h3>
+        <ul>
+          <li>导数：变化率的度量</li>
+          <li>梯度：多变量函数的导数</li>
+          <li>链式法则：复合函数求导</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--accent)">理解：梯度指向函数增长最快的方向</p>
+      </div>
+      <div class="card">
+        <h3>概率统计</h3>
+        <ul>
+          <li>概率：事件发生的可能性</li>
+          <li>分布：数据的统计规律</li>
+          <li>期望与方差：数据的集中趋势和离散程度</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--accent)">为理解损失函数打基础</p>
+      </div>
     </div>
   </div>
 
   <!-- SLIDE 5: 深度学习入门 -->
   <div class="slide slide-content" data-index="5">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent)">模块 3</div>
-      <h2>深度学习入门</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--accent)">模块 3</div>
+    <h2>深度学习入门</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3>神经网络基本结构</h3>
-      <ul>
-      <li><span class="highlight">神经元</span>：接收输入，加权求和，激活输出</li>
-      <li><span class="highlight">层</span>：多个神经元组成一层</li>
-      <li><span class="highlight">网络</span>：多层堆叠形成网络</li>
-      <li>输入层 → 隐藏层 → 输出层</li>
-      </ul>
-    </div>
+        <h3>神经网络基本结构</h3>
+        <ul>
+          <li><span class="highlight">神经元</span>：接收输入，加权求和，激活输出</li>
+          <li><span class="highlight">层</span>：多个神经元组成一层</li>
+          <li><span class="highlight">网络</span>：多层堆叠形成网络</li>
+          <li>输入层 → 隐藏层 → 输出层</li>
+        </ul>
+      </div>
       <div class="card">
         <h3>前向传播</h3>
         <p>数据从输入层流向输出层的过程</p>
@@ -763,22 +720,17 @@
         <p style="margin-top:8px; color:var(--text-muted)">根据梯度更新权重，最小化损失</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 6: 第二阶段概述 -->
   <div class="slide slide-content" data-index="6">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent-2)">第二阶段</div>
-      <h2>经典视觉主干与下游任务</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid cols-3">
+    <div class="section-tag" style="color:var(--accent-2)">第二阶段</div>
+    <h2>经典视觉主干与下游任务</h2>
+    <div class="content-grid cols-3">
       <div class="card">
-      <h3>模块 1：CNN 骨干演进</h3>
-      <p>LeNet → AlexNet → VGG → GoogLeNet → <span class="highlight">ResNet</span> → DenseNet → MobileNet → EfficientNet</p>
-    </div>
+        <h3>模块 1：CNN 骨干演进</h3>
+        <p>LeNet → AlexNet → VGG → GoogLeNet → <span class="highlight">ResNet</span> → DenseNet → MobileNet → EfficientNet</p>
+      </div>
       <div class="card">
         <h3>模块 2：目标检测</h3>
         <p><span class="highlight-pink">Two-Stage</span>：R-CNN → Fast R-CNN → Faster R-CNN → Mask R-CNN</p>
@@ -793,22 +745,17 @@
         </ul>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 7: CNN骨干网络 -->
   <div class="slide slide-content" data-index="7">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent-2)">模块 4</div>
-      <h2>CNN 特征提取主干演进</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="module-grid">
+    <div class="section-tag" style="color:var(--accent-2)">模块 4</div>
+    <h2>CNN 特征提取主干演进</h2>
+    <div class="module-grid">
       <div class="module-item">
-      <h4>LeNet</h4>
-      <p>CNN开山之作，理解卷积替代全连接</p>
-    </div>
+        <h4>LeNet</h4>
+        <p>CNN开山之作，理解卷积替代全连接</p>
+      </div>
       <div class="module-item">
         <h4>AlexNet</h4>
         <p>引入ReLU、Dropout、GPU并行训练</p>
@@ -842,28 +789,23 @@
         <p>使用timm库训练CIFAR-100分类模型</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 8: 目标检测 -->
   <div class="slide slide-content" data-index="8">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent-2)">模块 5</div>
-      <h2>目标检测两大范式</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--accent-2)">模块 5</div>
+    <h2>目标检测两大范式</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3 style="color:var(--accent)">Two-Stage（两阶段）</h3>
-      <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">R-CNN → SPPNet → Fast R-CNN → Faster R-CNN → Mask R-CNN</p>
-      <ul>
-      <li>ROI Pooling 与 ROI Align</li>
-      <li>RPN（区域生成网络）</li>
-      <li>Proposal 筛选</li>
-      <li>Anchor 的概念</li>
-      </ul>
-    </div>
+        <h3 style="color:var(--accent)">Two-Stage（两阶段）</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">R-CNN → SPPNet → Fast R-CNN → Faster R-CNN → Mask R-CNN</p>
+        <ul>
+          <li>ROI Pooling 与 ROI Align</li>
+          <li>RPN（区域生成网络）</li>
+          <li>Proposal 筛选</li>
+          <li>Anchor 的概念</li>
+        </ul>
+      </div>
       <div class="card">
         <h3 style="color:var(--pink)">One-Stage（一阶段）</h3>
         <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">SSD → RetinaNet → YOLOv1 → YOLOv8 → YOLO11</p>
@@ -879,28 +821,23 @@
       <h3>🏁 实战项目</h3>
       <p>克隆 <span class="highlight">ultralytics/ultralytics</span> 仓库，在 VOC/COCO 数据集上跑通 YOLO11 训练，分析检测头源码</p>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 9: 分割与跟踪 -->
   <div class="slide slide-content" data-index="9">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent-2)">模块 3</div>
-      <h2>图像分割与目标跟踪</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--accent-2)">模块 3</div>
+    <h2>图像分割与目标跟踪</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3 style="color:var(--accent)">图像分割演进</h3>
-      <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">FCN → U-Net → PSPNet → DeepLab → SAM</p>
-      <ul>
-      <li><span class="highlight">FCN</span>：全卷积网络，像素级分类</li>
-      <li><span class="highlight">U-Net</span>：跳跃连接，医学图像标配</li>
-      <li><span class="highlight">DeepLab</span>：ASPP空洞卷积金字塔</li>
-      <li><span class="highlight-green">SAM</span>：提示词引导的通用分割</li>
-      </ul>
-    </div>
+        <h3 style="color:var(--accent)">图像分割演进</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">FCN → U-Net → PSPNet → DeepLab → SAM</p>
+        <ul>
+          <li><span class="highlight">FCN</span>：全卷积网络，像素级分类</li>
+          <li><span class="highlight">U-Net</span>：跳跃连接，医学图像标配</li>
+          <li><span class="highlight">DeepLab</span>：ASPP空洞卷积金字塔</li>
+          <li><span class="highlight-green">SAM</span>：提示词引导的通用分割</li>
+        </ul>
+      </div>
       <div class="card">
         <h3 style="color:var(--pink)">OCR 文字识别</h3>
         <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">CRNN + CTC Loss</p>
@@ -922,29 +859,24 @@
         </ul>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 10: 第三阶段概述 -->
   <div class="slide slide-content" data-index="10">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--green)">第三阶段</div>
-      <h2>Transformer 架构与端到端新范式</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--green)">第三阶段</div>
+    <h2>Transformer 架构与端到端新范式</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3>模块 1：视觉 Transformer</h3>
-      <ul>
-      <li>标准 Transformer 源码级拆解</li>
-      <li>Self-Attention → Multi-Head</li>
-      <li>Vision Transformer (ViT)</li>
-      <li>Swin Transformer（窗口注意力）</li>
-      <li>ConvNeXt（现代CNN反向优化）</li>
-      </ul>
-      <p style="margin-top:12px; color:var(--accent)">硬核手写：纯手写多头注意力与ViT</p>
-    </div>
+        <h3>模块 1：视觉 Transformer</h3>
+        <ul>
+          <li>标准 Transformer 源码级拆解</li>
+          <li>Self-Attention → Multi-Head</li>
+          <li>Vision Transformer (ViT)</li>
+          <li>Swin Transformer（窗口注意力）</li>
+          <li>ConvNeXt（现代CNN反向优化）</li>
+        </ul>
+        <p style="margin-top:12px; color:var(--accent)">硬核手写：纯手写多头注意力与ViT</p>
+      </div>
       <div class="card">
         <h3>模块 2：DETR 家族</h3>
         <ul>
@@ -957,22 +889,17 @@
         <p style="margin-top:12px; color:var(--accent)">源码必读：facebookresearch/detr</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 11: ViT/Swin Transformer -->
   <div class="slide slide-content" data-index="11">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--green)">模块 1</div>
-      <h2>视觉 Transformer</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--green)">模块 1</div>
+    <h2>视觉 Transformer</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3 style="color:var(--accent)">标准 Transformer</h3>
-      <div class="formula-box" style="max-width:100%; margin:12px 0">
-    </div>
+        <h3 style="color:var(--accent)">标准 Transformer</h3>
+        <div class="formula-box" style="max-width:100%; margin:12px 0">
+          <div class="formula-main" style="font-size:16px; color:var(--accent)">Attention(Q,K,V) = softmax(QKᵀ/√dₖ)V</div>
         </div>
         <ul>
           <li>Self-Attention：自注意力机制</li>
@@ -1012,28 +939,23 @@
         <p style="margin-top:8px; color:var(--text-muted)">证明CNN仍有生命力</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 12: DETR家族 -->
   <div class="slide slide-content" data-index="12">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--green)">模块 2</div>
-      <h2>DETR 家族（端到端检测）</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--green)">模块 2</div>
+    <h2>DETR 家族（端到端检测）</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3 style="color:var(--accent)">DETR 奠基</h3>
-      <ul>
-      <li><span class="highlight">Object Query</span>：目标查询</li>
-      <li><span class="highlight">匈牙利匹配</span>：一对一集合预测</li>
-      <li>告别NMS后处理</li>
-      <li>Encoder-Decoder架构</li>
-      </ul>
-      <p style="margin-top:8px; color:var(--accent)">源码：facebookresearch/detr</p>
-    </div>
+        <h3 style="color:var(--accent)">DETR 奠基</h3>
+        <ul>
+          <li><span class="highlight">Object Query</span>：目标查询</li>
+          <li><span class="highlight">匈牙利匹配</span>：一对一集合预测</li>
+          <li>告别NMS后处理</li>
+          <li>Encoder-Decoder架构</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--accent)">源码：facebookresearch/detr</p>
+      </div>
       <div class="card">
         <h3 style="color:var(--accent-2)">Deformable DETR</h3>
         <ul>
@@ -1062,23 +984,18 @@
         </ul>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 13: 第四阶段 -->
   <div class="slide slide-content" data-index="13">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent-3)">第四阶段</div>
-      <h2>多模态智能与前沿风口</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid cols-3">
+    <div class="section-tag" style="color:var(--accent-3)">第四阶段</div>
+    <h2>多模态智能与前沿风口</h2>
+    <div class="content-grid cols-3">
       <div class="card">
-      <h3>模块 1：视觉-语言对齐</h3>
-      <p>CLIP：<span class="highlight">对比学习</span>将视觉与文本特征空间对齐</p>
-      <p style="margin-top:8px; color:var(--text-muted)">千万级图文对训练</p>
-    </div>
+        <h3>模块 1：视觉-语言对齐</h3>
+        <p>CLIP：<span class="highlight">对比学习</span>将视觉与文本特征空间对齐</p>
+        <p style="margin-top:8px; color:var(--text-muted)">千万级图文对训练</p>
+      </div>
       <div class="card">
         <h3>模块 2：多模态大模型</h3>
         <p>BLIP2 / Qwen-VL</p>
@@ -1109,28 +1026,23 @@
         </ul>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 14: 多模态模型 -->
   <div class="slide slide-content" data-index="14">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent-3)">模块 1-4</div>
-      <h2>视觉-语言大模型</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--accent-3)">模块 1-4</div>
+    <h2>视觉-语言大模型</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3 style="color:var(--accent)">CLIP</h3>
-      <ul>
-      <li>OpenAI 对比学习巨作</li>
-      <li><span class="highlight">双塔架构</span>：图像编码器 + 文本编码器</li>
-      <li>千万级图文对训练</li>
-      <li>Zero-Shot 零样本能力</li>
-      </ul>
-      <p style="margin-top:8px; color:var(--text-muted)">奠基之作，统一视觉与语言特征空间</p>
-    </div>
+        <h3 style="color:var(--accent)">CLIP</h3>
+        <ul>
+          <li>OpenAI 对比学习巨作</li>
+          <li><span class="highlight">双塔架构</span>：图像编码器 + 文本编码器</li>
+          <li>千万级图文对训练</li>
+          <li>Zero-Shot 零样本能力</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">奠基之作，统一视觉与语言特征空间</p>
+      </div>
       <div class="card">
         <h3 style="color:var(--accent-2)">BLIP2 / Qwen-VL</h3>
         <ul>
@@ -1162,26 +1074,21 @@
         <p style="margin-top:8px; color:var(--text-muted)">通用分割基础模型</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 15: 第五阶段 -->
   <div class="slide slide-content" data-index="15">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--purple)">第五阶段</div>
-      <h2>高性能架构与工业部署</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--purple)">第五阶段</div>
+    <h2>高性能架构与工业部署</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3>模块 1：模型转换</h3>
-      <ul>
-      <li>算子融合（Operator Fusion）</li>
-      <li>PyTorch → ONNX → TensorRT</li>
-      <li>OpenVINO / RKNN 导出</li>
-      </ul>
-    </div>
+        <h3>模块 1：模型转换</h3>
+        <ul>
+          <li>算子融合（Operator Fusion）</li>
+          <li>PyTorch → ONNX → TensorRT</li>
+          <li>OpenVINO / RKNN 导出</li>
+        </ul>
+      </div>
       <div class="card">
         <h3>模块 2：模型量化</h3>
         <ul>
@@ -1205,28 +1112,23 @@
         <p style="margin-top:8px">RT-DETR INT8量化 → TensorRT Engine → Triton推理服务</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 16: 模型部署详情 -->
   <div class="slide slide-content" data-index="16">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--purple)">模块 1-3</div>
-      <h2>工业级模型部署</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="content-grid">
+    <div class="section-tag" style="color:var(--purple)">模块 1-3</div>
+    <h2>工业级模型部署</h2>
+    <div class="content-grid">
       <div class="card">
-      <h3 style="color:var(--accent)">模型转换链</h3>
-      <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent)">PyTorch → ONNX → TensorRT</p>
-      <ul>
-      <li><span class="highlight">ONNX</span>：开放神经网络交换格式</li>
-      <li>算子融合（Operator Fusion）</li>
-      <li>计算图优化</li>
-      <li>OpenVINO / RKNN 导出</li>
-      </ul>
-    </div>
+        <h3 style="color:var(--accent)">模型转换链</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent)">PyTorch → ONNX → TensorRT</p>
+        <ul>
+          <li><span class="highlight">ONNX</span>：开放神经网络交换格式</li>
+          <li>算子融合（Operator Fusion）</li>
+          <li>计算图优化</li>
+          <li>OpenVINO / RKNN 导出</li>
+        </ul>
+      </div>
       <div class="card">
         <h3 style="color:var(--accent-2)">模型量化</h3>
         <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent-2)">FP32 → INT8</p>
@@ -1258,20 +1160,15 @@
         <p style="margin-top:8px; color:var(--text-muted)">C++ 或 Python 封装</p>
       </div>
     </div>
-    </div>
   </div>
 
   <!-- SLIDE 17: 总结 -->
   <div class="slide slide-content" data-index="17">
-    <div class="slide-header">
-      <div class="section-tag" style="color:var(--accent)">总结</div>
-      <h2>执行铁律</h2>
-    </div>
-    </div>
-    <div class="slide-body">
-      <div class="summary-grid">
+    <div class="section-tag" style="color:var(--accent)">总结</div>
+    <h2>执行铁律</h2>
+    <div class="summary-grid">
       <div class="summary-item">
-    </div>
+        <div class="summary-icon" style="background:rgba(0,229,255,0.15)">🔄</div>
         <div>
           <h3>"演进"思维</h3>
           <p>看任何模型，先问三件事：<span class="highlight">它要解决什么问题？之前的方案有什么不足？它用了什么创新方法？</span></p>
@@ -1298,7 +1195,6 @@
           <p>每个阶段都有明确的<span class="highlight-yellow">交付成果</span>，从手写算子到工业级部署，打通全链路</p>
         </div>
       </div>
-    </div>
     </div>
   </div>
 
