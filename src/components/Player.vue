@@ -25,6 +25,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import html2canvas from 'html2canvas'
 import Toolbar from './Toolbar.vue'
 
 interface Presentation {
@@ -115,9 +116,41 @@ function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-// 下载PNG - 提示用户使用截图工具
-function downloadPng() {
-  alert('请使用系统截图工具（Win+Shift+S 或 PrtSc）截图保存为PNG')
+// 下载PNG - 使用html2canvas截图
+async function downloadPng() {
+  if (!iframeRef.value?.contentDocument?.body) {
+    alert('无法访问页面内容')
+    return
+  }
+  try {
+    const iframeDoc = iframeRef.value.contentDocument
+    const iframeWin = iframeRef.value.contentWindow
+    const width = iframeWin?.innerWidth || 1920
+    const height = iframeWin?.innerHeight || 1080
+
+    // 使用html2canvas截图iframe内容
+    const canvas = await html2canvas(iframeDoc.body, {
+      width: width,
+      height: height,
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false
+    })
+
+    // 导出为PNG
+    const url = canvas.toDataURL('image/png')
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${props.presentation.id}-slide${props.currentPage + 1}.png`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  } catch (e) {
+    console.error('Download PNG error:', e)
+    alert('下载PNG失败: ' + (e as Error).message)
+  }
 }
 
 // 下载SVG - 将当前页面HTML包装为SVG
