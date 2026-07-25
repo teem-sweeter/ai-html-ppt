@@ -27,7 +27,7 @@ export interface Presentation {
 }
 
 // 自动发现所有工作空间
-const workspaceModules = import.meta.glob<{ [key: string]: Workspace }>('../../workspaces/**/index.ts', { eager: true })
+const workspaceModules = import.meta.glob<{ [key: string]: Workspace }>('../../../workspaces/**/index.ts', { eager: true })
 
 // 工作空间列表
 export const WORKSPACES: Workspace[] = []
@@ -53,7 +53,8 @@ for (const path in workspaceModules) {
           workspace: workspace.id,
           slides: presConfig.slides.map(slide => {
             // 根据文件扩展名创建不同的加载函数
-            const filePath = `../../workspaces/${workspace.id}/${presConfig.id}/${slide.file}`
+            // 使用绝对路径，从根目录访问
+            const filePath = `/workspaces/${workspace.id}/${presConfig.id}/${slide.file}`
             
             if (slide.file.endsWith('.html')) {
               return () => loadHtmlSlide(filePath)
