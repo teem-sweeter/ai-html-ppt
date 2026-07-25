@@ -115,68 +115,31 @@ function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-// 下载PNG
-async function downloadPng() {
-  if (!iframeRef.value?.contentDocument) return
-  try {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const iframe = iframeRef.value
-    const iframeDoc = iframe.contentDocument
-    const iframeWin = iframe.contentWindow
-
-    canvas.width = iframeWin?.innerWidth || 1920
-    canvas.height = iframeWin?.innerHeight || 1080
-
-    // 使用 html2canvas 或 dom-to-image 需要额外库
-    // 这里使用简单的截图方式
-    const svgData = new XMLSerializer().serializeToString(iframeDoc?.documentElement as Node || document.createElement('div'))
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
-    const url = URL.createObjectURL(svgBlob)
-
-    const img = new Image()
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0)
-      URL.revokeObjectURL(url)
-
-      canvas.toBlob((blob) => {
-        if (!blob) return
-        const a = document.createElement('a')
-        a.href = URL.createObjectURL(blob)
-        a.download = `${props.presentation.id}-slide${props.currentPage}.png`
-        a.click()
-        URL.revokeObjectURL(a.href)
-      }, 'image/png')
-    }
-    img.src = url
-  } catch (e) {
-    console.error('Download PNG error:', e)
-    alert('下载PNG失败，请尝试使用截图工具')
-  }
+// 下载PNG - 提示用户使用截图工具
+function downloadPng() {
+  alert('请使用系统截图工具（Win+Shift+S 或 PrtSc）截图保存为PNG')
 }
 
-// 下载SVG
+// 下载SVG - 将当前页面HTML包装为SVG
 function downloadSvg() {
-  if (!iframeRef.value?.contentDocument) return
+  if (!iframeRef.value?.contentDocument) {
+    alert('无法访问页面内容')
+    return
+  }
   try {
-    const html = iframeRef.value.contentDocument.documentElement.outerHTML
+    const doc = iframeRef.value.contentDocument
+    const html = doc.documentElement.outerHTML
+    const width = iframeRef.value.contentWindow?.innerWidth || 1920
+    const height = iframeRef.value.contentWindow?.innerHeight || 1080
+    
     const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
   <foreignObject width="100%" height="100%">
-    <div xmlns="http://www.w3.org/1999/xhtml">
-      ${html}
-    </div>
+    ${html}
   </foreignObject>
 </svg>`
 
-    const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `${props.presentation.id}-slide${props.currentPage}.svg`
-    a.click()
-    URL.revokeObjectURL(a.href)
+    downloadFile(svgContent, `${props.presentation.id}-slide${props.currentPage + 1}.svg`, 'image/svg+xml')
   } catch (e) {
     console.error('Download SVG error:', e)
     alert('下载SVG失败')
@@ -185,9 +148,13 @@ function downloadSvg() {
 
 // 导出HTML
 function exportHtml() {
-  if (!iframeRef.value?.contentDocument) return
+  if (!iframeRef.value?.contentDocument) {
+    alert('无法访问页面内容')
+    return
+  }
   try {
-    const html = iframeRef.value.contentDocument.documentElement.outerHTML
+    const doc = iframeRef.value.contentDocument
+    const html = doc.documentElement.outerHTML
     const fullHtml = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -200,16 +167,24 @@ ${html}
 </body>
 </html>`
 
-    const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `${props.presentation.id}-slide${props.currentPage}.html`
-    a.click()
-    URL.revokeObjectURL(a.href)
+    downloadFile(fullHtml, `${props.presentation.id}-slide${props.currentPage + 1}.html`, 'text/html')
   } catch (e) {
     console.error('Export HTML error:', e)
     alert('导出HTML失败')
   }
+}
+
+// 通用下载函数
+function downloadFile(content: string, filename: string, mimeType: string) {
+  const blob = new Blob([content], { type: mimeType })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
 }
 
 watch(() => props.currentPage, (newPage) => {
