@@ -285,6 +285,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: #000;
+  padding: 1rem;
 }
 
 .slide-container {
@@ -294,9 +295,11 @@ onUnmounted(() => {
   margin: 0 auto;
   aspect-ratio: 16 / 9;
   background: var(--bg);
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 .slide-iframe {
