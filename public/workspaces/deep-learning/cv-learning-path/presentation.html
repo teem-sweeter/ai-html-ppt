@@ -581,15 +581,15 @@
       <div class="roadmap-item">
         <div class="roadmap-num">4</div>
         <div class="roadmap-content">
-          <h3 style="color:var(--accent-3)">多模态智能与前沿风口</h3>
-          <p>CLIP、BLIP2、Grounding DINO、SAM</p>
+          <h3 style="color:var(--accent-3)">多模态智能与生成式视觉</h3>
+          <p>CLIP、LLaVA、Grounding DINO、SAM、Diffusion Models</p>
         </div>
       </div>
       <div class="roadmap-item">
         <div class="roadmap-num">5</div>
         <div class="roadmap-content">
           <h3 style="color:var(--purple)">高性能架构与工业部署</h3>
-          <p>ONNX、TensorRT、模型量化、推理优化</p>
+          <p>C++基础、ONNX、TensorRT、模型量化、端侧部署</p>
         </div>
       </div>
     </div>
@@ -605,12 +605,12 @@
     <h2>基础入门</h2>
     <div class="content-grid cols-3">
       <div class="card">
-        <h3>模块 1：Python 编程</h3>
+        <h3>模块 1：编程基础</h3>
         <ul>
           <li>Python 语法与数据结构</li>
-          <li>NumPy 数组操作</li>
-          <li>Matplotlib 数据可视化</li>
-          <li>Pandas 数据处理</li>
+          <li>NumPy、Pandas 数据处理</li>
+          <li><span class="highlight">Linux 基础命令</span></li>
+          <li><span class="highlight">Git 版本控制</span></li>
         </ul>
       </div>
       <div class="card">
@@ -788,14 +788,15 @@
       <div class="card">
         <h3>模块 2：目标检测</h3>
         <p><span class="highlight-pink">Two-Stage</span>：R-CNN → Fast R-CNN → Faster R-CNN → Mask R-CNN</p>
-        <p style="margin-top:8px"><span class="highlight-green">One-Stage</span>：SSD → YOLOv1 → YOLOv8 → YOLO11</p>
+        <p style="margin-top:8px"><span class="highlight-green">One-Stage</span>：SSD → YOLOv8 → <span class="highlight">YOLOv10 (NMS-Free)</span> → YOLO11</p>
       </div>
       <div class="card">
         <h3>模块 3：分割与跟踪</h3>
         <ul>
-          <li>FCN → U-Net → DeepLab → SAM</li>
-          <li>OCR：CRNN + CTC Loss</li>
-          <li>MOT：SORT → DeepSORT → ByteTrack</li>
+          <li><span class="highlight">语义分割</span>：FCN → U-Net → DeepLab</li>
+          <li><span class="highlight">实例分割</span>：Mask R-CNN → YOLO-Seg</li>
+          <li><span class="highlight">通用分割</span>：SAM / SAM2</li>
+          <li>MOT：SORT → DeepSORT → ByteTrack → BoT-SORT</li>
         </ul>
       </div>
     </div>
@@ -948,7 +949,17 @@
         <p style="margin-top:12px; color:var(--accent)">硬核手写：纯手写多头注意力与ViT</p>
       </div>
       <div class="card">
-        <h3>模块 2：DETR 家族</h3>
+        <h3>模块 2：自监督表征学习</h3>
+        <ul>
+          <li><span class="highlight">MAE</span>：掩码自编码器</li>
+          <li><span class="highlight">DINOv2</span>：无监督视觉特征</li>
+          <li>无需标注数据的表征学习</li>
+          <li>现代CV骨干网络的预训练范式</li>
+        </ul>
+        <p style="margin-top:12px; color:var(--accent)">理解：为什么现代模型很少从头训练</p>
+      </div>
+      <div class="card">
+        <h3>模块 3：DETR 家族</h3>
         <ul>
           <li>DETR：Object Query + 匈牙利匹配</li>
           <li>Deformable DETR：可变形注意力</li>
@@ -956,7 +967,7 @@
           <li><span class="highlight-green">DINO</span>：现代DETR巅峰</li>
           <li><span class="highlight">RT-DETR</span>：实时化王牌</li>
         </ul>
-        <p style="margin-top:12px; color:var(--accent)">源码必读：facebookresearch/detr</p>
+        <p style="margin-top:12px; color:var(--accent)">核心创新：混合编码器 + IoU-Aware Query</p>
       </div>
     </div>
   </div>
@@ -1071,7 +1082,7 @@
       <span class="header-page">13 / 17</span>
     </div>
     <div class="section-tag" style="color:var(--accent-3)">第四阶段</div>
-    <h2>多模态智能与前沿风口</h2>
+    <h2>多模态智能与生成式视觉</h2>
     <div class="content-grid cols-3">
       <div class="card">
         <h3>模块 1：视觉-语言对齐</h3>
@@ -1080,18 +1091,18 @@
       </div>
       <div class="card">
         <h3>模块 2：多模态大模型</h3>
-        <p>BLIP2 / Qwen-VL</p>
+        <p><span class="highlight">LLaVA</span> / Qwen-VL / InternVL</p>
         <p style="margin-top:8px; color:var(--text-muted)">Vision Encoder → Projection → LLM</p>
       </div>
       <div class="card">
-        <h3>模块 3：开放词汇检测</h3>
-        <p>Grounding DINO</p>
-        <p style="margin-top:8px; color:var(--text-muted)">文本提示词 + 图像特征跨注意力融合</p>
+        <h3>模块 3：生成式视觉</h3>
+        <p><span class="highlight">Diffusion Models</span> (DDPM)</p>
+        <p style="margin-top:8px; color:var(--text-muted)">前向加噪 → 反向去噪</p>
       </div>
       <div class="card">
-        <h3>模块 4：通用分割</h3>
-        <p>SAM / SAM2</p>
-        <p style="margin-top:8px; color:var(--text-muted)">支持点、框、文本作为Prompt</p>
+        <h3>模块 4：生成控制技术</h3>
+        <p><span class="highlight">ControlNet</span> / LoRA / DiT</p>
+        <p style="margin-top:8px; color:var(--text-muted)">可控生成与微调</p>
       </div>
       <div class="card">
         <h3>🏁 交付成果</h3>
@@ -1102,9 +1113,9 @@
         <h3>📚 核心论文</h3>
         <ul>
           <li>CLIP</li>
-          <li>SAM/SAM2</li>
-          <li>Grounding DINO</li>
-          <li>Qwen-VL Technical Report</li>
+          <li>LLaVA / Qwen-VL</li>
+          <li>DDPM / DiT</li>
+          <li>ControlNet</li>
         </ul>
       </div>
     </div>
@@ -1117,7 +1128,7 @@
       <span class="header-page">14 / 17</span>
     </div>
     <div class="section-tag" style="color:var(--accent-3)">模块 1-4</div>
-    <h2>视觉-语言大模型</h2>
+    <h2>视觉-语言大模型与生成式视觉</h2>
     <div class="content-grid">
       <div class="card">
         <h3 style="color:var(--accent)">CLIP</h3>
@@ -1130,34 +1141,34 @@
         <p style="margin-top:8px; color:var(--text-muted)">奠基之作，统一视觉与语言特征空间</p>
       </div>
       <div class="card">
-        <h3 style="color:var(--accent-2)">BLIP2 / Qwen-VL</h3>
+        <h3 style="color:var(--accent-2)">LLaVA / Qwen-VL</h3>
         <ul>
-          <li><span class="highlight">Q-Former</span>：解决Vision Token过长</li>
+          <li><span class="highlight">LLaVA</span>：直接连接ViT与LLM</li>
           <li>Vision Encoder → Projection → LLM</li>
-          <li>Cross-Attention交互</li>
-          <li>多模态理解与生成</li>
+          <li>极简高效架构</li>
+          <li>国产开源主力：Qwen-VL / InternVL</li>
         </ul>
-        <p style="margin-top:8px; color:var(--text-muted)">统一感知范式</p>
+        <p style="margin-top:8px; color:var(--text-muted)">现代多模态范式</p>
       </div>
       <div class="card">
-        <h3 style="color:var(--green)">Grounding DINO</h3>
+        <h3 style="color:var(--green)">Diffusion Models</h3>
         <ul>
-          <li><span class="highlight">开放词汇</span>目标检测</li>
-          <li>文本提示词 + 图像特征融合</li>
-          <li>跨注意力层交互</li>
-          <li>Zero-Shot检测能力</li>
+          <li><span class="highlight">DDPM</span>：前向加噪与反向去噪</li>
+          <li>U-Net 在 Diffusion 中的应用</li>
+          <li><span class="highlight">DiT</span>：Diffusion Transformers</li>
+          <li>视频/图像生成的主流骨干</li>
         </ul>
-        <p style="margin-top:8px; color:var(--text-muted)">文本驱动的检测</p>
+        <p style="margin-top:8px; color:var(--text-muted)">生成式AI的核心技术</p>
       </div>
       <div class="card">
-        <h3 style="color:var(--orange)">SAM / SAM2</h3>
+        <h3 style="color:var(--orange)">生成控制技术</h3>
         <ul>
-          <li><span class="highlight">Segment Anything</span></li>
-          <li>Prompt Encoder：点、框、文本</li>
-          <li>Mask Decoder：高质量分割</li>
-          <li>SAM2：视频时序记忆网</li>
+          <li><span class="highlight">ControlNet</span>：精确控制生成</li>
+          <li><span class="highlight">LoRA</span>：低秩适应微调</li>
+          <li>ComfyUI 工作流基础</li>
+          <li>图像/视频生成应用</li>
         </ul>
-        <p style="margin-top:8px; color:var(--text-muted)">通用分割基础模型</p>
+        <p style="margin-top:8px; color:var(--text-muted)">可控生成与微调</p>
       </div>
     </div>
   </div>
@@ -1172,18 +1183,19 @@
     <h2>高性能架构与工业部署</h2>
     <div class="content-grid">
       <div class="card">
-        <h3>模块 1：模型转换</h3>
+        <h3>模块 1：工程基础</h3>
         <ul>
-          <li>算子融合（Operator Fusion）</li>
-          <li>PyTorch → ONNX → TensorRT</li>
-          <li>OpenVINO / RKNN 导出</li>
+          <li><span class="highlight">Linux 基础命令</span></li>
+          <li><span class="highlight">现代 C++ 基础</span> (C++11/14)</li>
+          <li>智能指针、CMake 基础</li>
+          <li>Python/C++ 混合编程</li>
         </ul>
       </div>
       <div class="card">
-        <h3>模块 2：模型量化</h3>
+        <h3>模块 2：模型转换与量化</h3>
         <ul>
-          <li><span class="highlight">PTQ</span>（训练后量化）</li>
-          <li><span class="highlight">QAT</span>（量化感知训练）</li>
+          <li>PyTorch → ONNX → TensorRT</li>
+          <li><span class="highlight">PTQ</span> / <span class="highlight">QAT</span> 量化</li>
           <li>FP32 → INT8 映射机制</li>
           <li>KL散度寻找最佳截断阈值</li>
         </ul>
@@ -1194,6 +1206,7 @@
           <li>GPU硬件架构（SM、Tensor Core）</li>
           <li>显存层级、带宽瓶颈分析</li>
           <li>TensorRT Custom Plugin</li>
+          <li><span class="highlight">NCNN / MNN / RKNN</span> 端侧部署</li>
         </ul>
       </div>
       <div class="card">
@@ -1214,8 +1227,18 @@
     <h2>工业级模型部署</h2>
     <div class="content-grid">
       <div class="card">
-        <h3 style="color:var(--accent)">模型转换链</h3>
-        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent)">PyTorch → ONNX → TensorRT</p>
+        <h3 style="color:var(--accent)">工程基础</h3>
+        <ul>
+          <li><span class="highlight">Linux 基础命令</span></li>
+          <li><span class="highlight">现代 C++ 基础</span> (C++11/14)</li>
+          <li>智能指针、CMake 基础</li>
+          <li>Python/C++ 混合编程</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">工业界95%的高性能推理依赖C++</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">模型转换链</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent-2)">PyTorch → ONNX → TensorRT</p>
         <ul>
           <li><span class="highlight">ONNX</span>：开放神经网络交换格式</li>
           <li>算子融合（Operator Fusion）</li>
@@ -1224,8 +1247,8 @@
         </ul>
       </div>
       <div class="card">
-        <h3 style="color:var(--accent-2)">模型量化</h3>
-        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent-2)">FP32 → INT8</p>
+        <h3 style="color:var(--green)">模型量化</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--green)">FP32 → INT8</p>
         <ul>
           <li><span class="highlight">PTQ</span>：训练后量化</li>
           <li><span class="highlight">QAT</span>：量化感知训练</li>
@@ -1234,21 +1257,11 @@
         </ul>
       </div>
       <div class="card">
-        <h3 style="color:var(--green)">GPU 架构</h3>
+        <h3 style="color:var(--orange)">端侧部署</h3>
         <ul>
-          <li>SM（流多处理器）</li>
-          <li><span class="highlight">Tensor Core</span>：矩阵加速</li>
-          <li>显存层级：L1/L2/Global</li>
-          <li>Memory Bound vs Compute Bound</li>
-        </ul>
-        <p style="margin-top:8px; color:var(--text-muted)">理解硬件是优化的基础</p>
-      </div>
-      <div class="card">
-        <h3 style="color:var(--orange)">推理服务</h3>
-        <ul>
-          <li><span class="highlight">TensorRT Custom Plugin</span></li>
-          <li>动态Batch并发</li>
-          <li>多线程推理</li>
+          <li><span class="highlight">NCNN</span>：腾讯开源，移动端首选</li>
+          <li><span class="highlight">MNN</span>：阿里开源，轻量高效</li>
+          <li><span class="highlight">RKNN</span>：瑞芯微NPU专用</li>
           <li>Triton Inference Server</li>
         </ul>
         <p style="margin-top:8px; color:var(--text-muted)">C++ 或 Python 封装</p>
@@ -1289,8 +1302,9 @@
       <div class="summary-item">
         <div class="summary-icon" style="background:rgba(255,109,0,0.15)">🚀</div>
         <div>
-          <h3>"实战" 导向</h3>
-          <p>每个阶段都有明确的<span class="highlight-yellow">交付成果</span>，从手写算子到工业级部署，打通全链路</p>
+          <h3>Capstone Project</h3>
+          <p>贯穿始终的毕业项目：<span class="highlight-yellow">从0构建工业级缺陷检测系统</span></p>
+          <p style="margin-top:8px; font-size:12px; color:var(--text-muted)">阶段1-2: YOLO11训练 → 阶段3: RT-DETR对比 → 阶段4: Grounding DINO标注 → 阶段5: TensorRT部署</p>
         </div>
       </div>
     </div>
