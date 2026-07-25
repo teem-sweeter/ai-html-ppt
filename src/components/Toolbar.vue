@@ -2,19 +2,15 @@
   <div class="toolbar">
     <button class="toolbar-btn" @click="$emit('fullscreen')" title="全屏">
       <span class="btn-icon">⛶</span>
-      <span class="btn-text">全屏</span>
     </button>
     <button class="toolbar-btn" @click="$emit('download-png')" title="下载PNG">
       <span class="btn-icon">📷</span>
-      <span class="btn-text">PNG</span>
     </button>
     <button class="toolbar-btn" @click="$emit('download-svg')" title="下载SVG">
       <span class="btn-icon">🎨</span>
-      <span class="btn-text">SVG</span>
     </button>
     <button class="toolbar-btn" @click="$emit('export-html')" title="导出HTML">
       <span class="btn-icon">📄</span>
-      <span class="btn-text">HTML</span>
     </button>
   </div>
 </template>
@@ -30,41 +26,34 @@ defineEmits<{
 
 <style scoped>
 .toolbar {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   gap: 8px;
-  padding: 12px 16px;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
+  z-index: 100;
 }
 
 .toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--surface-2);
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+  font-size: 18px;
 }
 
 .toolbar-btn:hover {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--bg);
-}
-
-.btn-icon {
-  font-size: 16px;
-}
-
-.btn-text {
-  font-size: 12px;
 }
 </style>
