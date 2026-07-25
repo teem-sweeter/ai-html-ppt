@@ -823,8 +823,46 @@
     </div>
   </div>
 
-  <!-- SLIDE 9: 第三阶段概述 -->
+  <!-- SLIDE 9: 分割与跟踪 -->
   <div class="slide slide-content" data-index="9">
+    <div class="section-tag" style="color:var(--accent-2)">模块 3</div>
+    <h2>图像分割与目标跟踪</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">图像分割演进</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">FCN → U-Net → PSPNet → DeepLab → SAM</p>
+        <ul>
+          <li><span class="highlight">FCN</span>：全卷积网络，像素级分类</li>
+          <li><span class="highlight">U-Net</span>：跳跃连接，医学图像标配</li>
+          <li><span class="highlight">DeepLab</span>：ASPP空洞卷积金字塔</li>
+          <li><span class="highlight-green">SAM</span>：提示词引导的通用分割</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--pink)">OCR 文字识别</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">CRNN + CTC Loss</p>
+        <ul>
+          <li>CNN提取特征 + RNN序列建模</li>
+          <li>CTC Loss解决对齐问题</li>
+          <li>Attention OCR：注意力机制</li>
+          <li><span class="highlight">PaddleOCR</span>：极致轻量化</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">多目标跟踪（MOT）</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:12px; color:var(--text-muted)">SORT → DeepSORT → ByteTrack</p>
+        <ul>
+          <li><span class="highlight">SORT</span>：卡尔曼滤波 + 匈牙利算法</li>
+          <li><span class="highlight">DeepSORT</span>：引入ReID特征</li>
+          <li><span class="highlight-green">ByteTrack</span>：低分框二次匹配</li>
+          <li>OCSORT / BoTSORT</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: 第三阶段概述 -->
+  <div class="slide slide-content" data-index="10">
     <div class="section-tag" style="color:var(--green)">第三阶段</div>
     <h2>Transformer 架构与端到端新范式</h2>
     <div class="content-grid">
@@ -853,8 +891,103 @@
     </div>
   </div>
 
-  <!-- SLIDE 10: 第四阶段 -->
-  <div class="slide slide-content" data-index="10">
+  <!-- SLIDE 11: ViT/Swin Transformer -->
+  <div class="slide slide-content" data-index="11">
+    <div class="section-tag" style="color:var(--green)">模块 1</div>
+    <h2>视觉 Transformer</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">标准 Transformer</h3>
+        <div class="formula-box" style="max-width:100%; margin:12px 0">
+          <div class="formula-main" style="font-size:16px; color:var(--accent)">Attention(Q,K,V) = softmax(QKᵀ/√dₖ)V</div>
+        </div>
+        <ul>
+          <li>Self-Attention：自注意力机制</li>
+          <li>Multi-Head：多头并行注意力</li>
+          <li>Position Encoding：位置编码</li>
+          <li>FFN：前馈网络</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">ViT (Vision Transformer)</h3>
+        <ul>
+          <li><span class="highlight">Patch Embedding</span>：图像切块</li>
+          <li>[CLS] Token：分类标识</li>
+          <li>缺乏CNN的归纳偏置</li>
+          <li>需要大规模数据预训练</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">DeiT：引入蒸馏机制</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">Swin Transformer</h3>
+        <ul>
+          <li><span class="highlight">Window Attention</span>：局部窗口注意力</li>
+          <li><span class="highlight">Shifted Window</span>：移动窗口</li>
+          <li>层次化特征构建</li>
+          <li>线性计算复杂度 O(n)</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">CV任务的通用骨干网络</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--orange)">ConvNeXt</h3>
+        <ul>
+          <li>用现代技巧反向优化ResNet</li>
+          <li>大卷积核 (7×7)</li>
+          <li>GELU激活、LayerNorm</li>
+          <li>复刻ViT性能</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">证明CNN仍有生命力</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: DETR家族 -->
+  <div class="slide slide-content" data-index="12">
+    <div class="section-tag" style="color:var(--green)">模块 2</div>
+    <h2>DETR 家族（端到端检测）</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">DETR 奠基</h3>
+        <ul>
+          <li><span class="highlight">Object Query</span>：目标查询</li>
+          <li><span class="highlight">匈牙利匹配</span>：一对一集合预测</li>
+          <li>告别NMS后处理</li>
+          <li>Encoder-Decoder架构</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--accent)">源码：facebookresearch/detr</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">Deformable DETR</h3>
+        <ul>
+          <li><span class="highlight">MSDeformAttention</span></li>
+          <li>多尺度可变形注意力</li>
+          <li>采样点 + 参考点预测</li>
+          <li>解决计算量大问题</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">DAB-DETR & DN-DETR</h3>
+        <ul>
+          <li>Object Query具象化为4D锚框</li>
+          <li><span class="highlight">Denoising</span>：去噪训练</li>
+          <li>绕过匈牙利匹配不稳定性</li>
+          <li>大幅加速收敛</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--highlight)">DINO & RT-DETR</h3>
+        <ul>
+          <li><span class="highlight-green">DINO</span>：混合查询、对比去噪</li>
+          <li>现代DETR巅峰之作</li>
+          <li><span class="highlight">RT-DETR</span>：实时化王牌</li>
+          <li>Hybrid Encoder + IoU-Aware Query</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 13: 第四阶段 -->
+  <div class="slide slide-content" data-index="13">
     <div class="section-tag" style="color:var(--accent-3)">第四阶段</div>
     <h2>多模态智能与前沿风口</h2>
     <div class="content-grid cols-3">
@@ -895,8 +1028,56 @@
     </div>
   </div>
 
-  <!-- SLIDE 11: 第五阶段 -->
-  <div class="slide slide-content" data-index="11">
+  <!-- SLIDE 14: 多模态模型 -->
+  <div class="slide slide-content" data-index="14">
+    <div class="section-tag" style="color:var(--accent-3)">模块 1-4</div>
+    <h2>视觉-语言大模型</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">CLIP</h3>
+        <ul>
+          <li>OpenAI 对比学习巨作</li>
+          <li><span class="highlight">双塔架构</span>：图像编码器 + 文本编码器</li>
+          <li>千万级图文对训练</li>
+          <li>Zero-Shot 零样本能力</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">奠基之作，统一视觉与语言特征空间</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">BLIP2 / Qwen-VL</h3>
+        <ul>
+          <li><span class="highlight">Q-Former</span>：解决Vision Token过长</li>
+          <li>Vision Encoder → Projection → LLM</li>
+          <li>Cross-Attention交互</li>
+          <li>多模态理解与生成</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">统一感知范式</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">Grounding DINO</h3>
+        <ul>
+          <li><span class="highlight">开放词汇</span>目标检测</li>
+          <li>文本提示词 + 图像特征融合</li>
+          <li>跨注意力层交互</li>
+          <li>Zero-Shot检测能力</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">文本驱动的检测</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--orange)">SAM / SAM2</h3>
+        <ul>
+          <li><span class="highlight">Segment Anything</span></li>
+          <li>Prompt Encoder：点、框、文本</li>
+          <li>Mask Decoder：高质量分割</li>
+          <li>SAM2：视频时序记忆网</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">通用分割基础模型</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 15: 第五阶段 -->
+  <div class="slide slide-content" data-index="15">
     <div class="section-tag" style="color:var(--purple)">第五阶段</div>
     <h2>高性能架构与工业部署</h2>
     <div class="content-grid">
@@ -933,8 +1114,56 @@
     </div>
   </div>
 
-  <!-- SLIDE 12: 总结 -->
-  <div class="slide slide-content" data-index="12">
+  <!-- SLIDE 16: 模型部署详情 -->
+  <div class="slide slide-content" data-index="16">
+    <div class="section-tag" style="color:var(--purple)">模块 1-3</div>
+    <h2>工业级模型部署</h2>
+    <div class="content-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">模型转换链</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent)">PyTorch → ONNX → TensorRT</p>
+        <ul>
+          <li><span class="highlight">ONNX</span>：开放神经网络交换格式</li>
+          <li>算子融合（Operator Fusion）</li>
+          <li>计算图优化</li>
+          <li>OpenVINO / RKNN 导出</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">模型量化</h3>
+        <p style="margin-bottom:12px; font-family:monospace; font-size:14px; color:var(--accent-2)">FP32 → INT8</p>
+        <ul>
+          <li><span class="highlight">PTQ</span>：训练后量化</li>
+          <li><span class="highlight">QAT</span>：量化感知训练</li>
+          <li>校准集（Calibration）策略</li>
+          <li>KL散度寻找最佳截断阈值</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">GPU 架构</h3>
+        <ul>
+          <li>SM（流多处理器）</li>
+          <li><span class="highlight">Tensor Core</span>：矩阵加速</li>
+          <li>显存层级：L1/L2/Global</li>
+          <li>Memory Bound vs Compute Bound</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">理解硬件是优化的基础</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--orange)">推理服务</h3>
+        <ul>
+          <li><span class="highlight">TensorRT Custom Plugin</span></li>
+          <li>动态Batch并发</li>
+          <li>多线程推理</li>
+          <li>Triton Inference Server</li>
+        </ul>
+        <p style="margin-top:8px; color:var(--text-muted)">C++ 或 Python 封装</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 17: 总结 -->
+  <div class="slide slide-content" data-index="17">
     <div class="section-tag" style="color:var(--accent)">总结</div>
     <h2>执行铁律</h2>
     <div class="summary-grid">
