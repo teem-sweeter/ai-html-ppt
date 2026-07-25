@@ -13,15 +13,19 @@
         <div class="loading-spinner"></div>
         <div class="loading-text">加载中...</div>
       </div>
-      <button class="fullscreen-btn" @click.stop="toggleFullscreen" :title="isFullscreen ? '退出全屏' : '全屏'">
-        {{ isFullscreen ? '⊡' : '⛶' }}
-      </button>
     </div>
+    <Toolbar
+      @fullscreen="toggleFullscreen"
+      @download-png="downloadPng"
+      @download-svg="downloadSvg"
+      @export-html="exportHtml"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
+import Toolbar from './Toolbar.vue'
 
 interface Presentation {
   id: string
@@ -97,6 +101,117 @@ function injectControlScript() {
   }
 }
 
+// 全屏
+function toggleFullscreen() {
+  if (!slideContainer.value) return
+  if (!document.fullscreenElement) {
+    slideContainer.value.requestFullscreen().then(() => { isFullscreen.value = true })
+  } else {
+    document.exitFullscreen().then(() => { isFullscreen.value = false })
+  }
+}
+
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+}
+
+// 下载PNG
+async function downloadPng() {
+  if (!iframeRef.value?.contentDocument) return
+  try {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const iframe = iframeRef.value
+    const iframeDoc = iframe.contentDocument
+    const iframeWin = iframe.contentWindow
+
+    canvas.width = iframeWin?.innerWidth || 1920
+    canvas.height = iframeWin?.innerHeight || 1080
+
+    // 使用 html2canvas 或 dom-to-image 需要额外库
+    // 这里使用简单的截图方式
+    const svgData = new XMLSerializer().serializeToString(iframeDoc?.documentElement as Node || document.createElement('div'))
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    const url = URL.createObjectURL(svgBlob)
+
+    const img = new Image()
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0)
+      URL.revokeObjectURL(url)
+
+      canvas.toBlob((blob) => {
+        if (!blob) return
+        const a = document.createElement('a')
+        a.href = URL.createObjectURL(blob)
+        a.download = `${props.presentation.id}-slide${props.currentPage}.png`
+        a.click()
+        URL.revokeObjectURL(a.href)
+      }, 'image/png')
+    }
+    img.src = url
+  } catch (e) {
+    console.error('Download PNG error:', e)
+    alert('下载PNG失败，请尝试使用截图工具')
+  }
+}
+
+// 下载SVG
+function downloadSvg() {
+  if (!iframeRef.value?.contentDocument) return
+  try {
+    const html = iframeRef.value.contentDocument.documentElement.outerHTML
+    const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      ${html}
+    </div>
+  </foreignObject>
+</svg>`
+
+    const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `${props.presentation.id}-slide${props.currentPage}.svg`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  } catch (e) {
+    console.error('Download SVG error:', e)
+    alert('下载SVG失败')
+  }
+}
+
+// 导出HTML
+function exportHtml() {
+  if (!iframeRef.value?.contentDocument) return
+  try {
+    const html = iframeRef.value.contentDocument.documentElement.outerHTML
+    const fullHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${props.presentation.title} - Slide ${props.currentPage + 1}</title>
+</head>
+<body>
+${html}
+</body>
+</html>`
+
+    const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `${props.presentation.id}-slide${props.currentPage}.html`
+    a.click()
+    URL.revokeObjectURL(a.href)
+  } catch (e) {
+    console.error('Export HTML error:', e)
+    alert('导出HTML失败')
+  }
+}
+
 watch(() => props.currentPage, (newPage) => {
   goToSlide(newPage)
 })
@@ -119,19 +234,6 @@ function handleKeydown(event: KeyboardEvent) {
       emit('update:currentPage', props.currentPage - 1)
     }
   }
-}
-
-function toggleFullscreen() {
-  if (!slideContainer.value) return
-  if (!document.fullscreenElement) {
-    slideContainer.value.requestFullscreen().then(() => { isFullscreen.value = true })
-  } else {
-    document.exitFullscreen().then(() => { isFullscreen.value = false })
-  }
-}
-
-function handleFullscreenChange() {
-  isFullscreen.value = !!document.fullscreenElement
 }
 
 function handleClick(event: MouseEvent) {
@@ -181,22 +283,20 @@ onUnmounted(() => {
 .player {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   background: #000;
-  padding: 1rem;
 }
 
 .slide-container {
+  flex: 1;
   width: 100%;
   max-width: 1280px;
+  margin: 0 auto;
   aspect-ratio: 16 / 9;
   background: var(--bg);
-  border-radius: 4px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
 .slide-iframe {
@@ -264,41 +364,12 @@ onUnmounted(() => {
   color: var(--text-muted);
 }
 
-.fullscreen-btn {
-  position: absolute;
-  top: 10px; right: 10px;
-  z-index: 20;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  width: 36px; height: 36px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.slide-container:hover .fullscreen-btn { opacity: 1; }
-.fullscreen-btn:hover { background: rgba(0, 0, 0, 0.8); border-color: var(--accent); }
-
 .slide-container:fullscreen {
   width: 100vw; height: 100vh;
   max-width: none; aspect-ratio: auto;
-  border-radius: 0; box-shadow: none;
-}
-
-.slide-container:fullscreen .fullscreen-btn {
-  opacity: 1; top: 20px; right: 20px;
-  width: 44px; height: 44px; font-size: 22px;
 }
 
 @media (max-width: 768px) {
-  .player { padding: 0.5rem; }
-  .slide-container { border-radius: 2px; }
-  .fullscreen-btn { opacity: 1; width: 32px; height: 32px; font-size: 16px; }
+  .slide-container { aspect-ratio: auto; }
 }
 </style>
