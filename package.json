@@ -1,0 +1,41 @@
+{
+  "name": "ai-html-ppt",
+  "version": "1.0.0",
+  "description": "基于 Vue 3 + Vite 的 AI HTML PPT 演示系统，支持自动发现、动态加载、全屏展示等功能",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "ppt",
+    "presentation",
+    "vue3",
+    "vite",
+    "ai",
+    "html",
+    "slideshow"
+  ],
+  "author": "teem-sweeter",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/teem-sweeter/ai-html-ppt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/teem-sweeter/ai-html-ppt/issues"
+  },
+  "homepage": "https://github.com/teem-sweeter/ai-html-ppt#readme",
+  "dependencies": {
+    "vue": "^3.5.39"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.2",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "@vue/tsconfig": "^0.9.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vue-tsc": "^3.3.5"
+  }
+}
