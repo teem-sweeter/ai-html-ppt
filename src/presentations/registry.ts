@@ -27,7 +27,8 @@ export interface Presentation {
 }
 
 // 自动发现所有工作空间
-const workspaceModules = import.meta.glob<{ [key: string]: Workspace }>('../../workspaces/**/index.ts', { eager: true })
+// 使用相对于项目根目录的路径
+const workspaceModules = import.meta.glob<{ [key: string]: Workspace }>('/workspaces/**/index.ts', { eager: true })
 
 // 工作空间列表
 export const WORKSPACES: Workspace[] = []
