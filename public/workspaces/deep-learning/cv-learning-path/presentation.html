@@ -522,8 +522,8 @@
       <div class="roadmap-item">
         <div class="roadmap-num">1</div>
         <div class="roadmap-content">
-          <h3 style="color:var(--accent)">底层内功与算子重构</h3>
-          <p>数学基础、开发工具、深度学习通用基础</p>
+          <h3 style="color:var(--accent)">基础入门</h3>
+          <p>Python编程、数学基础、深度学习入门概念</p>
         </div>
       </div>
       <div class="roadmap-item">
@@ -559,104 +559,102 @@
 
   <!-- SLIDE 2: 第一阶段概述 -->
   <div class="slide slide-content" data-index="2">
-    <div class="section-tag" style="color:var(--accent)">⚔️ 第一阶段</div>
-    <h2>底层内功与算子重构</h2>
+    <div class="section-tag" style="color:var(--accent)">第一阶段</div>
+    <h2>基础入门</h2>
     <div class="content-grid cols-3">
       <div class="card">
-        <h3>模块1：数学具象化</h3>
+        <h3>Python 编程基础</h3>
         <ul>
-          <li>线性代数核心：向量/矩阵/张量</li>
-          <li>微积分与反向传播</li>
-          <li>概率统计与损失能量</li>
-          <li>手写矩阵乘法与PCA</li>
+          <li>Python 语法与数据结构</li>
+          <li>NumPy 数组操作基础</li>
+          <li>Matplotlib 数据可视化</li>
+          <li>Pandas 数据处理入门</li>
         </ul>
       </div>
       <div class="card">
-        <h3>模块2：开发工具</h3>
+        <h3>数学基础</h3>
         <ul>
-          <li>NumPy、OpenCV、Matplotlib</li>
-          <li>PyTorch核心机制</li>
-          <li>手写算子：Linear、Conv2d</li>
-          <li>手写MaxPool、BatchNorm</li>
+          <li>向量与矩阵基本运算</li>
+          <li>导数与梯度概念</li>
+          <li>概率与统计基础</li>
+          <li>线性代数直观理解</li>
         </ul>
       </div>
       <div class="card">
-        <h3>模块3：深度学习基础</h3>
+        <h3>深度学习入门</h3>
         <ul>
-          <li>网络结构：MLP、激活函数</li>
-          <li>工业优化：SGD、Adam、AdamW</li>
-          <li>损失函数：CrossEntropy</li>
-          <li>Focal Loss、Dice Loss、IoU Loss</li>
+          <li>神经网络基本概念</li>
+          <li>前向传播与反向传播</li>
+          <li>损失函数与优化器</li>
+          <li>PyTorch 基础使用</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 3: 数学基础 -->
+  <!-- SLIDE 3: Python基础 -->
   <div class="slide slide-content" data-index="3">
     <div class="section-tag" style="color:var(--accent)">模块 1</div>
-    <h2>数学具象化与底层推导</h2>
+    <h2>Python 编程基础</h2>
     <div class="content-grid">
       <div class="card">
-        <h3>线性代数核心</h3>
-        <p>向量/矩阵/张量的内存连续性、矩阵乘法（<span class="highlight">Q, K, V 矩阵变换的几何意义</span>）、SVD 分解、PCA 降维</p>
-        <p style="margin-top:8px; color:var(--accent)">手写攻关：NumPy 纯手写矩阵乘法与 PCA</p>
+        <h3>Python 语法</h3>
+        <p>变量、数据类型、控制流、函数、面向对象编程</p>
+        <p style="margin-top:8px; color:var(--accent)">重点掌握列表推导式、字典操作、文件读写</p>
       </div>
       <div class="card">
-        <h3>微积分与反向传播</h3>
-        <p>偏导数、梯度、链式法则、梯度下降</p>
-        <p style="margin-top:8px; color:var(--accent)">公式推导：线性层 y = Wx + b 的梯度</p>
+        <h3>NumPy 数组</h3>
+        <p>数组创建、索引切片、广播机制、矩阵运算</p>
+        <p style="margin-top:8px; color:var(--accent)">练习：50个NumPy核心练习题</p>
       </div>
       <div class="card">
-        <h3>概率统计与损失能量</h3>
-        <p>常见概率分布、<span class="highlight-pink">Softmax</span>、最大似然估计、贝叶斯理论、KL 散度</p>
-        <p style="margin-top:8px; color:var(--accent)">公式推导：交叉熵损失的导数</p>
+        <h3>数据可视化</h3>
+        <p>Matplotlib 绑图基础：折线图、散点图、柱状图、热力图</p>
+        <p style="margin-top:8px; color:var(--accent)">学会分析实验结果和数据分布</p>
       </div>
       <div class="card">
-        <h3>📚 推荐资料</h3>
+        <h3>📚 推荐资源</h3>
         <ul>
-          <li>《深度学习的数学》涌井良幸</li>
-          <li>《深度学习》花书前5章</li>
-          <li>李沐《动手学深度学习》前两单元</li>
-          <li>斯坦福 CS231n 前6讲</li>
+          <li>Python官方教程</li>
+          <li>NumPy官方文档</li>
+          <li>《利用Python进行数据分析》</li>
+          <li>Kaggle Learn 入门课程</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 4: 开发工具 -->
+  <!-- SLIDE 4: 数学基础 -->
   <div class="slide slide-content" data-index="4">
     <div class="section-tag" style="color:var(--accent)">模块 2</div>
-    <h2>开发工具与标准框架</h2>
+    <h2>数学基础</h2>
     <div class="content-grid">
       <div class="card">
-        <h3>基础工具链</h3>
+        <h3>线性代数</h3>
         <ul>
-          <li><span class="highlight">numpy</span> - 矩阵化思维</li>
-          <li><span class="highlight">opencv-python</span> - 图像处理</li>
-          <li><span class="highlight">matplotlib</span> - 可视化分析</li>
-          <li><span class="highlight">pandas</span> - 数据分析</li>
+          <li>向量：加法、数乘、点积</li>
+          <li>矩阵：乘法、转置、逆矩阵</li>
+          <li>直观理解：向量是方向，矩阵是变换</li>
         </ul>
-        <p style="margin-top:12px; color:var(--accent)">通关练习：50 个 NumPy 核心矩阵练习</p>
+        <p style="margin-top:8px; color:var(--accent)">推荐：3Blue1Brown《线性代数的本质》</p>
       </div>
       <div class="card">
-        <h3>PyTorch 核心机制</h3>
+        <h3>微积分</h3>
         <ul>
-          <li>Tensor 存储机制</li>
-          <li>Autograd 自动求导</li>
-          <li>Module 生命周期</li>
-          <li>Dataset/DataLoader 多线程加载</li>
+          <li>导数：变化率的度量</li>
+          <li>梯度：多变量函数的导数</li>
+          <li>链式法则：复合函数求导</li>
         </ul>
+        <p style="margin-top:8px; color:var(--accent)">理解：梯度指向函数增长最快的方向</p>
       </div>
       <div class="card">
-        <h3>手写算子（重点）</h3>
-        <p style="color:var(--pink); font-weight:600; margin-bottom:8px">禁止直接调用 nn 库</p>
+        <h3>概率统计</h3>
         <ul>
-          <li>Linear（全连接层）</li>
-          <li>Conv2d（二维卷积）</li>
-          <li>MaxPool（最大池化）</li>
-          <li>BatchNorm（批归一化）</li>
+          <li>概率：事件发生的可能性</li>
+          <li>分布：数据的统计规律</li>
+          <li>期望与方差：数据的集中趋势和离散程度</li>
         </ul>
+        <p style="margin-top:8px; color:var(--accent)">为理解损失函数打基础</p>
       </div>
     </div>
   </div>
