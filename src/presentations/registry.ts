@@ -97,23 +97,20 @@ async function loadHtmlSlide(path: string): Promise<any> {
     const html = await response.text()
     
     // 创建一个 Vue 组件来渲染 HTML
+    // 直接返回组件选项对象，而不是包含 default 的模块
     return {
-      default: {
-        template: `<div class="html-slide-wrapper" v-html="content"></div>`,
-        setup() {
-          return { content: html }
-        }
+      template: `<div class="html-slide-wrapper" v-html="content"></div>`,
+      setup() {
+        return { content: html }
       }
     }
   } catch (error) {
     console.error(`Failed to load HTML slide: ${path}`, error)
     // 返回一个错误占位组件
     return {
-      default: {
-        template: `<div class="slide-error">加载失败: {{ path }}</div>`,
-        setup() {
-          return { path }
-        }
+      template: `<div class="slide-error">加载失败: {{ path }}</div>`,
+      setup() {
+        return { path }
       }
     }
   }
