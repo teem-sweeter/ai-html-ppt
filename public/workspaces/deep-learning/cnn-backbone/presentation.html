@@ -228,22 +228,23 @@
   .timeline {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    overflow-x: auto;
     padding: 20px 0;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .timeline-item {
     flex-shrink: 0;
     text-align: center;
-    padding: 20px;
+    padding: 16px 20px;
     background: var(--surface);
     border: 1px solid var(--grid-border);
     border-radius: 8px;
-    min-width: 150px;
+    min-width: 120px;
     opacity: 0;
     transform: translateX(-20px);
   }
