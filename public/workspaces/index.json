@@ -16,7 +16,7 @@
         "title": "池化",
         "description": "池化技术详解",
         "file": "presentation.html",
-        "totalSlides": 8
+        "totalSlides": 10
       },
       {
         "id": "resnet",

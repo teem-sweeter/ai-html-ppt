@@ -454,6 +454,38 @@
     font-weight: 700;
   }
 
+  /* ===== COMPARISON ROW ===== */
+  .comparison-row {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .comparison-col {
+    flex: 1;
+  }
+
+  .comparison-col .card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 28px;
+    height: 100%;
+  }
+
+  .comparison-col .card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .comparison-col .card p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
   /* ===== SLIDE 7: SUMMARY ===== */
   .slide-summary {
     background: radial-gradient(ellipse at 70% 30%, rgba(0, 230, 118, 0.06) 0%, transparent 50%),
@@ -968,8 +1000,94 @@
     </p>
   </div>
 
-  <!-- SLIDE 7: Summary -->
-  <div class="slide slide-summary" data-index="7">
+  <!-- SLIDE 7: Average Pooling -->
+  <div class="slide slide-calc" data-index="7">
+    <div class="calc-header">
+      <span class="step-badge" style="background:var(--accent-2)">平均池化</span>
+      <h2>Average Pooling</h2>
+    </div>
+    <div class="calc-body">
+      <div class="grid-wrapper">
+        <div class="grid-label">输入特征图 4×4</div>
+        <div class="matrix-4x4">
+          <div class="matrix-cell active-cell">1</div>
+          <div class="matrix-cell active-cell">3</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell active-cell">5</div>
+          <div class="matrix-cell active-cell">6</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">0</div>
+          <div class="matrix-cell dim-cell">2</div>
+          <div class="matrix-cell dim-cell">1</div>
+          <div class="matrix-cell dim-cell">7</div>
+          <div class="matrix-cell dim-cell">3</div>
+          <div class="matrix-cell dim-cell">8</div>
+          <div class="matrix-cell dim-cell">4</div>
+          <div class="matrix-cell dim-cell">9</div>
+          <div class="matrix-cell dim-cell">5</div>
+        </div>
+      </div>
+      <div class="arrow-section">
+        <div class="arrow-line"></div>
+      </div>
+      <div class="grid-wrapper">
+        <div class="grid-label">输出特征图 2×2</div>
+        <div class="matrix-2x2">
+          <div class="matrix-cell result-new" style="background:rgba(124,77,255,0.15); border-color:var(--accent-2); color:var(--accent-2)">3.75</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+          <div class="matrix-cell" style="opacity:0.15">·</div>
+        </div>
+      </div>
+      <div class="formula-section">
+        <div class="formula-title">COMPUTATION</div>
+        <div class="formula-values">
+          <span class="formula-val">1</span>
+          <span class="formula-val">3</span>
+          <span class="formula-val">5</span>
+          <span class="formula-val">6</span>
+        </div>
+        <div class="formula-result">
+          avg(1, 3, 5, 6) = <strong>3.75</strong><br><br>
+          result[0][0] = <strong>3.75</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Global Average Pooling -->
+  <div class="slide slide-content" data-index="8">
+    <div class="section-tag" style="color:var(--green)">03 / 全局池化</div>
+    <h2>Global Average Pooling</h2>
+    <div class="comparison-row">
+      <div class="comparison-col">
+        <div class="card" style="border-top:3px solid var(--accent)">
+          <h3 style="color:var(--accent); margin-bottom:16px">传统方式</h3>
+          <p style="margin-bottom:12px">卷积 → <span class="hl">Flatten</span> → 全连接层</p>
+          <p style="color:var(--text-muted); font-size:14px">
+            参数量大，容易过拟合
+          </p>
+        </div>
+      </div>
+      <div class="comparison-col">
+        <div class="card" style="border-top:3px solid var(--green)">
+          <h3 style="color:var(--green); margin-bottom:16px">Global Average Pooling</h3>
+          <p style="margin-bottom:12px">卷积 → <span class="hl-green">GAP</span> → 分类</p>
+          <p style="color:var(--text-muted); font-size:14px">
+            将整个特征图压缩为一个值，零参数，强正则化
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="formula-box" style="margin-top:24px; max-width:100%">
+      <div class="formula-main" style="color:var(--green)">GAP: (H×W×C) → (1×1×C)</div>
+      <div class="formula-note">对每个通道的所有空间位置取平均值</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: Summary -->
+  <div class="slide slide-summary" data-index="9">
     <div class="section-tag">02 / 总结</div>
     <h2>池化的核心作用</h2>
     <div class="summary-grid">
