@@ -304,7 +304,7 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #000;
+  background: var(--bg);
   padding: 1rem;
 }
 
