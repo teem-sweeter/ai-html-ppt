@@ -132,6 +132,13 @@ watch(() => props.isDark, (newVal) => {
   }
 })
 
+// 监听PPT切换
+watch(() => [props.presentation.workspace, props.presentation.id], () => {
+  needsNavigate = true
+  iframeReady.value = false
+  iframeUrl.value = getIframeUrl()
+})
+
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') {
     event.preventDefault()
