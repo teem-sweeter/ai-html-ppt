@@ -1,6 +1,6 @@
 <template>
   <div class="player">
-    <div class="slide-container" ref="slideContainer" @click="handleClick">
+    <div class="slide-container" ref="slideContainer">
       <iframe
         ref="iframeRef"
         class="slide-iframe"
@@ -9,6 +9,7 @@
         :style="{ visibility: iframeReady ? 'visible' : 'hidden' }"
         @load="onIframeLoad"
       ></iframe>
+      <div class="click-overlay" @click="handleClick"></div>
       <div v-if="!iframeReady" class="loading-overlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">加载中...</div>
@@ -312,6 +313,16 @@ onUnmounted(() => {
   height: 100%;
   border: none;
   display: block;
+}
+
+.click-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  cursor: pointer;
 }
 
 .slide-counter {
