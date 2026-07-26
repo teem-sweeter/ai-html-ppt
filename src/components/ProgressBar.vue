@@ -51,12 +51,12 @@ defineEmits<{
 }
 
 .nav-btn {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border: none;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.5);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -66,7 +66,7 @@ defineEmits<{
 
 .nav-btn:hover:not(:disabled) {
   color: white;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .nav-btn:disabled {
@@ -76,13 +76,13 @@ defineEmits<{
 
 .dots {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 
 .dot {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
@@ -95,7 +95,7 @@ defineEmits<{
 
 .dot.active {
   background: white;
-  width: 18px;
-  border-radius: 3px;
+  width: 28px;
+  border-radius: 5px;
 }
 </style>
