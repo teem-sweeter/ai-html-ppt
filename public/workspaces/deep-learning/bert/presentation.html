@@ -448,61 +448,68 @@
     <div class="card-grid">
       <div class="card" style="grid-column: span 2">
         <h3>BERT 架构图</h3>
-        <svg viewBox="0 0 800 400" style="width:100%; margin-top:16px">
-          <!-- 输入层 -->
-          <rect x="50" y="340" width="700" height="50" rx="4" fill="#1e1e2e" stroke="#4a4a5d" stroke-width="1.5"/>
-          <text x="400" y="370" fill="#eef0f6" font-size="12" text-anchor="middle" font-family="monospace">[CLS] The cat sat on the [MASK] mat [SEP]</text>
+        <svg viewBox="0 0 800 420" style="width:100%; margin-top:16px">
+          <!-- 输出层 -->
+          <rect x="50" y="10" width="700" height="40" rx="4" fill="rgba(255,60,172,0.1)" stroke="#ff3cac" stroke-width="1.5"/>
+          <text x="400" y="35" fill="#ff3cac" font-size="12" text-anchor="middle" font-family="monospace">输出: 每个 token 的上下文表示 (768维 / 1024维)</text>
           
-          <!-- Embedding层 -->
-          <rect x="50" y="280" width="700" height="45" rx="4" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
-          <text x="400" y="308" fill="#7c4dff" font-size="11" text-anchor="middle" font-family="monospace">Token Embedding + Segment Embedding + Position Embedding</text>
-          
-          <!-- Transformer Encoder 层 -->
-          <rect x="150" y="40" width="500" height="220" rx="8" fill="rgba(0,229,255,0.05)" stroke="#00e5ff" stroke-width="2"/>
-          <text x="400" y="30" fill="#00e5ff" font-size="14" text-anchor="middle" font-weight="bold" font-family="monospace">Transformer Encoder × 12 (或 24)</text>
+          <!-- Transformer Encoder 外框 -->
+          <rect x="100" y="65" width="600" height="220" rx="8" fill="rgba(0,229,255,0.03)" stroke="#00e5ff" stroke-width="2"/>
+          <text x="400" y="85" fill="#00e5ff" font-size="12" text-anchor="middle" font-weight="bold" font-family="monospace">Transformer Encoder Block × 12 / 24</text>
           
           <!-- Multi-Head Attention -->
-          <rect x="200" y="70" width="180" height="70" rx="4" fill="rgba(255,171,0,0.1)" stroke="#ffab00" stroke-width="1.5"/>
-          <text x="290" y="100" fill="#ffab00" font-size="10" text-anchor="middle" font-family="monospace">Multi-Head</text>
-          <text x="290" y="120" fill="#ffab00" font-size="10" text-anchor="middle" font-family="monospace">Self-Attention</text>
+          <rect x="140" y="100" width="200" height="80" rx="6" fill="rgba(255,171,0,0.1)" stroke="#ffab00" stroke-width="1.5"/>
+          <text x="240" y="135" fill="#ffab00" font-size="11" text-anchor="middle" font-family="monospace">Multi-Head</text>
+          <text x="240" y="155" fill="#ffab00" font-size="11" text-anchor="middle" font-family="monospace">Self-Attention</text>
           
-          <!-- Add & Norm -->
-          <rect x="200" y="150" width="80" height="35" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
-          <text x="240" y="172" fill="#00e676" font-size="9" text-anchor="middle" font-family="monospace">Add & Norm</text>
+          <!-- Add & Norm 1 -->
+          <rect x="180" y="190" width="120" height="35" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="240" y="212" fill="#00e676" font-size="10" text-anchor="middle" font-family="monospace">Add & Norm</text>
           
           <!-- Feed Forward -->
-          <rect x="420" y="70" width="180" height="70" rx="4" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.5"/>
-          <text x="510" y="100" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="monospace">Feed Forward</text>
-          <text x="510" y="120" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="monospace">Network</text>
+          <rect x="460" y="100" width="200" height="80" rx="6" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
+          <text x="560" y="135" fill="#7c4dff" font-size="11" text-anchor="middle" font-family="monospace">Feed Forward</text>
+          <text x="560" y="155" fill="#7c4dff" font-size="11" text-anchor="middle" font-family="monospace">Network</text>
           
           <!-- Add & Norm 2 -->
-          <rect x="420" y="150" width="80" height="35" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
-          <text x="460" y="172" fill="#00e676" font-size="9" text-anchor="middle" font-family="monospace">Add & Norm</text>
+          <rect x="500" y="190" width="120" height="35" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="560" y="212" fill="#00e676" font-size="10" text-anchor="middle" font-family="monospace">Add & Norm</text>
           
-          <!-- 箭头 -->
-          <line x1="290" y1="140" x2="290" y2="150" stroke="#4a4a5d" stroke-width="1.5"/>
-          <line x1="240" y1="167" x2="420" y2="110" stroke="#4a4a5d" stroke-width="1.5"/>
-          <line x1="510" y1="140" x2="510" y2="150" stroke="#4a4a5d" stroke-width="1.5"/>
-          <line x1="460" y1="167" x2="290" y2="190" stroke="#4a4a5d" stroke-width="1.5"/>
+          <!-- 连接箭头 -->
+          <line x1="240" y1="180" x2="240" y2="190" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="300" y1="207" x2="460" y2="140" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="560" y1="180" x2="560" y2="190" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="500" y1="207" x2="340" y2="230" stroke="#4a4a5d" stroke-width="1.5"/>
           
-          <!-- 重复层标注 -->
-          <line x1="150" y1="200" x2="150" y2="250" stroke="#4a4a5d" stroke-width="1" stroke-dasharray="4"/>
-          <line x1="650" y1="200" x2="650" y2="250" stroke="#4a4a5d" stroke-width="1" stroke-dasharray="4"/>
-          <text x="400" y="240" fill="#b0b3c0" font-size="10" text-anchor="middle" font-family="monospace">× 12 (BERT-Base) 或 × 24 (BERT-Large)</text>
+          <!-- 残差连接 -->
+          <line x1="140" y1="140" x2="120" y2="140" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          <line x1="120" y1="140" x2="120" y2="207" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          <line x1="120" y1="207" x2="180" y2="207" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
           
-          <!-- 输出层 -->
-          <rect x="50" y="0" width="700" height="30" rx="4" fill="rgba(255,60,172,0.1)" stroke="#ff3cac" stroke-width="1.5"/>
-          <text x="400" y="20" fill="#ff3cac" font-size="11" text-anchor="middle" font-family="monospace">输出: 每个token的上下文表示 (768维 或 1024维)</text>
+          <line x1="460" y1="140" x2="440" y2="140" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          <line x1="440" y1="140" x2="440" y2="207" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          <line x1="440" y1="207" x2="500" y2="207" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
           
-          <!-- 箭头 -->
-          <line x1="400" y1="260" x2="400" y2="280" stroke="#4a4a5d" stroke-width="2"/>
-          <polygon points="396,278 400,286 404,278" fill="#4a4a5d"/>
+          <!-- Embedding 层 -->
+          <rect x="50" y="300" width="700" height="45" rx="4" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
+          <text x="400" y="328" fill="#7c4dff" font-size="11" text-anchor="middle" font-family="monospace">Token Embedding + Segment Embedding + Position Embedding</text>
           
-          <line x1="400" y1="325" x2="400" y2="340" stroke="#4a4a5d" stroke-width="2"/>
-          <polygon points="396,338 400,346 404,338" fill="#4a4a5d"/>
+          <!-- 输入层 -->
+          <rect x="50" y="360" width="700" height="45" rx="4" fill="#1e1e2e" stroke="#4a4a5d" stroke-width="1.5"/>
+          <text x="400" y="388" fill="#eef0f6" font-size="12" text-anchor="middle" font-family="monospace">[CLS] The cat sat on the [MASK] mat [SEP]</text>
           
-          <line x1="400" y1="230" x2="400" y2="240" stroke="#4a4a5d" stroke-width="2"/>
-          <polygon points="396,238 400,246 404,238" fill="#4a4a5d"/>
+          <!-- 垂直箭头 -->
+          <line x1="400" y1="50" x2="400" y2="65" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,63 400,71 404,63" fill="#4a4a5d"/>
+          
+          <line x1="400" y1="240" x2="400" y2="285" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,283 400,291 404,283" fill="#4a4a5d"/>
+          
+          <line x1="400" y1="345" x2="400" y2="360" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,358 400,366 404,358" fill="#4a4a5d"/>
+          
+          <!-- 重复标注 -->
+          <text x="400" y="275" fill="#b0b3c0" font-size="10" text-anchor="middle" font-family="monospace">重复 × 12 (Base) 或 × 24 (Large)</text>
         </svg>
       </div>
     </div>
