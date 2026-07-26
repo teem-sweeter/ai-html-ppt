@@ -560,45 +560,47 @@
   </div>
 
   <!-- SLIDE 4: 输入表示 -->
-  <div class="slide slide-content" data-index="4">
+  <div class="slide slide-content" data-index="4" style="padding: 40px 80px;">
     <div class="section-tag">04 / 输入表示</div>
-    <h2>输入表示</h2>
-    <div class="card-grid">
-      <div class="card" style="grid-column: span 2">
-        <h3>输入嵌入组成</h3>
-        <svg viewBox="0 0 800 200" style="width:100%; margin-top:12px">
+    <h2 style="margin-bottom: 20px;">输入表示</h2>
+    <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
+      <div style="background: var(--surface); border: 1px solid var(--grid-border); border-radius: 6px; padding: 20px; margin-bottom: 16px;">
+        <svg viewBox="0 0 800 140" style="width:100%">
           <!-- Token Embedding -->
-          <rect x="50" y="10" width="700" height="50" rx="4" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.5"/>
-          <text x="80" y="40" fill="#00e5ff" font-size="10" font-weight="bold" font-family="monospace">Token Embedding</text>
-          <text x="300" y="40" fill="#b0b3c0" font-size="9" font-family="monospace">[CLS] The cat sat on the [MASK] mat [SEP]</text>
+          <rect x="50" y="5" width="700" height="38" rx="3" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1"/>
+          <text x="80" y="30" fill="#00e5ff" font-size="10" font-weight="bold" font-family="monospace">Token Embedding</text>
+          <text x="300" y="30" fill="#b0b3c0" font-size="9" font-family="monospace">[CLS] The cat sat on the [MASK] mat [SEP]</text>
           
           <!-- Segment Embedding -->
-          <rect x="50" y="70" width="700" height="50" rx="4" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
-          <text x="80" y="100" fill="#7c4dff" font-size="10" font-weight="bold" font-family="monospace">Segment Embedding</text>
-          <text x="300" y="100" fill="#b0b3c0" font-size="9" font-family="monospace">  A    A   A   A   A  A   A   A    B</text>
+          <rect x="50" y="50" width="700" height="38" rx="3" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1"/>
+          <text x="80" y="75" fill="#7c4dff" font-size="10" font-weight="bold" font-family="monospace">Segment Embedding</text>
+          <text x="300" y="75" fill="#b0b3c0" font-size="9" font-family="monospace">  A    A   A   A   A  A   A   A    B</text>
           
           <!-- Position Embedding -->
-          <rect x="50" y="130" width="700" height="50" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1.5"/>
-          <text x="80" y="160" fill="#00e676" font-size="10" font-weight="bold" font-family="monospace">Position Embedding</text>
-          <text x="300" y="160" fill="#b0b3c0" font-size="9" font-family="monospace">  0    1   2   3   4  5   6   7    8</text>
-          
-          <!-- 加号和等号 -->
-          <text x="400" y="195" fill="#ffab00" font-size="14" text-anchor="middle" font-weight="bold">↓ 相加</text>
+          <rect x="50" y="95" width="700" height="38" rx="3" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="80" y="120" fill="#00e676" font-size="10" font-weight="bold" font-family="monospace">Position Embedding</text>
+          <text x="300" y="120" fill="#b0b3c0" font-size="9" font-family="monospace">  0    1   2   3   4  5   6   7    8</text>
         </svg>
+        <div style="text-align: center; margin-top: 8px;">
+          <span style="color: var(--highlight); font-size: 13px; font-weight: 600;">↓ 相加得到最终输入表示</span>
+        </div>
       </div>
-      <div class="card">
-        <h3>特殊Token</h3>
-        <ul>
-          <li><span class="highlight">[CLS]</span>：分类标记，用于句子级任务</li>
-          <li><span class="highlight-purple">[SEP]</span>：分隔符，分隔两个句子</li>
-          <li><span class="highlight-yellow">[MASK]</span>：遮盖标记，用于MLM</li>
-          <li><span class="highlight-green">[PAD]</span>：填充标记，对齐长度</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Segment Embedding</h3>
-        <p>用于区分<span class="highlight">句子A</span>和<span class="highlight-purple">句子B</span>，帮助模型理解句子边界。</p>
-        <p style="margin-top:12px">对于单句任务，全部使用Segment A。</p>
+      
+      <div style="display: flex; gap: 16px;">
+        <div style="flex: 1; background: var(--surface); border: 1px solid var(--grid-border); border-radius: 6px; padding: 16px;">
+          <h3 style="font-size: 15px; color: var(--accent); margin-bottom: 10px;">特殊Token</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;"><span style="color: var(--accent); font-weight: 600;">[CLS]</span> 分类标记，用于句子级任务</li>
+            <li style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;"><span style="color: var(--accent-2); font-weight: 600;">[SEP]</span> 分隔符，分隔两个句子</li>
+            <li style="font-size: 13px; color: var(--text-muted); margin-bottom: 6px;"><span style="color: var(--highlight); font-weight: 600;">[MASK]</span> 遮盖标记，用于MLM</li>
+            <li style="font-size: 13px; color: var(--text-muted);"><span style="color: var(--green); font-weight: 600;">[PAD]</span> 填充标记，对齐长度</li>
+          </ul>
+        </div>
+        <div style="flex: 1; background: var(--surface); border: 1px solid var(--grid-border); border-radius: 6px; padding: 16px;">
+          <h3 style="font-size: 15px; color: var(--accent-2); margin-bottom: 10px;">Segment Embedding</h3>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">用于区分<span style="color: var(--accent); font-weight: 600;">句子A</span>和<span style="color: var(--accent-2); font-weight: 600;">句子B</span>，帮助模型理解句子边界。</p>
+          <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">对于单句任务，全部使用Segment A。</p>
+        </div>
       </div>
     </div>
   </div>
