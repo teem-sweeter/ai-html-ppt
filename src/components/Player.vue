@@ -56,7 +56,6 @@ const slideContainer = ref<HTMLDivElement | null>(null)
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 const iframeReady = ref(false)
 const touchStartX = ref(0)
-let needsNavigate = false
 
 const iframeUrl = ref('')
 
@@ -75,15 +74,11 @@ function goToSlide(index: number) {
 
 function onIframeLoad() {
   injectControlScript()
-  if (needsNavigate) {
-    setTimeout(() => {
-      goToSlide(props.currentPage)
-      iframeReady.value = true
-    }, 100)
-    needsNavigate = false
-  } else {
+  // 延迟执行，确保iframe中的JavaScript已经加载完成
+  setTimeout(() => {
+    goToSlide(props.currentPage)
     iframeReady.value = true
-  }
+  }, 300)
 }
 
 function injectControlScript() {
@@ -91,34 +86,37 @@ function injectControlScript() {
   try {
     const script = iframeRef.value.contentDocument.createElement('script')
     script.textContent = `
+      // 隐藏导航栏
       var navBar = document.querySelector('.nav-bar');
       if (navBar) navBar.style.display = 'none';
-      var pres = document.querySelector('.presentation');
-      if (pres) { pres.style.width = '100vw'; pres.style.height = '100vh'; }
       
+      // 确保presentation填满视口
+      var pres = document.querySelector('.presentation');
+      if (pres) { 
+        pres.style.width = '100vw'; 
+        pres.style.height = '100vh'; 
+      }
+      
+      // 监听消息
       window.addEventListener('message', function(e) {
         if (e.data && e.data.type === 'goToSlide') {
-          if (typeof goTo === 'function') { goTo(e.data.index); }
-        }
-        if (e.data && e.data.type === 'themeChange') {
-          var root = document.documentElement;
-          if (e.data.isDark) {
-            root.style.setProperty('--bg', '#0a0a0f');
-            root.style.setProperty('--surface', '#12121a');
-            root.style.setProperty('--surface-2', '#1a1a26');
-            root.style.setProperty('--text-primary', '#eef0f6');
-            root.style.setProperty('--text-muted', '#6b6d7b');
-            root.style.setProperty('--grid-border', '#2a2a3d');
+          // 确保goTo函数存在
+          if (typeof goTo === 'function') {
+            goTo(e.data.index);
           } else {
-            root.style.setProperty('--bg', '#ffffff');
-            root.style.setProperty('--surface', '#f5f5f7');
-            root.style.setProperty('--surface-2', '#e8e8ed');
-            root.style.setProperty('--text-primary', '#1d1d1f');
-            root.style.setProperty('--text-muted', '#86868b');
-            root.style.setProperty('--grid-border', '#d2d2d7');
+            // 备用方案：直接操作DOM
+            var slides = document.querySelectorAll('.slide');
+            if (slides[e.data.index]) {
+              // 移除所有active类
+              slides.forEach(function(s) { s.classList.remove('active'); });
+              // 添加active类到目标slide
+              slides[e.data.index].classList.add('active');
+            }
           }
         }
       });
+      
+      console.log('Control script injected successfully');
     `
     iframeRef.value.contentDocument.head.appendChild(script)
   } catch (e) {
@@ -134,7 +132,6 @@ watch(() => props.isDark, (newVal) => {
 
 // 监听PPT切换
 watch(() => [props.presentation.workspace, props.presentation.id], () => {
-  needsNavigate = true
   iframeReady.value = false
   iframeUrl.value = getIframeUrl()
 })
@@ -278,7 +275,6 @@ onMounted(() => {
   document.addEventListener('fullscreenchange', handleFullscreenChange)
   slideContainer.value?.addEventListener('touchstart', handleTouchStart)
   slideContainer.value?.addEventListener('touchend', handleTouchEnd)
-  needsNavigate = true
   iframeReady.value = false
   iframeUrl.value = getIframeUrl()
 })
