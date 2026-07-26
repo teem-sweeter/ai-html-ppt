@@ -97,6 +97,7 @@ watch(isDark, (newVal) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-bottom: 50px;
 }
 
 .loading {

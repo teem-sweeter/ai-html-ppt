@@ -36,11 +36,18 @@ defineEmits<{
 
 <style scoped>
 .progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 280px;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   padding: 12px 0;
+  background: rgba(30, 30, 30, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 50;
 }
 
 .nav-btn {
