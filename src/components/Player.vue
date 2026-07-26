@@ -290,22 +290,15 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  padding: 24px;
-  gap: 16px;
 }
 
 .slide-container {
   flex: 1;
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  aspect-ratio: 16 / 9;
   background: var(--surface);
-  border-radius: var(--radius-xl);
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  box-shadow: var(--shadow-3);
 }
 
 .slide-iframe {
