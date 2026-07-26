@@ -1,14 +1,7 @@
 <template>
   <div class="progress-bar">
-    <div class="progress-nav">
-      <div class="nav-dots">
-        <div 
-          v-for="page in total" 
-          :key="page" 
-          :class="['nav-dot', { active: page - 1 === current }]"
-          @click="$emit('update:currentPage', page - 1)"
-        ></div>
-      </div>
+    <div class="progress-track">
+      <div class="track-fill" :style="{ width: `${(current / (total - 1)) * 100}%` }"></div>
     </div>
     
     <div class="progress-controls">
@@ -17,15 +10,15 @@
         :disabled="current === 0"
         @click="$emit('update:currentPage', current - 1)"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
         </svg>
       </button>
       
       <div class="page-info">
-        <span class="current-page">{{ current + 1 }}</span>
+        <span class="current">{{ current + 1 }}</span>
         <span class="separator">/</span>
-        <span class="total-pages">{{ total }}</span>
+        <span class="total">{{ total }}</span>
       </div>
       
       <button 
@@ -33,10 +26,19 @@
         :disabled="current === total - 1"
         @click="$emit('update:currentPage', current + 1)"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="9 18 15 12 9 6"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
         </svg>
       </button>
+    </div>
+    
+    <div class="page-dots">
+      <div 
+        v-for="page in Math.min(total, 10)" 
+        :key="page" 
+        :class="['dot', { active: page - 1 === current }]"
+        @click="$emit('update:currentPage', page - 1)"
+      ></div>
     </div>
   </div>
 </template>
@@ -56,69 +58,55 @@ defineEmits<{
 .progress-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
+  gap: 16px;
+  padding: 12px 24px;
   background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
 }
 
-.progress-nav {
+.progress-track {
   flex: 1;
-}
-
-.nav-dots {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.nav-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  height: 4px;
   background: var(--surface-3);
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 2px;
+  overflow: hidden;
 }
 
-.nav-dot:hover {
-  background: var(--text-muted);
-}
-
-.nav-dot.active {
-  background: var(--accent);
-  width: 24px;
-  border-radius: 4px;
+.track-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .progress-controls {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .control-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   border: none;
-  background: var(--surface-2);
+  background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .control-btn:hover:not(:disabled) {
-  background: var(--surface-3);
+  background: var(--surface-2);
   color: var(--text-primary);
 }
 
 .control-btn:active:not(:disabled) {
-  transform: scale(0.95);
+  background: var(--surface-3);
 }
 
 .control-btn:disabled {
@@ -138,25 +126,41 @@ defineEmits<{
 }
 
 .separator {
-  color: var(--text-muted);
+  color: var(--text-disabled);
+}
+
+.page-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dot:hover {
+  background: var(--text-disabled);
+}
+
+.dot.active {
+  background: var(--primary);
+  width: 24px;
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {
   .progress-bar {
-    padding: 8px 12px;
+    padding: 8px 16px;
   }
   
-  .nav-dots {
-    gap: 4px;
-  }
-  
-  .nav-dot {
-    width: 6px;
-    height: 6px;
-  }
-  
-  .nav-dot.active {
-    width: 18px;
+  .page-dots {
+    display: none;
   }
 }
 </style>

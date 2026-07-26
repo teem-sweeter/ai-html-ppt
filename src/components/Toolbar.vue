@@ -1,44 +1,34 @@
 <template>
   <div class="toolbar">
-    <div class="toolbar-group">
-      <button class="toolbar-btn" @click="$emit('fullscreen')" title="全屏">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
-        </svg>
-        <span>全屏</span>
-      </button>
-    </div>
+    <button class="toolbar-btn" @click="$emit('fullscreen')" title="全屏">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <span>全屏</span>
+    </button>
     
-    <div class="toolbar-divider"></div>
+    <div class="divider"></div>
     
-    <div class="toolbar-group">
-      <button class="toolbar-btn" @click="$emit('download-png')" title="下载 PNG">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-          <circle cx="8.5" cy="8.5" r="1.5"/>
-          <polyline points="21 15 16 10 5 21"/>
-        </svg>
-        <span>PNG</span>
-      </button>
-      
-      <button class="toolbar-btn" @click="$emit('download-svg')" title="下载 SVG">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/>
-          <line x1="16" y1="17" x2="8" y2="17"/>
-        </svg>
-        <span>SVG</span>
-      </button>
-      
-      <button class="toolbar-btn" @click="$emit('export-html')" title="导出 HTML">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="16 18 22 12 16 6"/>
-          <polyline points="8 6 2 12 8 18"/>
-        </svg>
-        <span>HTML</span>
-      </button>
-    </div>
+    <button class="toolbar-btn" @click="$emit('download-png')" title="下载 PNG">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+      </svg>
+      <span>PNG</span>
+    </button>
+    
+    <button class="toolbar-btn" @click="$emit('download-svg')" title="下载 SVG">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+      </svg>
+      <span>SVG</span>
+    </button>
+    
+    <button class="toolbar-btn" @click="$emit('export-html')" title="导出 HTML">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+      </svg>
+      <span>HTML</span>
+    </button>
   </div>
 </template>
 
@@ -56,39 +46,26 @@ defineEmits<{
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   padding: 8px 16px;
   background: var(--surface);
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-}
-
-.toolbar-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.toolbar-divider {
-  width: 1px;
-  height: 24px;
-  background: var(--divider);
-  margin: 0 8px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
 }
 
 .toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 8px 16px;
   border: none;
   background: transparent;
   color: var(--text-secondary);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .toolbar-btn:hover {
@@ -101,8 +78,11 @@ defineEmits<{
   transform: scale(0.98);
 }
 
-.toolbar-btn svg {
-  flex-shrink: 0;
+.divider {
+  width: 1px;
+  height: 24px;
+  background: var(--divider);
+  margin: 0 8px;
 }
 
 @media (max-width: 768px) {

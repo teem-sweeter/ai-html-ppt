@@ -14,7 +14,6 @@ const currentPresentation = computed(() => {
   return PRESENTATIONS.find(p => p.id === currentPptId.value) || PRESENTATIONS[0]
 })
 
-// 从URL查询参数初始化状态
 onMounted(async () => {
   await workspacesReady
   ready.value = true
@@ -36,7 +35,6 @@ onMounted(async () => {
   }
 })
 
-// 更新URL查询参数
 function updateUrl() {
   const params = new URLSearchParams()
   params.set('ppt', currentPptId.value)
@@ -99,7 +97,8 @@ watch(isDark, (newVal) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  gap: 0;
+  gap: 16px;
+  padding: 16px 16px 16px 0;
 }
 
 .loading {
@@ -118,10 +117,10 @@ watch(isDark, (newVal) => {
 }
 
 .loading-spinner {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border: 3px solid var(--surface-3);
-  border-top-color: var(--accent);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

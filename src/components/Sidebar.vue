@@ -1,21 +1,20 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-header">
-      <div class="header-content">
-        <div class="logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect width="24" height="24" rx="6" fill="var(--accent)"/>
-            <path d="M7 8h10v2H7V8zm0 3h10v2H7v-2zm0 3h7v2H7v-2z" fill="white"/>
+      <div class="header-top">
+        <div class="app-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--primary)">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+            <path d="M7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/>
           </svg>
-          <span class="logo-text">PPT Viewer</span>
+          <span>PPT Viewer</span>
         </div>
-        <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '浅色模式' : '深色模式'">
-          <svg v-if="isDark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        <button class="icon-btn" @click="toggleTheme" :title="isDark ? '浅色模式' : '深色模式'">
+          <svg v-if="isDark" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
           </svg>
-          <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
           </svg>
         </button>
       </div>
@@ -25,11 +24,11 @@
       <div 
         v-for="workspace in workspaces" 
         :key="workspace.id"
-        class="workspace-section"
+        class="workspace-group"
       >
-        <div class="workspace-title">
+        <div class="workspace-header">
           <span class="workspace-name">{{ workspace.name }}</span>
-          <span class="workspace-count">{{ getPresentationsByWorkspace(workspace.id).length }}</span>
+          <span class="workspace-badge">{{ getPresentationsByWorkspace(workspace.id).length }}</span>
         </div>
         
         <div class="ppt-list">
@@ -40,20 +39,14 @@
             @click="$emit('update:currentPptId', ppt.id)"
           >
             <div class="ppt-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                <line x1="8" y1="21" x2="16" y2="21"/>
-                <line x1="12" y1="17" x2="12" y2="21"/>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+                <path d="M7 12h10v2H7zm0-4h10v2H7zm0 8h7v2H7z"/>
               </svg>
             </div>
             <div class="ppt-info">
               <div class="ppt-title">{{ ppt.title }}</div>
               <div class="ppt-desc">{{ ppt.description }}</div>
-            </div>
-            <div class="ppt-arrow">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
             </div>
           </div>
         </div>
@@ -111,68 +104,44 @@ onMounted(() => {
 .sidebar {
   width: 280px;
   background: var(--surface);
-  border-right: 1px solid var(--border);
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  box-shadow: var(--shadow-2);
+  z-index: 10;
 }
 
 .sidebar-header {
-  padding: 16px 20px;
+  padding: 16px;
   border-bottom: 1px solid var(--divider);
-  background: var(--surface);
 }
 
-.header-content {
+.header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.logo {
+.app-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.logo-text {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.2px;
-}
-
-.theme-toggle {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: none;
-  background: var(--surface-2);
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.theme-toggle:hover {
-  background: var(--surface-3);
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 8px;
 }
 
-.workspace-section {
+.workspace-group {
   margin-bottom: 8px;
 }
 
-.workspace-title {
+.workspace-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -181,16 +150,16 @@ onMounted(() => {
 }
 
 .workspace-name {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
-.workspace-count {
-  font-size: 12px;
-  color: var(--text-muted);
+.workspace-badge {
+  font-size: 11px;
+  color: var(--text-disabled);
   background: var(--surface-2);
   padding: 2px 8px;
   border-radius: 10px;
@@ -206,10 +175,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  padding: 12px;
+  border-radius: var(--radius);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
 }
 
@@ -218,7 +187,7 @@ onMounted(() => {
 }
 
 .ppt-item.active {
-  background: var(--accent);
+  background: var(--primary);
   color: white;
 }
 
@@ -227,16 +196,12 @@ onMounted(() => {
 }
 
 .ppt-item.active .ppt-desc {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.ppt-item.active .ppt-arrow {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .ppt-icon {
   flex-shrink: 0;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .ppt-info {
@@ -254,35 +219,10 @@ onMounted(() => {
 
 .ppt-desc {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 2px;
-}
-
-.ppt-arrow {
-  flex-shrink: 0;
-  color: var(--text-muted);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.ppt-item:hover .ppt-arrow {
-  opacity: 1;
-}
-
-/* 滚动条 */
-.sidebar-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 2px;
 }
 </style>

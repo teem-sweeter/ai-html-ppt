@@ -125,7 +125,6 @@ function injectControlScript() {
   }
 }
 
-// 监听主题变化
 watch(() => props.isDark, (newVal) => {
   if (iframeRef.value?.contentWindow) {
     iframeRef.value.contentWindow.postMessage({ type: 'themeChange', isDark: newVal }, '*')
@@ -184,7 +183,6 @@ function handleTouchEnd(event: TouchEvent) {
   }
 }
 
-// 下载PNG
 async function downloadPng() {
   if (!iframeRef.value?.contentDocument?.body) {
     alert('无法访问页面内容')
@@ -210,7 +208,6 @@ async function downloadPng() {
   }
 }
 
-// 下载SVG
 async function downloadSvg() {
   if (!iframeRef.value?.contentDocument?.body) {
     alert('无法访问页面内容')
@@ -235,7 +232,6 @@ async function downloadSvg() {
   }
 }
 
-// 导出HTML
 function exportHtml() {
   if (!iframeRef.value?.contentDocument) {
     alert('无法访问页面内容')
@@ -293,7 +289,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  padding: 20px;
+  padding: 24px;
   gap: 16px;
 }
 
@@ -304,11 +300,11 @@ onUnmounted(() => {
   margin: 0 auto;
   aspect-ratio: 16 / 9;
   background: var(--surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-3);
 }
 
 .slide-iframe {
@@ -322,13 +318,12 @@ onUnmounted(() => {
   position: absolute;
   bottom: 16px;
   right: 16px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   color: white;
-  padding: 6px 12px;
+  padding: 6px 16px;
   border-radius: 20px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  backdrop-filter: blur(10px);
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -349,10 +344,10 @@ onUnmounted(() => {
 }
 
 .loading-spinner {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border: 3px solid var(--surface-3);
-  border-top-color: var(--accent);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin-bottom: 16px;
@@ -367,7 +362,6 @@ onUnmounted(() => {
   color: var(--text-secondary);
 }
 
-/* 全屏状态 */
 .slide-container:fullscreen {
   width: 100vw;
   height: 100vh;
@@ -387,7 +381,7 @@ onUnmounted(() => {
   }
   
   .slide-container {
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
   }
 }
 </style>
