@@ -2,6 +2,9 @@
   <div class="sidebar">
     <div class="sidebar-header">
       <h2>PPT 演示系统</h2>
+      <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换到白色主题' : '切换到暗色主题'">
+        {{ isDark ? '☀️' : '🌙' }}
+      </button>
     </div>
     <div class="workspace-list">
       <div 
@@ -30,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { WORKSPACES, PRESENTATIONS } from '@/presentations/registry'
 import type { Presentation } from '@/presentations/registry'
 
@@ -42,10 +46,44 @@ defineEmits<{
 }>()
 
 const workspaces = WORKSPACES
+const isDark = ref(true)
 
 function getPresentationsByWorkspace(workspaceId: string): Presentation[] {
   return PRESENTATIONS.filter(p => p.workspace === workspaceId)
 }
+
+function toggleTheme() {
+  isDark.value = !isDark.value
+  applyTheme()
+  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+}
+
+function applyTheme() {
+  const root = document.documentElement
+  if (isDark.value) {
+    root.style.setProperty('--bg', '#0a0a0f')
+    root.style.setProperty('--surface', '#12121a')
+    root.style.setProperty('--surface-2', '#1a1a26')
+    root.style.setProperty('--text-primary', '#eef0f6')
+    root.style.setProperty('--text-muted', '#6b6d7b')
+    root.style.setProperty('--border', '#2a2a3d')
+  } else {
+    root.style.setProperty('--bg', '#ffffff')
+    root.style.setProperty('--surface', '#f5f5f7')
+    root.style.setProperty('--surface-2', '#e8e8ed')
+    root.style.setProperty('--text-primary', '#1d1d1f')
+    root.style.setProperty('--text-muted', '#86868b')
+    root.style.setProperty('--border', '#d2d2d7')
+  }
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) {
+    isDark.value = savedTheme === 'dark'
+  }
+  applyTheme()
+})
 </script>
 
 <style scoped>
@@ -63,6 +101,9 @@ function getPresentationsByWorkspace(workspaceId: string): Presentation[] {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .sidebar-header h2 {
@@ -70,6 +111,26 @@ function getPresentationsByWorkspace(workspaceId: string): Presentation[] {
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
+}
+
+.theme-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .workspace-list {
