@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPT 深度解析</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --accent: #00e5ff;
+    --accent-2: #7c4dff;
+    --accent-3: #ff6d00;
+    --text-primary: #eef0f6;
+    --text-muted: #b0b3c0;
+    --green: #00e676;
+    --grid-border: #4a4a5d;
+    --highlight: #ffab00;
+    --pink: #ff3cac;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s 0.6s;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .slide-title {
+    background: radial-gradient(ellipse at 30% 50%, rgba(0, 230, 118, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
+                var(--bg);
+    text-align: center;
+  }
+
+  .slide-title .tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green);
+    border: 1px solid rgba(0, 230, 118, 0.3);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+  }
+
+  .slide-title h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #b0b8d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title h1 span {
+    background: linear-gradient(135deg, var(--green) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title .subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .slide-title .meta {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 24px;
+    opacity: 0.7;
+  }
+
+  .slide-title .hint {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  .slide-content {
+    align-items: flex-start;
+    background: var(--bg);
+  }
+
+  .section-tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--green);
+    margin-bottom: 16px;
+    opacity: 0.85;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .card {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .card:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .card:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .card:nth-child(4) { animation-delay: 0.3s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .card:nth-child(1)::before { background: var(--green); }
+  .card:nth-child(2)::before { background: var(--accent); }
+  .card:nth-child(3)::before { background: var(--accent-2); }
+  .card:nth-child(4)::before { background: var(--accent-3); }
+
+  .card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--green);
+  }
+
+  .card p, .card li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card ul li {
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .card ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--green);
+  }
+
+  .highlight { color: var(--accent); font-weight: 600; }
+  .highlight-green { color: var(--green); font-weight: 600; }
+  .highlight-yellow { color: var(--highlight); font-weight: 600; }
+  .highlight-purple { color: var(--accent-2); font-weight: 600; }
+  .highlight-pink { color: var(--pink); font-weight: 600; }
+
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .formula-main {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 12px;
+  }
+
+  .formula-note {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .slide-summary {
+    background: var(--bg);
+    align-items: center;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .summary-item {
+    display: flex;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .summary-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .summary-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .summary-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .summary-item:nth-child(4) { animation-delay: 0.3s; }
+
+  .summary-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: rgba(0, 230, 118, 0.1);
+    color: var(--green);
+  }
+
+  .summary-item h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .summary-item p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    z-index: 100;
+  }
+
+  .nav-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--grid-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .nav-dot.active {
+    background: var(--green);
+    box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .nav-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .nav-page {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 12px;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 30px 24px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .card-grid.cols-3 { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- SLIDE 0: 标题页 -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag">NLP · Large Language Model</div>
+    <h1><span>GPT</span> 深度解析</h1>
+    <p class="subtitle">Generative Pre-trained Transformer — 生成式预训练Transformer</p>
+    <p class="meta">OpenAI · 2018-2024</p>
+    <div class="hint">按 → 或点击底部导航切换页面</div>
+  </div>
+
+  <!-- SLIDE 1: GPT概述 -->
+  <div class="slide slide-content" data-index="1">
+    <div class="section-tag">01 / 概述</div>
+    <h2>GPT 是什么？</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>核心思想</h3>
+        <p>GPT是一个<span class="highlight-green">自回归</span>语言模型，通过预测下一个token来学习语言的统计规律，是<span class="highlight">Decoder-only</span>架构的代表。</p>
+      </div>
+      <div class="card">
+        <h3>关键特点</h3>
+        <ul>
+          <li><span class="highlight-green">单向注意力</span>：只能看到左侧上下文</li>
+          <li><span class="highlight">自回归生成</span>：逐token生成文本</li>
+          <li><span class="highlight-purple">大规模预训练</span>：在海量文本上训练</li>
+          <li><span class="highlight-yellow">上下文学习</span>：In-Context Learning</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>与BERT的区别</h3>
+        <ul>
+          <li>BERT: <span class="highlight">双向</span>、理解型、编码器</li>
+          <li>GPT: <span class="highlight-green">单向</span>、生成型、解码器</li>
+          <li>BERT适合理解任务</li>
+          <li>GPT适合生成任务</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>历史意义</h3>
+        <p>GPT系列开启了<span class="highlight-yellow">大语言模型</span>时代，从GPT-1到GPT-4，参数量从1.17亿增长到万亿级别，展现了"大力出奇迹"的scaling law。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: 模型架构 -->
+  <div class="slide slide-content" data-index="2">
+    <div class="section-tag">02 / 架构</div>
+    <h2>Decoder-Only 架构</h2>
+    <div class="card-grid">
+      <div class="card" style="grid-column: span 2">
+        <h3>GPT 架构图</h3>
+        <svg viewBox="0 0 800 380" style="width:100%; margin-top:12px">
+          <!-- 输入层 -->
+          <rect x="50" y="320" width="700" height="45" rx="4" fill="#1e1e2e" stroke="#4a4a5d" stroke-width="1.5"/>
+          <text x="400" y="348" fill="#eef0f6" font-size="12" text-anchor="middle" font-family="monospace">The cat sat on the</text>
+          
+          <!-- Position + Token Embedding -->
+          <rect x="50" y="270" width="700" height="40" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1.5"/>
+          <text x="400" y="295" fill="#00e676" font-size="11" text-anchor="middle" font-family="monospace">Token Embedding + Position Embedding</text>
+          
+          <!-- Transformer Decoder 外框 -->
+          <rect x="100" y="50" width="600" height="200" rx="8" fill="rgba(0,229,255,0.03)" stroke="#00e5ff" stroke-width="2"/>
+          <text x="400" y="75" fill="#00e5ff" font-size="12" text-anchor="middle" font-weight="bold" font-family="monospace">Transformer Decoder Block × N</text>
+          
+          <!-- Masked Multi-Head Attention -->
+          <rect x="140" y="90" width="180" height="60" rx="4" fill="rgba(255,171,0,0.1)" stroke="#ffab00" stroke-width="1.5"/>
+          <text x="230" y="115" fill="#ffab00" font-size="10" text-anchor="middle" font-family="monospace">Masked Multi-Head</text>
+          <text x="230" y="135" fill="#ffab00" font-size="10" text-anchor="middle" font-family="monospace">Self-Attention</text>
+          
+          <!-- Add & Norm 1 -->
+          <rect x="170" y="160" width="120" height="30" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="230" y="180" fill="#00e676" font-size="9" text-anchor="middle" font-family="monospace">Add & Norm</text>
+          
+          <!-- Feed Forward -->
+          <rect x="480" y="90" width="180" height="60" rx="4" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
+          <text x="570" y="115" fill="#7c4dff" font-size="10" text-anchor="middle" font-family="monospace">Feed Forward</text>
+          <text x="570" y="135" fill="#7c4dff" font-size="10" text-anchor="middle" font-family="monospace">Network</text>
+          
+          <!-- Add & Norm 2 -->
+          <rect x="510" y="160" width="120" height="30" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="570" y="180" fill="#00e676" font-size="9" text-anchor="middle" font-family="monospace">Add & Norm</text>
+          
+          <!-- 连接箭头 -->
+          <line x1="230" y1="150" x2="230" y2="160" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="290" y1="175" x2="480" y2="120" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="570" y1="150" x2="570" y2="160" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="510" y1="175" x2="320" y2="195" stroke="#4a4a5d" stroke-width="1.5"/>
+          
+          <!-- 残差连接 -->
+          <line x1="140" y1="120" x2="120" y2="120" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          <line x1="120" y1="120" x2="120" y2="175" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          <line x1="120" y1="175" x2="170" y2="175" stroke="#00e676" stroke-width="1.5" stroke-dasharray="4"/>
+          
+          <!-- 输出层 -->
+          <rect x="50" y="5" width="700" height="35" rx="4" fill="rgba(255,60,172,0.1)" stroke="#ff3cac" stroke-width="1.5"/>
+          <text x="400" y="28" fill="#ff3cac" font-size="11" text-anchor="middle" font-family="monospace">输出: 预测下一个 token 的概率分布</text>
+          
+          <!-- 箭头 -->
+          <line x1="400" y1="40" x2="400" y2="50" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,48 400,56 404,48" fill="#4a4a5d"/>
+          
+          <line x1="400" y1="250" x2="400" y2="270" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,268 400,276 404,268" fill="#4a4a5d"/>
+          
+          <line x1="400" y1="310" x2="400" y2="320" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,318 400,326 404,318" fill="#4a4a5d"/>
+          
+          <!-- Mask标注 -->
+          <text x="230" y="210" fill="#ffab00" font-size="9" text-anchor="middle" font-family="monospace">因果掩码：只能看到左侧</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 预训练任务 -->
+  <div class="slide slide-content" data-index="3">
+    <div class="section-tag">03 / 预训练</div>
+    <h2>自回归语言模型</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>训练目标</h3>
+        <p>给定前面的token，预测<span class="highlight-green">下一个token</span>的概率分布。</p>
+        <div class="formula-box" style="margin-top:16px; max-width:100%">
+          <div class="formula-main" style="font-size:16px">P(xₜ | x₁, x₂, ..., xₜ₋₁)</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>损失函数</h3>
+        <p>最大化序列的<span class="highlight">对数似然</span>：</p>
+        <div class="formula-box" style="margin-top:16px; max-width:100%">
+          <div class="formula-main" style="font-size:16px">L = -Σ log P(xₜ | x&lt;t)</div>
+        </div>
+      </div>
+      <div class="card" style="grid-column: span 2">
+        <h3>生成过程示例</h3>
+        <svg viewBox="0 0 800 120" style="width:100%; margin-top:12px">
+          <text x="50" y="30" fill="#b0b3c0" font-size="11" font-family="monospace">输入: The</text>
+          <text x="50" y="55" fill="#00e676" font-size="11" font-family="monospace">预测: cat (概率最高)</text>
+          <text x="50" y="80" fill="#b0b3c0" font-size="11" font-family="monospace">输入: The cat</text>
+          <text x="50" y="105" fill="#00e676" font-size="11" font-family="monospace">预测: sat (概率最高)</text>
+          
+          <text x="350" y="30" fill="#b0b3c0" font-size="11" font-family="monospace">输入: The cat sat</text>
+          <text x="350" y="55" fill="#00e676" font-size="11" font-family="monospace">预测: on</text>
+          <text x="350" y="80" fill="#b0b3c0" font-size="11" font-family="monospace">输入: The cat sat on</text>
+          <text x="350" y="105" fill="#00e676" font-size="11" font-family="monospace">预测: the</text>
+          
+          <text x="600" y="30" fill="#b0b3c0" font-size="11" font-family="monospace">输入: The cat sat on the</text>
+          <text x="600" y="55" fill="#00e676" font-size="11" font-family="monospace">预测: mat</text>
+          <text x="600" y="90" fill="#eef0f6" font-size="12" font-family="monospace">→ The cat sat on the mat</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: GPT演进 -->
+  <div class="slide slide-content" data-index="4">
+    <div class="section-tag">04 / 演进</div>
+    <h2>GPT 系列演进</h2>
+    <div class="card-grid cols-3">
+      <div class="card">
+        <h3 style="color:var(--accent)">GPT-1 (2018)</h3>
+        <ul>
+          <li>1.17亿参数</li>
+          <li>12层 Transformer</li>
+          <li>BooksCorpus 训练</li>
+          <li>证明了预训练+微调的有效性</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">GPT-2 (2019)</h3>
+        <ul>
+          <li>15亿参数</li>
+          <li>48层 Transformer</li>
+          <li>WebText 数据集</li>
+          <li><span class="highlight-purple">零样本学习</span>能力</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">GPT-3 (2020)</h3>
+        <ul>
+          <li>1750亿参数</li>
+          <li>96层 Transformer</li>
+          <li><span class="highlight-green">In-Context Learning</span></li>
+          <li>少样本学习能力惊人</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--highlight)">GPT-3.5 (2022)</h3>
+        <ul>
+          <li>基于GPT-3微调</li>
+          <li>RLHF 对齐训练</li>
+          <li><span class="highlight-yellow">ChatGPT</span> 背后模型</li>
+          <li>对话能力大幅提升</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--pink)">GPT-4 (2023)</h3>
+        <ul>
+          <li>多模态（文本+图像）</li>
+          <li>更强的推理能力</li>
+          <li>更长的上下文窗口</li>
+          <li>多项基准测试SOTA</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-3)">GPT-4o (2024)</h3>
+        <ul>
+          <li>全模态（文本+图像+音频+视频）</li>
+          <li>更快的推理速度</li>
+          <li>更低的使用成本</li>
+          <li>实时语音交互</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Scaling Law -->
+  <div class="slide slide-content" data-index="5">
+    <div class="section-tag">05 / 规律</div>
+    <h2>Scaling Law</h2>
+    <div class="card-grid">
+      <div class="card" style="grid-column: span 2">
+        <h3>缩放定律</h3>
+        <svg viewBox="0 0 800 250" style="width:100%; margin-top:12px">
+          <!-- 坐标轴 -->
+          <line x1="80" y1="200" x2="750" y2="200" stroke="#4a4a5d" stroke-width="2"/>
+          <line x1="80" y1="200" x2="80" y2="30" stroke="#4a4a5d" stroke-width="2"/>
+          
+          <!-- 轴标签 -->
+          <text x="400" y="240" fill="#b0b3c0" font-size="11" text-anchor="middle" font-family="monospace">计算量 / 参数量 / 数据量</text>
+          <text x="30" y="120" fill="#b0b3c0" font-size="11" text-anchor="middle" font-family="monospace" transform="rotate(-90, 30, 120)">Loss</text>
+          
+          <!-- 曲线 -->
+          <path d="M100 180 Q200 150 300 100 Q400 60 500 45 Q600 35 700 30" stroke="#00e676" stroke-width="3" fill="none"/>
+          
+          <!-- 标注 -->
+          <text x="150" y="170" fill="#00e676" font-size="10" font-family="monospace">GPT-1</text>
+          <text x="300" y="90" fill="#00e676" font-size="10" font-family="monospace">GPT-2</text>
+          <text x="500" y="35" fill="#00e676" font-size="10" font-family="monospace">GPT-3</text>
+          <text x="700" y="25" fill="#00e676" font-size="10" font-family="monospace">GPT-4</text>
+          
+          <!-- 关键点 -->
+          <circle cx="150" cy="175" r="5" fill="#00e676"/>
+          <circle cx="300" cy="95" r="5" fill="#00e676"/>
+          <circle cx="500" cy="42" r="5" fill="#00e676"/>
+          <circle cx="700" cy="28" r="5" fill="#00e676"/>
+        </svg>
+        <p style="margin-top:12px">模型性能与<span class="highlight-green">参数量</span>、<span class="highlight">数据量</span>、<span class="highlight-yellow">计算量</span>呈幂律关系，增大模型规模持续带来性能提升。</p>
+      </div>
+      <div class="card">
+        <h3>涌现能力</h3>
+        <p>当模型规模超过一定阈值时，会出现<span class="highlight-purple">质的飞跃</span>：</p>
+        <ul style="margin-top:12px">
+          <li>上下文学习 (ICL)</li>
+          <li>思维链推理 (CoT)</li>
+          <li>指令遵循</li>
+          <li>代码生成</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>训练数据</h3>
+        <p>GPT-3训练数据约<span class="highlight">45TB</span>文本：</p>
+        <ul style="margin-top:12px">
+          <li>Common Crawl (60%)</li>
+          <li>WebText2</li>
+          <li>Books1 & Books2</li>
+          <li>Wikipedia</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: 应用 -->
+  <div class="slide slide-content" data-index="6">
+    <div class="section-tag">06 / 应用</div>
+    <h2>GPT 的应用场景</h2>
+    <div class="card-grid cols-3">
+      <div class="card">
+        <h3 style="color:var(--accent)">文本生成</h3>
+        <ul>
+          <li>文章写作</li>
+          <li>代码生成</li>
+          <li>翻译</li>
+          <li>摘要提取</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">对话系统</h3>
+        <ul>
+          <li>智能客服</li>
+          <li>虚拟助手</li>
+          <li>教育辅导</li>
+          <li>心理咨询</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">推理分析</h3>
+        <ul>
+          <li>数学推理</li>
+          <li>逻辑分析</li>
+          <li>决策支持</li>
+          <li>知识问答</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--highlight)">多模态</h3>
+        <ul>
+          <li>图像理解</li>
+          <li>视频分析</li>
+          <li>语音交互</li>
+          <li>跨模态生成</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--pink)">Agent</h3>
+        <ul>
+          <li>工具调用</li>
+          <li>任务规划</li>
+          <li>自主决策</li>
+          <li>多Agent协作</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-3)">行业应用</h3>
+        <ul>
+          <li>医疗诊断</li>
+          <li>法律咨询</li>
+          <li>金融分析</li>
+          <li>教育辅导</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 总结 -->
+  <div class="slide slide-summary" data-index="7">
+    <div class="section-tag">总结</div>
+    <h2>GPT 的核心贡献</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-icon">→</div>
+        <div>
+          <h3>自回归范式</h3>
+          <p>通过预测下一个token的简单目标，在大规模数据上学习通用的语言表示，成为生成式AI的基础。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">📈</div>
+        <div>
+          <h3>Scaling Law</h3>
+          <p>证明了模型规模与性能的幂律关系，推动了大模型军备竞赛，开启了"大力出奇迹"时代。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">✨</div>
+        <div>
+          <h3>涌现能力</h3>
+          <p>大规模模型展现出小模型不具备的能力，如上下文学习、思维链推理、代码生成等。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">🚀</div>
+        <div>
+          <h3>AGI之路</h3>
+          <p>GPT系列被认为是通往通用人工智能(AGI)的重要路径，正在改变人类与AI交互的方式。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nav-bar">
+  <div class="nav-progress" id="navProgress"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <span class="nav-page" id="pageIndicator">1 / 8</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  const navProgress = document.getElementById('navProgress');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    navProgress.appendChild(dot);
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+  }
+
+  function navigate(dir) {
+    goTo(currentSlide + dir);
+  }
+
+  function updateNav() {
+    document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+      dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    });
+    document.getElementById('pageIndicator').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    document.getElementById('btnPrev').disabled = currentSlide === 0;
+    document.getElementById('btnNext').disabled = currentSlide === totalSlides - 1;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      navigate(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      navigate(-1);
+    }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) navigate(1);
+      else navigate(-1);
+    }
+  });
+
+  updateNav();
+</script>
+
+</body>
+</html>

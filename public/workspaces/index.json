@@ -45,6 +45,13 @@
         "description": "双向Transformer预训练模型详解",
         "file": "presentation.html",
         "totalSlides": 8
+      },
+      {
+        "id": "gpt",
+        "title": "GPT深度解析",
+        "description": "生成式预训练Transformer详解",
+        "file": "presentation.html",
+        "totalSlides": 8
       }
     ]
   }
