@@ -63,22 +63,29 @@ function getIframeUrl() {
   return `/workspaces/${props.presentation.workspace}/${props.presentation.id}/${props.presentation.file}`
 }
 
-function goToSlide(index: number) {
-  if (!iframeRef.value?.contentWindow) return
-  try {
-    iframeRef.value.contentWindow.postMessage({ type: 'goToSlide', index }, '*')
-  } catch (e) {
-    console.error('postMessage error:', e)
-  }
-}
-
 function onIframeLoad() {
-  injectControlScript()
   // 延迟执行，确保iframe中的JavaScript已经加载完成
   setTimeout(() => {
-    goToSlide(props.currentPage)
+    injectControlScript()
+    // 直接切换到当前页
+    navigateToSlide(props.currentPage)
     iframeReady.value = true
-  }, 300)
+  }, 500)
+}
+
+function navigateToSlide(index: number) {
+  if (!iframeRef.value?.contentDocument) return
+  
+  const slides = iframeRef.value.contentDocument.querySelectorAll('.slide')
+  if (!slides || slides.length === 0) return
+  
+  // 移除所有active类
+  slides.forEach((s: Element) => s.classList.remove('active'))
+  
+  // 添加active类到目标slide
+  if (slides[index]) {
+    slides[index].classList.add('active')
+  }
 }
 
 function injectControlScript() {
@@ -134,6 +141,11 @@ watch(() => props.isDark, (newVal) => {
 watch(() => [props.presentation.workspace, props.presentation.id], () => {
   iframeReady.value = false
   iframeUrl.value = getIframeUrl()
+})
+
+// 监听页码变化
+watch(() => props.currentPage, (newPage) => {
+  navigateToSlide(newPage)
 })
 
 function handleKeydown(event: KeyboardEvent) {
