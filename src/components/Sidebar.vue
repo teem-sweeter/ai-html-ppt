@@ -1,21 +1,37 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-header">
-      <h2>PPT 演示系统</h2>
-      <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '切换到白色主题' : '切换到暗色主题'">
-        {{ isDark ? '☀️' : '🌙' }}
-      </button>
+      <div class="header-content">
+        <div class="logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect width="24" height="24" rx="6" fill="var(--accent)"/>
+            <path d="M7 8h10v2H7V8zm0 3h10v2H7v-2zm0 3h7v2H7v-2z" fill="white"/>
+          </svg>
+          <span class="logo-text">PPT Viewer</span>
+        </div>
+        <button class="theme-toggle" @click="toggleTheme" :title="isDark ? '浅色模式' : '深色模式'">
+          <svg v-if="isDark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+      </div>
     </div>
-    <div class="workspace-list">
+    
+    <div class="sidebar-content">
       <div 
         v-for="workspace in workspaces" 
         :key="workspace.id"
-        class="workspace-group"
+        class="workspace-section"
       >
-        <div class="workspace-header">
-          <div class="workspace-name">{{ workspace.name }}</div>
-          <div class="workspace-desc">{{ workspace.description }}</div>
+        <div class="workspace-title">
+          <span class="workspace-name">{{ workspace.name }}</span>
+          <span class="workspace-count">{{ getPresentationsByWorkspace(workspace.id).length }}</span>
         </div>
+        
         <div class="ppt-list">
           <div 
             v-for="ppt in getPresentationsByWorkspace(workspace.id)" 
@@ -23,8 +39,22 @@
             :class="['ppt-item', { active: ppt.id === currentPptId }]"
             @click="$emit('update:currentPptId', ppt.id)"
           >
-            <div class="ppt-title">{{ ppt.title }}</div>
-            <div class="ppt-description">{{ ppt.description }}</div>
+            <div class="ppt-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <div class="ppt-info">
+              <div class="ppt-title">{{ ppt.title }}</div>
+              <div class="ppt-desc">{{ ppt.description }}</div>
+            </div>
+            <div class="ppt-arrow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -61,21 +91,10 @@ function toggleTheme() {
 }
 
 function applyTheme() {
-  const root = document.documentElement
   if (isDark.value) {
-    root.style.setProperty('--bg', '#0a0a0f')
-    root.style.setProperty('--surface', '#12121a')
-    root.style.setProperty('--surface-2', '#1a1a26')
-    root.style.setProperty('--text-primary', '#eef0f6')
-    root.style.setProperty('--text-muted', '#6b6d7b')
-    root.style.setProperty('--border', '#2a2a3d')
+    document.documentElement.removeAttribute('data-theme')
   } else {
-    root.style.setProperty('--bg', '#ffffff')
-    root.style.setProperty('--surface', '#f5f5f7')
-    root.style.setProperty('--surface-2', '#e8e8ed')
-    root.style.setProperty('--text-primary', '#1d1d1f')
-    root.style.setProperty('--text-muted', '#86868b')
-    root.style.setProperty('--border', '#d2d2d7')
+    document.documentElement.setAttribute('data-theme', 'light')
   }
 }
 
@@ -90,141 +109,180 @@ onMounted(() => {
 
 <style scoped>
 .sidebar {
-  width: 300px;
+  width: 280px;
   background: var(--surface);
   border-right: 1px solid var(--border);
   height: 100vh;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .sidebar-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface);
 }
 
-.sidebar-header h2 {
-  font-size: 1.25rem;
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text {
+  font-size: 17px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0;
+  letter-spacing: -0.2px;
 }
 
 .theme-toggle {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
+  border: none;
+  background: var(--surface-2);
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   transition: all 0.2s ease;
 }
 
 .theme-toggle:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--surface-3);
+  color: var(--text-primary);
 }
 
-.workspace-list {
+.sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 12px;
 }
 
-.workspace-group {
-  margin-bottom: 1rem;
+.workspace-section {
+  margin-bottom: 8px;
 }
 
-.workspace-header {
-  padding: 0.75rem 1rem;
-  background: var(--surface-2);
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
+.workspace-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin-bottom: 4px;
 }
 
 .workspace-name {
+  font-size: 13px;
   font-weight: 600;
-  color: var(--accent);
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.workspace-desc {
-  font-size: 0.75rem;
+.workspace-count {
+  font-size: 12px;
   color: var(--text-muted);
-  margin-top: 0.25rem;
+  background: var(--surface-2);
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 .ppt-list {
-  padding-left: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .ppt-item {
-  padding: 0.75rem 1rem;
-  margin: 0.25rem 0;
-  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all 0.2s ease;
-  border-left: 3px solid transparent;
+  color: var(--text-primary);
 }
 
 .ppt-item:hover {
   background: var(--surface-2);
-  border-left-color: var(--accent);
 }
 
 .ppt-item.active {
   background: var(--accent);
-  color: var(--bg);
-  border-left-color: var(--accent);
+  color: white;
 }
 
-.ppt-item.active .ppt-title {
-  color: var(--bg);
-  font-weight: 700;
+.ppt-item.active .ppt-icon {
+  color: white;
 }
 
-.ppt-item.active .ppt-description {
-  color: rgba(0, 0, 0, 0.7);
+.ppt-item.active .ppt-desc {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ppt-item.active .ppt-arrow {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ppt-icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.ppt-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .ppt-title {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ppt-description {
-  font-size: 0.75rem;
+.ppt-desc {
+  font-size: 12px;
   color: var(--text-muted);
-  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
-/* 滚动条美化 */
-.workspace-list::-webkit-scrollbar {
-  width: 6px;
+.ppt-arrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-.workspace-list::-webkit-scrollbar-track {
+.ppt-item:hover .ppt-arrow {
+  opacity: 1;
+}
+
+/* 滚动条 */
+.sidebar-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.workspace-list::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-.workspace-list::-webkit-scrollbar-thumb:hover {
+.sidebar-content::-webkit-scrollbar-thumb {
   background: var(--text-muted);
+  border-radius: 2px;
 }
 </style>

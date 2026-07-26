@@ -1,28 +1,41 @@
 <template>
   <div class="progress-bar">
-    <div class="nav-progress">
-      <div 
-        v-for="page in total" 
-        :key="page" 
-        :class="['nav-dot', { active: page - 1 === current }]"
-        @click="$emit('update:currentPage', page - 1)"
-      ></div>
+    <div class="progress-nav">
+      <div class="nav-dots">
+        <div 
+          v-for="page in total" 
+          :key="page" 
+          :class="['nav-dot', { active: page - 1 === current }]"
+          @click="$emit('update:currentPage', page - 1)"
+        ></div>
+      </div>
     </div>
-    <div class="nav-controls">
+    
+    <div class="progress-controls">
       <button 
-        class="nav-btn" 
+        class="control-btn" 
         :disabled="current === 0"
         @click="$emit('update:currentPage', current - 1)"
       >
-        ← Prev
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
       </button>
-      <span class="nav-page">{{ current + 1 }} / {{ total }}</span>
+      
+      <div class="page-info">
+        <span class="current-page">{{ current + 1 }}</span>
+        <span class="separator">/</span>
+        <span class="total-pages">{{ total }}</span>
+      </div>
+      
       <button 
-        class="nav-btn" 
+        class="control-btn" 
         :disabled="current === total - 1"
         @click="$emit('update:currentPage', current + 1)"
       >
-        Next →
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
       </button>
     </div>
   </div>
@@ -41,73 +54,109 @@ defineEmits<{
 
 <style scoped>
 .progress-bar {
-  padding: 1rem 2rem;
-  background: var(--surface);
-  border-top: 1px solid var(--border);
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
 }
 
-.nav-progress {
+.progress-nav {
+  flex: 1;
+}
+
+.nav-dots {
   display: flex;
   gap: 6px;
   align-items: center;
-  justify-content: center;
 }
 
 .nav-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--grid-border);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.nav-dot.active {
-  background: var(--accent);
-  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
-  width: 24px;
-  border-radius: 4px;
-}
-
-.nav-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-btn {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  background: var(--surface);
-  border: 1px solid var(--grid-border);
-  color: var(--text-muted);
-  padding: 6px 16px;
-  border-radius: 3px;
+  background: var(--surface-3);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.nav-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.nav-dot:hover {
+  background: var(--text-muted);
 }
 
-.nav-btn:disabled {
-  opacity: 0.2;
-  cursor: default;
+.nav-dot.active {
+  background: var(--accent);
+  width: 24px;
+  border-radius: 4px;
 }
 
-.nav-btn:disabled:hover {
-  border-color: var(--grid-border);
+.progress-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}
+
+.control-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  min-width: 60px;
+  justify-content: center;
+}
+
+.separator {
   color: var(--text-muted);
 }
 
-.nav-page {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-muted);
+@media (max-width: 768px) {
+  .progress-bar {
+    padding: 8px 12px;
+  }
+  
+  .nav-dots {
+    gap: 4px;
+  }
+  
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .nav-dot.active {
+    width: 18px;
+  }
 }
 </style>

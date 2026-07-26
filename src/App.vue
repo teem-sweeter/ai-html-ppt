@@ -16,7 +16,6 @@ const currentPresentation = computed(() => {
 
 // 从URL查询参数初始化状态
 onMounted(async () => {
-  // 等待工作空间加载完成
   await workspacesReady
   ready.value = true
 
@@ -31,7 +30,6 @@ onMounted(async () => {
     currentPage.value = Number(page)
   }
 
-  // 读取主题设置
   const savedTheme = localStorage.getItem('theme')
   if (savedTheme) {
     isDark.value = savedTheme === 'dark'
@@ -46,15 +44,12 @@ function updateUrl() {
   window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`)
 }
 
-// 监听状态变化更新URL
 watch([currentPptId, currentPage], updateUrl)
 
-// 当切换PPT时重置页码
 watch(currentPptId, () => {
   currentPage.value = 0
 })
 
-// 监听主题变化
 watch(isDark, (newVal) => {
   localStorage.setItem('theme', newVal ? 'dark' : 'light')
 })
@@ -84,7 +79,10 @@ watch(isDark, (newVal) => {
     </div>
   </div>
   <div v-else class="loading">
-    <p>加载中...</p>
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
+    </div>
   </div>
 </template>
 
@@ -93,6 +91,7 @@ watch(isDark, (newVal) => {
   display: flex;
   height: 100vh;
   width: 100vw;
+  background: var(--bg);
 }
 
 .main-content {
@@ -100,6 +99,7 @@ watch(isDark, (newVal) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  gap: 0;
 }
 
 .loading {
@@ -107,6 +107,31 @@ watch(isDark, (newVal) => {
   align-items: center;
   justify-content: center;
   height: 100vh;
-  color: var(--text-muted);
+  background: var(--bg);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--surface-3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-content p {
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 </style>

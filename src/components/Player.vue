@@ -13,6 +13,9 @@
         <div class="loading-spinner"></div>
         <div class="loading-text">加载中...</div>
       </div>
+      <div class="slide-counter">
+        {{ currentPage + 1 }} / {{ presentation.totalSlides }}
+      </div>
     </div>
     <Toolbar
       @fullscreen="toggleFullscreen"
@@ -92,7 +95,6 @@ function injectControlScript() {
       var pres = document.querySelector('.presentation');
       if (pres) { pres.style.width = '100vw'; pres.style.height = '100vh'; }
       
-      // 主题切换支持
       window.addEventListener('message', function(e) {
         if (e.data && e.data.type === 'goToSlide') {
           if (typeof goTo === 'function') { goTo(e.data.index); }
@@ -130,7 +132,20 @@ watch(() => props.isDark, (newVal) => {
   }
 })
 
-// 全屏
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') {
+    event.preventDefault()
+    if (props.currentPage < props.presentation.totalSlides - 1) {
+      emit('update:currentPage', props.currentPage + 1)
+    }
+  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    event.preventDefault()
+    if (props.currentPage > 0) {
+      emit('update:currentPage', props.currentPage - 1)
+    }
+  }
+}
+
 function toggleFullscreen() {
   if (!slideContainer.value) return
   if (!document.fullscreenElement) {
@@ -144,7 +159,32 @@ function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-// 下载PNG - 使用html-to-image
+function handleClick(event: MouseEvent) {
+  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  const clickX = event.clientX - rect.left
+  if (clickX < rect.width / 3) {
+    if (props.currentPage > 0) emit('update:currentPage', props.currentPage - 1)
+  } else {
+    if (props.currentPage < props.presentation.totalSlides - 1) emit('update:currentPage', props.currentPage + 1)
+  }
+}
+
+function handleTouchStart(event: TouchEvent) {
+  touchStartX.value = event.changedTouches[0].screenX
+}
+
+function handleTouchEnd(event: TouchEvent) {
+  const diff = touchStartX.value - event.changedTouches[0].screenX
+  if (Math.abs(diff) > 60) {
+    if (diff > 0 && props.currentPage < props.presentation.totalSlides - 1) {
+      emit('update:currentPage', props.currentPage + 1)
+    } else if (diff < 0 && props.currentPage > 0) {
+      emit('update:currentPage', props.currentPage - 1)
+    }
+  }
+}
+
+// 下载PNG
 async function downloadPng() {
   if (!iframeRef.value?.contentDocument?.body) {
     alert('无法访问页面内容')
@@ -158,7 +198,6 @@ async function downloadPng() {
       pixelRatio: 2,
       backgroundColor: '#0a0a0f'
     })
-
     const a = document.createElement('a')
     a.href = dataUrl
     a.download = `${props.presentation.id}-slide${props.currentPage + 1}.png`
@@ -171,7 +210,7 @@ async function downloadPng() {
   }
 }
 
-// 下载SVG - 使用html-to-image
+// 下载SVG
 async function downloadSvg() {
   if (!iframeRef.value?.contentDocument?.body) {
     alert('无法访问页面内容')
@@ -184,7 +223,6 @@ async function downloadSvg() {
       height: iframeRef.value.contentWindow?.innerHeight || 1080,
       backgroundColor: '#0a0a0f'
     })
-
     const a = document.createElement('a')
     a.href = dataUrl
     a.download = `${props.presentation.id}-slide${props.currentPage + 1}.svg`
@@ -216,7 +254,6 @@ function exportHtml() {
 ${doc.body.innerHTML}
 </body>
 </html>`
-
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -229,55 +266,6 @@ ${doc.body.innerHTML}
   } catch (e) {
     console.error('Export HTML error:', e)
     alert('导出HTML失败')
-  }
-}
-
-watch(() => props.currentPage, (newPage) => {
-  goToSlide(newPage)
-})
-
-watch(() => [props.presentation.workspace, props.presentation.id], () => {
-  needsNavigate = true
-  iframeReady.value = false
-  iframeUrl.value = getIframeUrl()
-}, { immediate: false })
-
-function handleKeydown(event: KeyboardEvent) {
-  if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === ' ') {
-    event.preventDefault()
-    if (props.currentPage < props.presentation.totalSlides - 1) {
-      emit('update:currentPage', props.currentPage + 1)
-    }
-  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-    event.preventDefault()
-    if (props.currentPage > 0) {
-      emit('update:currentPage', props.currentPage - 1)
-    }
-  }
-}
-
-function handleClick(event: MouseEvent) {
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  const clickX = event.clientX - rect.left
-  if (clickX < rect.width / 3) {
-    if (props.currentPage > 0) emit('update:currentPage', props.currentPage - 1)
-  } else {
-    if (props.currentPage < props.presentation.totalSlides - 1) emit('update:currentPage', props.currentPage + 1)
-  }
-}
-
-function handleTouchStart(event: TouchEvent) {
-  touchStartX.value = event.changedTouches[0].screenX
-}
-
-function handleTouchEnd(event: TouchEvent) {
-  const diff = touchStartX.value - event.changedTouches[0].screenX
-  if (Math.abs(diff) > 60) {
-    if (diff > 0 && props.currentPage < props.presentation.totalSlides - 1) {
-      emit('update:currentPage', props.currentPage + 1)
-    } else if (diff < 0 && props.currentPage > 0) {
-      emit('update:currentPage', props.currentPage - 1)
-    }
   }
 }
 
@@ -305,7 +293,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: var(--bg);
-  padding: 1rem;
+  padding: 20px;
+  gap: 16px;
 }
 
 .slide-container {
@@ -314,12 +303,12 @@ onUnmounted(() => {
   max-width: 1280px;
   margin: 0 auto;
   aspect-ratio: 16 / 9;
-  background: var(--bg);
-  border-radius: 4px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
 }
 
 .slide-iframe {
@@ -329,31 +318,23 @@ onUnmounted(() => {
   display: block;
 }
 
-.slide-container:hover::before,
-.slide-container:hover::after {
+.slide-counter {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.slide-container:hover .slide-counter {
   opacity: 1;
-}
-
-.slide-container::before {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: 0;
-  width: 33%;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
-}
-
-.slide-container::after {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; right: 0;
-  width: 67%;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  background: linear-gradient(-90deg, rgba(255,255,255,0.03) 0%, transparent 100%);
 }
 
 .loading-overlay {
@@ -363,14 +344,14 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: var(--surface);
   z-index: 5;
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--surface-2);
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--surface-3);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -382,17 +363,31 @@ onUnmounted(() => {
 }
 
 .loading-text {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
+/* 全屏状态 */
 .slide-container:fullscreen {
-  width: 100vw; height: 100vh;
-  max-width: none; aspect-ratio: auto;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.slide-container:fullscreen .slide-counter {
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
-  .slide-container { aspect-ratio: auto; }
+  .player {
+    padding: 12px;
+  }
+  
+  .slide-container {
+    border-radius: var(--radius);
+  }
 }
 </style>
