@@ -38,6 +38,13 @@
         "description": "从LeNet到EfficientNet的卷积神经网络发展历程",
         "file": "presentation.html",
         "totalSlides": 11
+      },
+      {
+        "id": "bert",
+        "title": "BERT深度解析",
+        "description": "双向Transformer预训练模型详解",
+        "file": "presentation.html",
+        "totalSlides": 8
       }
     ]
   }

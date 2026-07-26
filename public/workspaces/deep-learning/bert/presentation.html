@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BERT 深度解析</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --accent: #00e5ff;
+    --accent-2: #7c4dff;
+    --accent-3: #ff6d00;
+    --text-primary: #eef0f6;
+    --text-muted: #b0b3c0;
+    --green: #00e676;
+    --grid-border: #4a4a5d;
+    --highlight: #ffab00;
+    --pink: #ff3cac;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s 0.6s;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 标题页 */
+  .slide-title {
+    background: radial-gradient(ellipse at 30% 50%, rgba(124, 77, 255, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
+                var(--bg);
+    text-align: center;
+  }
+
+  .slide-title .tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    border: 1px solid rgba(124, 77, 255, 0.3);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+  }
+
+  .slide-title h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #b0b8d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title h1 span {
+    background: linear-gradient(135deg, var(--accent-2) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title .subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .slide-title .meta {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 24px;
+    opacity: 0.7;
+  }
+
+  .slide-title .hint {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  /* 内容页 */
+  .slide-content {
+    align-items: flex-start;
+    background: var(--bg);
+  }
+
+  .section-tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--accent-2);
+    margin-bottom: 16px;
+    opacity: 0.85;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  /* 卡片网格 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .card {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .card:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .card:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .card:nth-child(4) { animation-delay: 0.3s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .card:nth-child(1)::before { background: var(--accent); }
+  .card:nth-child(2)::before { background: var(--accent-2); }
+  .card:nth-child(3)::before { background: var(--green); }
+  .card:nth-child(4)::before { background: var(--accent-3); }
+
+  .card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+
+  .card p, .card li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card ul li {
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .card ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .highlight { color: var(--accent); font-weight: 600; }
+  .highlight-pink { color: var(--pink); font-weight: 600; }
+  .highlight-green { color: var(--green); font-weight: 600; }
+  .highlight-yellow { color: var(--highlight); font-weight: 600; }
+  .highlight-purple { color: var(--accent-2); font-weight: 600; }
+
+  /* 公式框 */
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .formula-main {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .formula-note {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* 总结页 */
+  .slide-summary {
+    background: var(--bg);
+    align-items: center;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .summary-item {
+    display: flex;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .summary-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .summary-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .summary-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .summary-item:nth-child(4) { animation-delay: 0.3s; }
+
+  .summary-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: rgba(124, 77, 255, 0.1);
+    color: var(--accent-2);
+  }
+
+  .summary-item h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .summary-item p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* 导航栏 */
+  .nav-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    z-index: 100;
+  }
+
+  .nav-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--grid-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .nav-dot.active {
+    background: var(--accent-2);
+    box-shadow: 0 0 10px rgba(124, 77, 255, 0.4);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .nav-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent-2);
+    color: var(--accent-2);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .nav-page {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 12px;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 30px 24px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .card-grid.cols-3 { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- SLIDE 0: 标题页 -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag">NLP · Transformer</div>
+    <h1><span>BERT</span> 深度解析</h1>
+    <p class="subtitle">Bidirectional Encoder Representations from Transformers</p>
+    <p class="meta">Devlin et al. 2018 · Google AI Language</p>
+    <div class="hint">按 → 或点击底部导航切换页面</div>
+  </div>
+
+  <!-- SLIDE 1: BERT概述 -->
+  <div class="slide slide-content" data-index="1">
+    <div class="section-tag">01 / 概述</div>
+    <h2>BERT 是什么？</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>核心思想</h3>
+        <p>BERT 是一个<span class="highlight">双向</span>的 Transformer 预训练模型，通过在大规模无标注文本上进行预训练，学习通用的语言表示，然后通过微调应用于下游任务。</p>
+      </div>
+      <div class="card">
+        <h3>关键创新</h3>
+        <ul>
+          <li><span class="highlight">双向上下文</span>：同时考虑左右两侧的上下文</li>
+          <li><span class="highlight-purple">掩码语言模型(MLM)</span>：随机遮盖词汇进行预测</li>
+          <li><span class="highlight-green">预训练+微调</span>范式</li>
+          <li>刷新了11项NLP任务记录</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>模型规模</h3>
+        <ul>
+          <li>BERT-Base: 12层, 768维, 12头, 110M参数</li>
+          <li>BERT-Large: 24层, 1024维, 16头, 340M参数</li>
+          <li>预训练数据: BooksCorpus + Wikipedia (3.3B词)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>历史意义</h3>
+        <p>BERT开启了<span class="highlight-yellow">预训练大模型</span>时代，证明了"预训练+微调"范式的强大，深刻影响了后续GPT、T5等模型的发展。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: 模型架构 -->
+  <div class="slide slide-content" data-index="2">
+    <div class="section-tag">02 / 架构</div>
+    <h2>模型架构</h2>
+    <div class="card-grid">
+      <div class="card" style="grid-column: span 2">
+        <h3>BERT 架构图</h3>
+        <svg viewBox="0 0 800 400" style="width:100%; margin-top:16px">
+          <!-- 输入层 -->
+          <rect x="50" y="340" width="700" height="50" rx="4" fill="#1e1e2e" stroke="#4a4a5d" stroke-width="1.5"/>
+          <text x="400" y="370" fill="#eef0f6" font-size="12" text-anchor="middle" font-family="monospace">[CLS] The cat sat on the [MASK] mat [SEP]</text>
+          
+          <!-- Embedding层 -->
+          <rect x="50" y="280" width="700" height="45" rx="4" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
+          <text x="400" y="308" fill="#7c4dff" font-size="11" text-anchor="middle" font-family="monospace">Token Embedding + Segment Embedding + Position Embedding</text>
+          
+          <!-- Transformer Encoder 层 -->
+          <rect x="150" y="40" width="500" height="220" rx="8" fill="rgba(0,229,255,0.05)" stroke="#00e5ff" stroke-width="2"/>
+          <text x="400" y="30" fill="#00e5ff" font-size="14" text-anchor="middle" font-weight="bold" font-family="monospace">Transformer Encoder × 12 (或 24)</text>
+          
+          <!-- Multi-Head Attention -->
+          <rect x="200" y="70" width="180" height="70" rx="4" fill="rgba(255,171,0,0.1)" stroke="#ffab00" stroke-width="1.5"/>
+          <text x="290" y="100" fill="#ffab00" font-size="10" text-anchor="middle" font-family="monospace">Multi-Head</text>
+          <text x="290" y="120" fill="#ffab00" font-size="10" text-anchor="middle" font-family="monospace">Self-Attention</text>
+          
+          <!-- Add & Norm -->
+          <rect x="200" y="150" width="80" height="35" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="240" y="172" fill="#00e676" font-size="9" text-anchor="middle" font-family="monospace">Add & Norm</text>
+          
+          <!-- Feed Forward -->
+          <rect x="420" y="70" width="180" height="70" rx="4" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.5"/>
+          <text x="510" y="100" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="monospace">Feed Forward</text>
+          <text x="510" y="120" fill="#00e5ff" font-size="10" text-anchor="middle" font-family="monospace">Network</text>
+          
+          <!-- Add & Norm 2 -->
+          <rect x="420" y="150" width="80" height="35" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1"/>
+          <text x="460" y="172" fill="#00e676" font-size="9" text-anchor="middle" font-family="monospace">Add & Norm</text>
+          
+          <!-- 箭头 -->
+          <line x1="290" y1="140" x2="290" y2="150" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="240" y1="167" x2="420" y2="110" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="510" y1="140" x2="510" y2="150" stroke="#4a4a5d" stroke-width="1.5"/>
+          <line x1="460" y1="167" x2="290" y2="190" stroke="#4a4a5d" stroke-width="1.5"/>
+          
+          <!-- 重复层标注 -->
+          <line x1="150" y1="200" x2="150" y2="250" stroke="#4a4a5d" stroke-width="1" stroke-dasharray="4"/>
+          <line x1="650" y1="200" x2="650" y2="250" stroke="#4a4a5d" stroke-width="1" stroke-dasharray="4"/>
+          <text x="400" y="240" fill="#b0b3c0" font-size="10" text-anchor="middle" font-family="monospace">× 12 (BERT-Base) 或 × 24 (BERT-Large)</text>
+          
+          <!-- 输出层 -->
+          <rect x="50" y="0" width="700" height="30" rx="4" fill="rgba(255,60,172,0.1)" stroke="#ff3cac" stroke-width="1.5"/>
+          <text x="400" y="20" fill="#ff3cac" font-size="11" text-anchor="middle" font-family="monospace">输出: 每个token的上下文表示 (768维 或 1024维)</text>
+          
+          <!-- 箭头 -->
+          <line x1="400" y1="260" x2="400" y2="280" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,278 400,286 404,278" fill="#4a4a5d"/>
+          
+          <line x1="400" y1="325" x2="400" y2="340" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,338 400,346 404,338" fill="#4a4a5d"/>
+          
+          <line x1="400" y1="230" x2="400" y2="240" stroke="#4a4a5d" stroke-width="2"/>
+          <polygon points="396,238 400,246 404,238" fill="#4a4a5d"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: 预训练任务 -->
+  <div class="slide slide-content" data-index="3">
+    <div class="section-tag">03 / 预训练</div>
+    <h2>预训练任务</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">掩码语言模型 (MLM)</h3>
+        <p>随机遮盖输入中<span class="highlight">15%</span>的token，让模型预测被遮盖的词。</p>
+        <ul style="margin-top:12px">
+          <li>80% 替换为 [MASK]</li>
+          <li>10% 替换为随机词</li>
+          <li>10% 保持不变</li>
+        </ul>
+        <p style="margin-top:12px; font-size:13px">这让模型学习<span class="highlight">双向</span>上下文表示</p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">下一句预测 (NSP)</h3>
+        <p>判断两个句子是否是<span class="highlight-purple">连续</span>的。</p>
+        <ul style="margin-top:12px">
+          <li>50% 正样本（真实下一句）</li>
+          <li>50% 负样本（随机拼接）</li>
+        </ul>
+        <p style="margin-top:12px; font-size:13px">让模型学习句子间的关系</p>
+      </div>
+      <div class="card" style="grid-column: span 2">
+        <h3>MLM 示例</h3>
+        <svg viewBox="0 0 800 120" style="width:100%; margin-top:12px">
+          <!-- 原始句子 -->
+          <text x="50" y="30" fill="#b0b3c0" font-size="11" font-family="monospace">原始: The cat sat on the mat</text>
+          
+          <!-- 遮盖后 -->
+          <text x="50" y="65" fill="#eef0f6" font-size="11" font-family="monospace">输入: The cat sat on the [MASK]</text>
+          
+          <!-- 预测 -->
+          <text x="50" y="100" fill="#00e5ff" font-size="11" font-family="monospace">预测: [MASK] → "mat" (概率最高)</text>
+          
+          <!-- 高亮框 -->
+          <rect x="305" y="50" width="70" height="25" rx="3" fill="rgba(255,171,0,0.2)" stroke="#ffab00" stroke-width="1.5"/>
+          <text x="340" y="67" fill="#ffab00" font-size="11" text-anchor="middle" font-family="monospace">[MASK]</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 输入表示 -->
+  <div class="slide slide-content" data-index="4">
+    <div class="section-tag">04 / 输入表示</div>
+    <h2>输入表示</h2>
+    <div class="card-grid">
+      <div class="card" style="grid-column: span 2">
+        <h3>输入嵌入组成</h3>
+        <svg viewBox="0 0 800 300" style="width:100%; margin-top:16px">
+          <!-- Token Embedding -->
+          <rect x="50" y="20" width="700" height="60" rx="4" fill="rgba(0,229,255,0.1)" stroke="#00e5ff" stroke-width="1.5"/>
+          <text x="80" y="50" fill="#00e5ff" font-size="11" font-weight="bold" font-family="monospace">Token Embedding</text>
+          <text x="300" y="50" fill="#b0b3c0" font-size="10" font-family="monospace">[CLS] The cat sat on the [MASK] mat [SEP]</text>
+          
+          <!-- Segment Embedding -->
+          <rect x="50" y="90" width="700" height="60" rx="4" fill="rgba(124,77,255,0.1)" stroke="#7c4dff" stroke-width="1.5"/>
+          <text x="80" y="120" fill="#7c4dff" font-size="11" font-weight="bold" font-family="monospace">Segment Embedding</text>
+          <text x="300" y="120" fill="#b0b3c0" font-size="10" font-family="monospace">  A    A   A   A   A  A   A   A    B</text>
+          
+          <!-- Position Embedding -->
+          <rect x="50" y="160" width="700" height="60" rx="4" fill="rgba(0,230,118,0.1)" stroke="#00e676" stroke-width="1.5"/>
+          <text x="80" y="190" fill="#00e676" font-size="11" font-weight="bold" font-family="monospace">Position Embedding</text>
+          <text x="300" y="190" fill="#b0b3c0" font-size="10" font-family="monospace">  0    1   2   3   4  5   6   7    8</text>
+          
+          <!-- 加号 -->
+          <text x="400" y="240" fill="#ffab00" font-size="20" text-anchor="middle" font-weight="bold">+</text>
+          
+          <!-- 输出 -->
+          <rect x="200" y="260" width="400" height="30" rx="4" fill="rgba(255,171,0,0.1)" stroke="#ffab00" stroke-width="1.5"/>
+          <text x="400" y="280" fill="#ffab00" font-size="11" text-anchor="middle" font-family="monospace">最终输入表示 = Token + Segment + Position</text>
+        </svg>
+      </div>
+      <div class="card">
+        <h3>特殊Token</h3>
+        <ul>
+          <li><span class="highlight">[CLS]</span>：分类标记，用于句子级任务</li>
+          <li><span class="highlight-purple">[SEP]</span>：分隔符，分隔两个句子</li>
+          <li><span class="highlight-yellow">[MASK]</span>：遮盖标记，用于MLM</li>
+          <li><span class="highlight-green">[PAD]</span>：填充标记，对齐长度</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Segment Embedding</h3>
+        <p>用于区分<span class="highlight">句子A</span>和<span class="highlight-purple">句子B</span>，帮助模型理解句子边界。</p>
+        <p style="margin-top:12px">对于单句任务，全部使用Segment A。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: 微调 -->
+  <div class="slide slide-content" data-index="5">
+    <div class="section-tag">05 / 微调</div>
+    <h2>下游任务微调</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3 style="color:var(--accent)">文本分类</h3>
+        <p>使用<span class="highlight">[CLS]</span> token的输出进行分类。</p>
+        <ul style="margin-top:12px">
+          <li>情感分析</li>
+          <li>垃圾邮件检测</li>
+          <li>主题分类</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-2)">序列标注</h3>
+        <p>使用<span class="highlight-purple">每个token</span>的输出进行标注。</p>
+        <ul style="margin-top:12px">
+          <li>命名实体识别(NER)</li>
+          <li>词性标注(POS)</li>
+          <li>语义角色标注</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">问答系统</h3>
+        <p>预测答案在文本中的<span class="highlight-green">起始和结束位置</span>。</p>
+        <ul style="margin-top:12px">
+          <li>抽取式问答</li>
+          <li>SQuAD数据集</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--accent-3)">句子对任务</h3>
+        <p>判断两个句子的<span class="highlight-yellow">关系</span>。</p>
+        <ul style="margin-top:12px">
+          <li>自然语言推理(NLI)</li>
+          <li>语义相似度</li>
+          <li>释义检测</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: BERT变体 -->
+  <div class="slide slide-content" data-index="6">
+    <div class="section-tag">06 / 变体</div>
+    <h2>BERT 变体</h2>
+    <div class="card-grid cols-3">
+      <div class="card">
+        <h3>RoBERTa</h3>
+        <p><span class="highlight">更强的训练策略</span></p>
+        <ul style="margin-top:8px">
+          <li>移除NSP任务</li>
+          <li>动态掩码</li>
+          <li>更多数据，更大batch</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>ALBERT</h3>
+        <p><span class="highlight-purple">参数压缩</span></p>
+        <ul style="margin-top:8px">
+          <li>因式分解嵌入</li>
+          <li>跨层参数共享</li>
+          <li>参数量减少18x</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>DistilBERT</h3>
+        <p><span class="highlight-green">知识蒸馏</span></p>
+        <ul style="margin-top:8px">
+          <li>6层，66M参数</li>
+          <li>保持97%性能</li>
+          <li>推理速度快60%</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>DeBERTa</h3>
+        <p><span class="highlight-yellow">解耦注意力</span></p>
+        <ul style="margin-top:8px">
+          <li>内容和位置分离</li>
+          <li>增强的掩码解码器</li>
+          <li>多项SOTA记录</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>ELECTRA</h3>
+        <p><span class="highlight-pink">替换token检测</span></p>
+        <ul style="margin-top:8px">
+          <li>生成器+判别器</li>
+          <li>更高效的训练</li>
+          <li>小模型效果好</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>SpanBERT</h3>
+        <p><span class="highlight">跨度预测</span></p>
+        <ul style="margin-top:8px">
+          <li>遮盖连续span</li>
+          <li>跨度边界预测</li>
+          <li>更适合问答任务</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 总结 -->
+  <div class="slide slide-summary" data-index="7">
+    <div class="section-tag">总结</div>
+    <h2>BERT 的核心贡献</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-icon">↔</div>
+        <div>
+          <h3>双向上下文</h3>
+          <p>通过MLM任务，让模型同时学习左右两侧的上下文信息，突破了单向语言模型的限制。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">🔄</div>
+        <div>
+          <h3>预训练+微调范式</h3>
+          <p>奠定了"大规模预训练+下游任务微调"的范式，成为现代NLP的标准流程。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">📊</div>
+        <div>
+          <h3>通用语言表示</h3>
+          <p>证明了在大规模文本上预训练可以学到通用的语言知识，适用于各种NLP任务。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">🚀</div>
+        <div>
+          <h3>开启大模型时代</h3>
+          <p>BERT的成功直接推动了GPT、T5等更大规模模型的发展，开启了大语言模型时代。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 导航栏 -->
+<div class="nav-bar">
+  <div class="nav-progress" id="navProgress"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <span class="nav-page" id="pageIndicator">1 / 8</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  const navProgress = document.getElementById('navProgress');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    navProgress.appendChild(dot);
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+  }
+
+  function navigate(dir) {
+    goTo(currentSlide + dir);
+  }
+
+  function updateNav() {
+    document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+      dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    });
+    document.getElementById('pageIndicator').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    document.getElementById('btnPrev').disabled = currentSlide === 0;
+    document.getElementById('btnNext').disabled = currentSlide === totalSlides - 1;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      navigate(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      navigate(-1);
+    }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) navigate(1);
+      else navigate(-1);
+    }
+  });
+
+  updateNav();
+</script>
+
+</body>
+</html>
