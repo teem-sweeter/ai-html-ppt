@@ -31,6 +31,13 @@
         "description": "从数学基础到工业部署的完整进阶之路",
         "file": "presentation.html",
         "totalSlides": 17
+      },
+      {
+        "id": "cnn-backbone",
+        "title": "CNN骨干网络演进",
+        "description": "从LeNet到EfficientNet的卷积神经网络发展历程",
+        "file": "presentation.html",
+        "totalSlides": 11
       }
     ]
   }

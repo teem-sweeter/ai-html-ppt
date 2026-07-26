@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNN骨干网络演进</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface-2: #1a1a26;
+    --accent: #00e5ff;
+    --accent-2: #7c4dff;
+    --accent-3: #ff6d00;
+    --text-primary: #eef0f6;
+    --text-muted: #b0b3c0;
+    --green: #00e676;
+    --grid-border: #4a4a5d;
+    --highlight: #ffab00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans SC', 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0s 0.6s;
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* 标题页 */
+  .slide-title {
+    background: radial-gradient(ellipse at 30% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(124, 77, 255, 0.06) 0%, transparent 50%),
+                var(--bg);
+    text-align: center;
+  }
+
+  .slide-title .tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 40px;
+  }
+
+  .slide-title h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #ffffff 0%, #b0b8d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title h1 span {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-title .subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+
+  .slide-title .hint {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+
+  /* 内容页 */
+  .slide-content {
+    align-items: flex-start;
+    background: var(--bg);
+  }
+
+  .section-tag {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--accent-2);
+    margin-bottom: 16px;
+    opacity: 0.85;
+  }
+
+  h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  /* 卡片网格 */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .card {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .card:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .card:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .card:nth-child(4) { animation-delay: 0.3s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .card:nth-child(1)::before { background: var(--accent); }
+  .card:nth-child(2)::before { background: var(--accent-2); }
+  .card:nth-child(3)::before { background: var(--green); }
+  .card:nth-child(4)::before { background: var(--accent-3); }
+
+  .card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+  }
+
+  .card p, .card li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .card ul li {
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .card ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .highlight { color: var(--accent); font-weight: 600; }
+  .highlight-pink { color: var(--accent-2); font-weight: 600; }
+  .highlight-green { color: var(--green); font-weight: 600; }
+  .highlight-yellow { color: var(--highlight); font-weight: 600; }
+
+  /* 时间线 */
+  .timeline {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+    padding: 20px 0;
+  }
+
+  .timeline-item {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 8px;
+    min-width: 150px;
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  .slide.active .timeline-item {
+    animation: fadeRight 0.5s ease forwards;
+  }
+
+  .slide.active .timeline-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .timeline-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .timeline-item:nth-child(4) { animation-delay: 0.3s; }
+  .slide.active .timeline-item:nth-child(5) { animation-delay: 0.4s; }
+
+  @keyframes fadeRight {
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .timeline-item .year {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .timeline-item .name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .timeline-item .desc {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* 公式框 */
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .formula-main {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .formula-note {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* 总结页 */
+  .slide-summary {
+    background: var(--bg);
+    align-items: center;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .summary-item {
+    display: flex;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    border-radius: 6px;
+    padding: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .slide.active .summary-item {
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .slide.active .summary-item:nth-child(2) { animation-delay: 0.1s; }
+  .slide.active .summary-item:nth-child(3) { animation-delay: 0.2s; }
+  .slide.active .summary-item:nth-child(4) { animation-delay: 0.3s; }
+
+  .summary-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: rgba(0, 229, 255, 0.1);
+    color: var(--accent);
+  }
+
+  .summary-item h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .summary-item p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  /* 导航栏 */
+  .nav-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.04);
+    z-index: 100;
+  }
+
+  .nav-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--grid-border);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .nav-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .nav-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .nav-btn {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--grid-border);
+    color: var(--text-muted);
+    padding: 6px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+  }
+
+  .nav-page {
+    font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 12px;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 30px 24px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .card-grid.cols-3 { grid-template-columns: 1fr; }
+    .card-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .timeline { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- SLIDE 0: 标题页 -->
+  <div class="slide slide-title active" data-index="0">
+    <div class="tag">Computer Vision · CNN</div>
+    <h1>CNN<span>骨干网络</span>演进</h1>
+    <p class="subtitle">从 LeNet 到 EfficientNet — 卷积神经网络的发展历程</p>
+    <div class="hint">按 → 或点击底部导航切换页面</div>
+  </div>
+
+  <!-- SLIDE 1: 发展历程 -->
+  <div class="slide slide-content" data-index="1">
+    <div class="section-tag">01 / 概述</div>
+    <h2>CNN 骨干网络发展历程</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="year">1998</div>
+        <div class="name">LeNet</div>
+        <div class="desc">CNN开山之作</div>
+      </div>
+      <div class="timeline-item">
+        <div class="year">2012</div>
+        <div class="name">AlexNet</div>
+        <div class="desc">深度学习复兴</div>
+      </div>
+      <div class="timeline-item">
+        <div class="year">2014</div>
+        <div class="name">VGG</div>
+        <div class="desc">小卷积核堆叠</div>
+      </div>
+      <div class="timeline-item">
+        <div class="year">2014</div>
+        <div class="name">GoogLeNet</div>
+        <div class="desc">Inception模块</div>
+      </div>
+      <div class="timeline-item">
+        <div class="year">2015</div>
+        <div class="name">ResNet</div>
+        <div class="desc">残差连接</div>
+      </div>
+      <div class="timeline-item">
+        <div class="year">2017</div>
+        <div class="name">MobileNet</div>
+        <div class="desc">轻量化网络</div>
+      </div>
+      <div class="timeline-item">
+        <div class="year">2019</div>
+        <div class="name">EfficientNet</div>
+        <div class="desc">复合缩放</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: LeNet -->
+  <div class="slide slide-content" data-index="2">
+    <div class="section-tag">02 / 开山之作</div>
+    <h2>LeNet-5 (1998)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>网络结构</h3>
+        <ul>
+          <li>输入：32×32 灰度图</li>
+          <li>2层卷积 + 2层池化</li>
+          <li>3层全连接</li>
+          <li>输出：10类数字</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>核心创新</h3>
+        <ul>
+          <li><span class="highlight">卷积层</span>：局部感受野</li>
+          <li><span class="highlight">池化层</span>：下采样</li>
+          <li>权值共享：减少参数</li>
+          <li>证明了CNN的有效性</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>历史意义</h3>
+        <p>第一个成功的CNN架构，证明了卷积神经网络在图像识别任务上的有效性，为后续所有CNN架构奠定了基础。</p>
+      </div>
+      <div class="card">
+        <h3>局限性</h3>
+        <p>网络较浅，只能处理简单任务（手写数字识别），无法处理复杂图像。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: AlexNet -->
+  <div class="slide slide-content" data-index="3">
+    <div class="section-tag">03 / 深度学习复兴</div>
+    <h2>AlexNet (2012)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>网络结构</h3>
+        <ul>
+          <li>输入：227×227×3 RGB图像</li>
+          <li>5层卷积 + 3层全连接</li>
+          <li>约6000万参数</li>
+          <li>ImageNet Top-5: 15.3%</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>核心创新</h3>
+        <ul>
+          <li><span class="highlight">ReLU激活函数</span>：解决梯度消失</li>
+          <li><span class="highlight">Dropout</span>：防止过拟合</li>
+          <li>GPU并行训练</li>
+          <li>数据增强技术</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>历史意义</h3>
+        <p>在ImageNet竞赛中大幅领先传统方法，开启了深度学习时代，证明了深层网络+大数据+GPU的强大组合。</p>
+      </div>
+      <div class="card">
+        <h3>关键突破</h3>
+        <ul>
+          <li>ReLU替代Sigmoid，加速训练</li>
+          <li>Dropout正则化技术</li>
+          <li>GPU训练的先驱</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: VGG -->
+  <div class="slide slide-content" data-index="4">
+    <div class="section-tag">04 / 小卷积核哲学</div>
+    <h2>VGGNet (2014)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>核心思想</h3>
+        <p>用多个<span class="highlight">3×3小卷积核</span>堆叠替代大卷积核，增加网络深度同时减少参数。</p>
+        <p style="margin-top:12px">两个3×3卷积的感受野 = 一个5×5卷积</p>
+      </div>
+      <div class="card">
+        <h3>网络变体</h3>
+        <ul>
+          <li>VGG-11：11层</li>
+          <li>VGG-13：13层</li>
+          <li>VGG-16：16层</li>
+          <li>VGG-19：19层</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>设计原则</h3>
+        <ul>
+          <li>统一使用3×3卷积核</li>
+          <li>统一使用2×2最大池化</li>
+          <li>通道数逐层翻倍：64→128→256→512</li>
+          <li>结构规整，易于实现</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>影响</h3>
+        <p>证明了<strong>网络深度</strong>对性能的重要性，3×3小卷积核成为后续CNN的标准配置。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: GoogLeNet -->
+  <div class="slide slide-content" data-index="5">
+    <div class="section-tag">05 / 多尺度特征</div>
+    <h2>GoogLeNet / Inception (2014)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Inception模块</h3>
+        <p>并行使用不同大小的卷积核，提取<span class="highlight">多尺度特征</span>后拼接。</p>
+        <ul style="margin-top:12px">
+          <li>1×1卷积</li>
+          <li>3×3卷积</li>
+          <li>5×5卷积</li>
+          <li>3×3最大池化</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>核心创新</h3>
+        <ul>
+          <li><span class="highlight">1×1卷积</span>：降维，减少计算量</li>
+          <li>多尺度并行特征提取</li>
+          <li>全局平均池化替代全连接</li>
+          <li>22层深度，仅500万参数</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>1×1卷积的作用</h3>
+        <p>在3×3和5×5卷积前使用1×1卷积<span class="highlight-pink">降维</span>，大幅减少计算量，同时增加非线性。</p>
+      </div>
+      <div class="card">
+        <h3>历史意义</h3>
+        <p>证明了网络<strong>宽度</strong>和<strong>深度</strong>同样重要，Inception模块成为经典设计模式。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: ResNet -->
+  <div class="slide slide-content" data-index="6">
+    <div class="section-tag">06 / 残差学习</div>
+    <h2>ResNet (2015)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>核心问题</h3>
+        <p>网络加深后，训练误差反而上升（<span class="highlight-pink">退化问题</span>），不是过拟合，而是训练困难。</p>
+      </div>
+      <div class="card">
+        <h3>残差连接</h3>
+        <div class="formula-box" style="max-width:100%; margin-top:12px">
+          <div class="formula-main" style="font-size:18px">y = F(x) + x</div>
+          <div class="formula-note">学习残差而非直接学习映射</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>为什么有效</h3>
+        <ul>
+          <li>梯度可以通过<span class="highlight">跳跃连接</span>直接传播</li>
+          <li>恒等映射很容易学习</li>
+          <li>解决深层网络的梯度消失</li>
+          <li>可训练100+层网络</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>历史意义</h3>
+        <p>ResNet是CNN历史上最重要的突破之一，残差连接成为现代深度学习的标配，影响了Transformer等后续架构。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: DenseNet -->
+  <div class="slide slide-content" data-index="7">
+    <div class="section-tag">07 / 特征复用</div>
+    <h2>DenseNet (2017)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>核心思想</h3>
+        <p>每一层都与前面所有层<span class="highlight">直接连接</span>，极致的特征复用。</p>
+        <p style="margin-top:12px">xₗ = Hₗ([x₀, x₁, ..., xₗ₋₁])</p>
+      </div>
+      <div class="card">
+        <h3>Dense Block</h3>
+        <ul>
+          <li>每一层接收所有前面层的输出</li>
+          <li>特征图在通道维度拼接</li>
+          <li>增长率(growth rate)控制新增通道数</li>
+          <li>参数效率极高</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>优势</h3>
+        <ul>
+          <li><span class="highlight-green">特征复用</span>：减少冗余</li>
+          <li>梯度流畅通</li>
+          <li>参数效率高</li>
+          <li>一定的正则化效果</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>与ResNet对比</h3>
+        <p>ResNet是<strong>相加</strong>（add），DenseNet是<strong>拼接</strong>（concat）。DenseNet特征复用更彻底，但显存占用更大。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: MobileNet -->
+  <div class="slide slide-content" data-index="8">
+    <div class="section-tag">08 / 轻量化网络</div>
+    <h2>MobileNet 系列</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>MobileNet V1</h3>
+        <p><span class="highlight">深度可分离卷积</span>：将标准卷积分解为：</p>
+        <ul style="margin-top:12px">
+          <li>Depthwise Conv：逐通道卷积</li>
+          <li>Pointwise Conv：1×1卷积</li>
+        </ul>
+        <p style="margin-top:12px">计算量减少 8~9 倍</p>
+      </div>
+      <div class="card">
+        <h3>MobileNet V2</h3>
+        <ul>
+          <li><span class="highlight">倒残差结构</span>：先升维再降维</li>
+          <li>Linear Bottleneck：去除ReLU</li>
+          <li>残差连接在低维空间</li>
+          <li>更适合移动端</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>MobileNet V3</h3>
+        <ul>
+          <li><span class="highlight">SE模块</span>：通道注意力</li>
+          <li>NAS搜索网络结构</li>
+          <li>h-swish激活函数</li>
+          <li>性能与效率的最佳平衡</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>应用场景</h3>
+        <p>移动端、嵌入式设备、实时推理等对计算资源有限制的场景。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: EfficientNet -->
+  <div class="slide slide-content" data-index="9">
+    <div class="section-tag">09 / 复合缩放</div>
+    <h2>EfficientNet (2019)</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>核心思想</h3>
+        <p>同时平衡网络的<span class="highlight">深度</span>、<span class="highlight">宽度</span>和<span class="highlight">分辨率</span>三个维度。</p>
+      </div>
+      <div class="card">
+        <h3>复合缩放</h3>
+        <div class="formula-box" style="max-width:100%; margin-top:12px">
+          <div class="formula-main" style="font-size:16px">depth: d = α^φ</div>
+          <div class="formula-main" style="font-size:16px">width: w = β^φ</div>
+          <div class="formula-main" style="font-size:16px">resolution: r = γ^φ</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>EfficientNet-B0</h3>
+        <ul>
+          <li>NAS搜索基础网络</li>
+          <li>MBConv模块（倒残差）</li>
+          <li>SE注意力模块</li>
+          <li>Swish激活函数</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>性能表现</h3>
+        <p>EfficientNet-B7在ImageNet上达到<span class="highlight-green">84.3% Top-1</span>，同时比当时最优模型小8.4倍、快6.3倍。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: 总结 -->
+  <div class="slide slide-summary" data-index="10">
+    <div class="section-tag">总结</div>
+    <h2>CNN 骨干网络的核心演进</h2>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-icon">↓</div>
+        <div>
+          <h3>网络深度</h3>
+          <p>从LeNet的5层到ResNet的152层，残差连接解决了深层网络的训练问题。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">◎</div>
+        <div>
+          <h3>计算效率</h3>
+          <p>深度可分离卷积、1×1卷积降维、复合缩放等技术大幅提升效率。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">↔</div>
+        <div>
+          <h3>多尺度特征</h3>
+          <p>Inception模块、FPN等技术让网络能捕捉不同尺度的特征。</p>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-icon">⚡</div>
+        <div>
+          <h3>轻量化部署</h3>
+          <p>MobileNet、EfficientNet等网络让深度学习可以在移动端运行。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 导航栏 -->
+<div class="nav-bar">
+  <div class="nav-progress" id="navProgress"></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">← Prev</button>
+    <span class="nav-page" id="pageIndicator">1 / 11</span>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+
+  const navProgress = document.getElementById('navProgress');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    navProgress.appendChild(dot);
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateNav();
+  }
+
+  function navigate(dir) {
+    goTo(currentSlide + dir);
+  }
+
+  function updateNav() {
+    document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+      dot.className = 'nav-dot' + (i === currentSlide ? ' active' : '');
+    });
+    document.getElementById('pageIndicator').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    document.getElementById('btnPrev').disabled = currentSlide === 0;
+    document.getElementById('btnNext').disabled = currentSlide === totalSlides - 1;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      navigate(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      navigate(-1);
+    }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 60) {
+      if (diff > 0) navigate(1);
+      else navigate(-1);
+    }
+  });
+
+  updateNav();
+</script>
+
+</body>
+</html>
