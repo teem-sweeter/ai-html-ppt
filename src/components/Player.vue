@@ -303,17 +303,22 @@ onUnmounted(() => {
 .player {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: var(--bg);
+  padding: 24px;
 }
 
 .slide-container {
-  flex: 1;
   width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
   background: var(--surface);
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .slide-iframe {
