@@ -42,9 +42,8 @@ defineEmits<{
 <style scoped>
 .progress-bar {
   padding: 1rem 2rem;
-  background: rgba(10, 10, 15, 0.85);
-  backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255,255,255,0.04);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

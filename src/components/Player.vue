@@ -40,6 +40,7 @@ interface Presentation {
 const props = defineProps<{
   presentation: Presentation
   currentPage: number
+  isDark?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -90,9 +91,29 @@ function injectControlScript() {
       if (navBar) navBar.style.display = 'none';
       var pres = document.querySelector('.presentation');
       if (pres) { pres.style.width = '100vw'; pres.style.height = '100vh'; }
+      
+      // 主题切换支持
       window.addEventListener('message', function(e) {
         if (e.data && e.data.type === 'goToSlide') {
           if (typeof goTo === 'function') { goTo(e.data.index); }
+        }
+        if (e.data && e.data.type === 'themeChange') {
+          var root = document.documentElement;
+          if (e.data.isDark) {
+            root.style.setProperty('--bg', '#0a0a0f');
+            root.style.setProperty('--surface', '#12121a');
+            root.style.setProperty('--surface-2', '#1a1a26');
+            root.style.setProperty('--text-primary', '#eef0f6');
+            root.style.setProperty('--text-muted', '#6b6d7b');
+            root.style.setProperty('--grid-border', '#2a2a3d');
+          } else {
+            root.style.setProperty('--bg', '#ffffff');
+            root.style.setProperty('--surface', '#f5f5f7');
+            root.style.setProperty('--surface-2', '#e8e8ed');
+            root.style.setProperty('--text-primary', '#1d1d1f');
+            root.style.setProperty('--text-muted', '#86868b');
+            root.style.setProperty('--grid-border', '#d2d2d7');
+          }
         }
       });
     `
@@ -101,6 +122,13 @@ function injectControlScript() {
     console.error('inject script error:', e)
   }
 }
+
+// 监听主题变化
+watch(() => props.isDark, (newVal) => {
+  if (iframeRef.value?.contentWindow) {
+    iframeRef.value.contentWindow.postMessage({ type: 'themeChange', isDark: newVal }, '*')
+  }
+})
 
 // 全屏
 function toggleFullscreen() {

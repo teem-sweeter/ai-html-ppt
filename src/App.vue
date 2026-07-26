@@ -8,6 +8,7 @@ import { PRESENTATIONS, workspacesReady } from './presentations/registry'
 const currentPptId = ref('pooling')
 const currentPage = ref(0)
 const ready = ref(false)
+const isDark = ref(true)
 
 const currentPresentation = computed(() => {
   return PRESENTATIONS.find(p => p.id === currentPptId.value) || PRESENTATIONS[0]
@@ -29,6 +30,12 @@ onMounted(async () => {
   if (page && !isNaN(Number(page))) {
     currentPage.value = Number(page)
   }
+
+  // 读取主题设置
+  const savedTheme = localStorage.getItem('theme')
+  if (savedTheme) {
+    isDark.value = savedTheme === 'dark'
+  }
 })
 
 // 更新URL查询参数
@@ -46,6 +53,11 @@ watch([currentPptId, currentPage], updateUrl)
 watch(currentPptId, () => {
   currentPage.value = 0
 })
+
+// 监听主题变化
+watch(isDark, (newVal) => {
+  localStorage.setItem('theme', newVal ? 'dark' : 'light')
+})
 </script>
 
 <template>
@@ -53,12 +65,14 @@ watch(currentPptId, () => {
     <Sidebar 
       :current-ppt-id="currentPptId"
       @update:current-ppt-id="currentPptId = $event"
+      @theme-change="isDark = $event"
     />
     <div class="main-content">
       <Player 
         v-if="currentPresentation"
         :presentation="currentPresentation"
         :current-page="currentPage"
+        :is-dark="isDark"
         @update:current-page="currentPage = $event"
       />
       <ProgressBar 

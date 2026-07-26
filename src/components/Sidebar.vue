@@ -41,8 +41,9 @@ defineProps<{
   currentPptId: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:currentPptId': [id: string]
+  'theme-change': [isDark: boolean]
 }>()
 
 const workspaces = WORKSPACES
@@ -56,6 +57,7 @@ function toggleTheme() {
   isDark.value = !isDark.value
   applyTheme()
   localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
+  emit('theme-change', isDark.value)
 }
 
 function applyTheme() {
